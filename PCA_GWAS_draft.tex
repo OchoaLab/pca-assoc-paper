@@ -60,7 +60,7 @@ The construction of trait simulation is based on a R package called "simtrait". 
 
 
 \subsection{Result Examination Method}
-In this paper, precision-recall curves (AUC) and uniformity p-value test (RMSD) will be used to test the performance of PCA under different scenarios.
+In this paper, precision-recall curves (AUC) and uniformity p-value test (RMSD) will be used to test the performance of PCA under different scenarios. Both two methods will be illustrated by boxplot.
 \subsubsection{Precision-Recall Curves (AUC)}
 Precision-recall curve (AUC) is a plot whose y-axis represents precision and x-axis represents recall. Precision is calculated as the number of true positives divided by sum of both true positives which indicates the performance of model in predicting positives. Similarly, recall measures the ratio of number of true negatives and sum of true negatives and false negatives, which measures the performance of model in predicting negatives. The higher value of AUC, the better performance of statistical model.
 \subsubsection{Uniform P-Value Test (RMSD)}
@@ -79,19 +79,26 @@ In some aspects, PCA GWAS can be deemed as equivalent to linear regression, base
 
 \section{Result}
 \subsection{RMSD Evaluation}
+\subsubsection{No Family Structure}
 We compare the performances of PCA with different quantity of eigenvectors when the number of sub-population (k) equals to 10 and 50 separately in terms of RMSD. In this case,  RMSD is used measure to find the optimal p under different situation. At each p, the simulations are repeated for 10 times in order to remove the extra variance.\\
 
 According to the result of RMSD box-plot of PCA when k equals to 10, it can be seen that RMSD values remain relatively high when p is smaller than 9, which satisfies the actual rank of genotype matrix (k-1). It illustrates that the performances of PCA are bad of piece of eigenvalues is smaller than rank of genotype. Additionally, there exists an obvious tendency that RMSD values decreases as p increases before p increases to 9. Once p reaches 9, RMSD value jump downwards immediately. After that, RMSD values are relatively small and stable. It shows that the piece of eigenvalues can not impose extra statistical power of PCA after p reaches the rank of genotype matrix\\
 
 Similarly to previous result, RMSD box-plot indicates that pieces of eigenvalues should be at least the rank of genotype matrix in order to obtain a good performance of PCA. Hence, these two examples show that RMSD requires p to be no smaller than the true rank of genotype matrix or number of sub-population minus 1.
+\subsubsection{Family Structure Exists}
+
 
 \subsection{AUC Evaluation}
+\subsubsection{No Family Structure}
 The situation of AUC evaluation is slightly different from RMSD evaluations. Although AUC still requires the piece of eigenvalues to be no smaller than the rank of genotype matrix, our simulation indicates that the AUC value will decrease when number of eigenvectors used in PCA is extremely large while the true rank of kinship matrix in small or sample size is small. It means the excessively adding number of eigenvectors in PCA will not strengthen the performance of PCA in GWAS.
-When sample size is 1000 and   
+When sample size is 1000, when PCs of eigenvectors used in PCA is among the interval from 1p to 100, there exists fluctuation in terms of AUC, but no obvious decreasing tendency. Then we test the AUC value with the same environment but increase PCs of eigenvector to 200 with 5 repeats. Compared with AUC values of PCs from 10 to 100, AUC values is much smaller when PCs is 200.\\
+ Considering the large calculation cost when PCs of eigenvectors used in PCA are large, we reduce the individual number from 1000 to 100. The reason for us to set the sample size to 100 is that it can better illustrate the tendency of AUC and save time for simulation. Based on the boxplot of AUC, it can be seen that the AUC will keep increasing when number of eigenvectors is smaller than 10. Once the PCs of eigenvectors reach 10, there exists a decreasing pattern of AUC though fluctuations exist. To better illustrate the pattern, we take absolute logarithm of AUC and then generate the boxplot again. In this case, the plot absolute logarithm of AUC has a bell-shaped and hence, it can be seen that the excessive use of eigenvector can impose negative influences on prediction accuracy.\\
+ \subsubsection{Family Structure Exists}
+
 
 \section{Discussion}
 \subsection{PCA GWAS fails without enough PCs}
-According to the result of our simulation, it can be seen that PCA perform poorly when the number of PCs is smaller than the ranks of genotype matrix or kinship matrix. 
+According to the result of our simulation, it can be seen that PCA perform poorly when the number of PCs is smaller than the ranks of genotype matrix or kinship matrix. When the number of PCs is smaller than rank of kinship matrix and genotype matrix, RMSD values will be quite high which indicates that there is no significant association among alleles and trait. In addition, AUC values will very low indicating bad performance of PCA in predicting positives. 
 \subsection{PCA GWAS still works even too many PCs are used}
 
 \subsection{PCA GWAS fails with the existence are close relatives }
