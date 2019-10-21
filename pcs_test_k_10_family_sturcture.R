@@ -28,7 +28,7 @@ option_list = list(
               help = "number of generations, for realistic local kinship", metavar = "int"),
   make_option("--herit", type = "double", default = 0.8, 
               help = "heritability", metavar = "double"),
-  make_option("--m_causal", type = "integer", default = 100, 
+  make_option("--m_causal", type = "integer", default = 10, 
               help = "num causal loci", metavar = "int"),
   make_option(c("-t", "--threads"), type = "integer", default = 1, 
               help = "number of threads (affects GCTA only)", metavar = "int")
@@ -86,12 +86,7 @@ simple <- opt$simple
   ############
   ### SIMS ###
   ############
-     
-  M_rmsd<-matrix(0,5,100)
-  M_auc<-matrix(0,5,100)
-  style <- read_tsv('style.txt', col_types = 'cci')
-  for (pcs in 1:50){
-    for (j in 1:5){
+
       sim_geno_trait_k3 <- function(
         # params of population structure
         n_ind = 100, # number of individuals (columns)
@@ -102,7 +97,7 @@ simple <- opt$simple
         # the family code gets triggered if generations > 1
         generations = 20, # number of generations (1 is unrelated founders)
         # params of complex trait
-        m_causal = 100,
+        m_causal = 10,
         herit = 0.8,
         verbose = TRUE, # to print messages
         low_mem = FALSE # for bnpsd::draw_all_admix
@@ -216,9 +211,14 @@ simple <- opt$simple
         )
       }
       
-  # simulate genotypes and trait as usual
+
+  M_rmsd<-matrix(0,5,100)
+  M_auc<-matrix(0,5,100)
+    
+  style <- read_tsv('style.txt', col_types = 'cci')
+     for (j in 1:1){  # simulate genotypes and trait as usual
   obj <- sim_geno_trait_k3(
-    n_ind = n_ind,
+    n_ind = 100,
     m_loci = m_loci,
     m_causal = m_causal,
     k_subpops = 10,
@@ -243,7 +243,8 @@ simple <- opt$simple
   stopifnot( nrow(X) == m_loci )
   stopifnot( ncol(admix_proportions) == k_subpops )
   
- 
+  for (pcs in 2:2){
+
 
     # compute true eigenvectors (for PCA oracle versions)
     eigenvectors <- kinship_to_evd(kinship)
@@ -258,7 +259,7 @@ simple <- opt$simple
   times_kin <- tibble(.rows = 1)
   times_gas <- tibble(.rows = 1)
   pvals <- tibble(.rows = m_loci)
-  
+
   
   ###########
   ### PCA ###
@@ -277,7 +278,8 @@ simple <- opt$simple
   times_gas[[name]] <- obj$runtime
   pvals[[name]] <- obj$pvals
   
-    
+  
+ 
   style <- read_tsv('style.txt', col_types = 'cci')
 
   
@@ -320,13 +322,12 @@ simple <- opt$simple
   p<-unlist(p)
   M_auc[j,pcs]<-p[2]
   M_rmsd[j,pcs]<-p[1]
+   
     }
  
     
   }
-  setwd("/dscrhome/yy222/fix_k/k_10")
+  setwd("/dscrhome/yy222/fix_k/family_structure")
   
-  write.table(M_auc, file="auc_k_fixed_k_10_pcs_2_50_family.txt")
-  write.table(M_rmsd, file="rmsd_k_fixed_k_10_pcs_2_50_family.txt")
-  
-  
+  write.table(M_auc, file="auc_k_fixed_k_10_pcs_2_30_n_100_9_27.txt")
+  write.table(M_rmsd, file="rmsd_k_fixed_k_10_pcs_30_n_100_9_27.txt")

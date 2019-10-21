@@ -49,6 +49,14 @@ According to the result of our simulation,
 
 \section{Method} 
 \subsection{Theory connecting to kinship}
+
+\subsection{PCA GWAS  is Equivalent to linear regression with covariate}
+The model in our project has the similar component of linear regression. The formula can be written as:
+$$Y=\vec{\mu} +\vec{ \beta}\vec{X}+\vec{	\gamma}\vec{PC}+\epsilon $$
+Here Y repesents the numerical value of trait of different individual and $\mu$ is the intercept. In addition to this, $\vec{ \beta}$ is coefficient of causal index and $\vec{ X}$ is causal index. Here we assume there exists 100 causal index in total and hence, $\vec{ \beta}$ is a 1*100 vector and $\vec{ X}$ is a 100*100 matrix. In the next part, $\vec{\gamma}$ is a vector of coefficient of Principal Components whose length depends on the number of PCs used in PCA and similarly, $\vec{PC}$ represents the matrix of principal component. The dimension of principal matrix also depends on the number of PCA. In the end, $\epsilon$ represnets the residual which follows a normal distribution $N(0,\sigma)$. Therefore, the formula of our model is quite similar to the structure of linear regression model and the major difference is the existence of $\vec{	\gamma}\vec{PC}$.\\
+In our simulation, each individual will be test 100000 SNPs (Single Nucleotide Polymorphism) and each for each loci (in total 100000), we will conduct linear regression separately.  The genotype of each loci will be combined with eigenvector of principal components matrix which is composed of eigenvectors we used in PCA.Regarding the eigenvector of principal component, it is calculated by decomposing the kinship matrix.  For each linear regression, we assume trait = $ \beta $*X+ $\epsilon$. Then, we estimate the coefficient $\beta$ by least square estimation and calculate the p-value through F statistics and since linear regressions are identical to each loci, it is a multiply hypothesis test. 
+
+
 \subsection{Admixture Simulation}
 The construction of admixture population is mainly based on admixture simulation of Alex (2016). The related code of admixture simulation has been uploaded to Github with a R package called "bnpsd".  Some parameters are changed in order to better simulate under different situation. According to Alex (2016), the number of independent loci is 30000, in this paper the number of independent locus is 10000. The default value of Alex (2016) is 3, whereas in this project, it can be variable. Considering the difference among number of sub-population, the sample size of $i_{th}$ sub-population will be set as the smaller integer of the ratio of total sample divided by number of sub-population.\\
 Regarding the family structure, the generation will be set to be 20 to simulate admixture population with the existence of family structure. Considering the large calculation cost during the generation process of admixture population with family structure, this data set will be treated as real data set. It will be used repeatedly to test performance of PCA under different situations with random traits.
@@ -57,19 +65,23 @@ Regarding the family structure, the generation will be set to be 20 to simulate 
 
 \subsection{Trait Simulation}
 The construction of trait simulation is based on a R package called "simtrait". This package constructs the complex trait simulation with user-defined causal loci and the desirable heritability of the trait. It can be used in both simulated data set and real data set if the kinship matrix is estimated correctly. \\
+In our simulation,the function of trait can be written as $$Trait=G+ \epsilon$$ 
+, where G represents the effect of genotype and $\epsilon$ represents the noise.  The noise follows a normal distribution with mean zero and variacne  equals to one minus hertability rate times desired parametric variance factor of the trait which is 1 in default. To obtain the genotype effect, marginal allele frequency will be calculated first and then, SNP will be randomly selected as causal index with random SNP coefficients. Then  coefficients of causal index will be scaled and centered to estimate the genotype effect, thereby obtaining the numerical value of traits of each causal loci.
 
 
 \subsection{Result Examination Method}
 In this paper, precision-recall curves (AUC) and uniformity p-value test (RMSD) will be used to test the performance of PCA under different scenarios. Both two methods will be illustrated by boxplot.
-\subsubsection{Precision-Recall Curves (AUC)}
+\subsubsection{Precision-Recall Curves}
 Precision-recall curve (AUC) is a plot whose y-axis represents precision and x-axis represents recall. Precision is calculated as the number of true positives divided by sum of both true positives which indicates the performance of model in predicting positives. Similarly, recall measures the ratio of number of true negatives and sum of true negatives and false negatives, which measures the performance of model in predicting negatives. The higher value of AUC, the better performance of statistical model.
 \subsubsection{Uniform P-Value Test (RMSD)}
-The
-For multiple independent and identical hypothesis tests, if the null hypothesis is true, the distribution of p-values will approximate to a uniform distribution [8]. In this paper,error metric (RMSD) is used to measure the performance of PCA in terms of p-values. The RMSD is calculated as the root of mean square of the difference among sorted p-values of null hypothesis and expected quantiles of sorted p-values of null hypothesis after removing causal indexes.The numerical values of RMSD is inversely  performance of PCA. The formula of RMSD is:
+Due to the existence of multiply hypothesis test in our simulation, the frequency of erroneous inferences will increase. Altough Bonferroni Correction can be used to deal with this problem, it can result in high false negative rate (FNR). The better strategy is to controlling the False Discovery Rate (FDR). FDR is calculated as the ratio of flase positives and the sum of true positives and false positives.For multiple independent and identical hypothesis tests, if the null hypothesis is true, the distribution of p-values will approximate to a uniform distribution [8]. In this case, a bette strategy is to use the q-value rather than p-value to control the FDR. Therefore, we should evaluate the performance of PCA by quantifying the distribution of p-value of null hypothesis. If distribution of p-vlaues of null hypothesis is significantly below the quantiles of uniform distribution, the resulting q-values are anti-conservative.Thus, we use root mean square deviation (RMSD) to measure the fittness of quantiles p-values to the expected quantiles of uniform distribution. The RMSD is calculated as the root of mean square of the difference among sorted p-values of null hypothesis and expected quantiles of sorted p-values of null hypothesis after removing causal indexes.The numerical values of RMSD is inversely  performance of PCA. The formula of RMSD is:
 $$RMSD=\sqrt{{(p_{uniform}-p_{null}})^2}$$
-where $p_{null}$ is a list of p-values of null hypothesis after removing causal index and $p_{uniform}$ is a list of expected quantiles of $p_{null}$ in uniform distribution.
-\subsection{PCA GWAS  is Equivalent to linear regression with covariate}
-In some aspects, PCA GWAS can be deemed as equivalent to linear regression, based on result of principal component analysis. The trait in PCA GWAS is regressed by principal component of covariates rather than the set of covariates. Typically, the high eigenvalues of covarites corresponding to high variance will be selected in PCA GWAS. 
+where $p_{null}$ is a list of p-values of null hypothesis after removing causal index and $p_{uniform}$ is a list of expected quantiles of $p_{null}$ in uniform distribution. \\
+
+In many other papers, genetic control is also used to detect or correct for stratification
+
+
+
 \subsection{Comparison among PCA and Existing Implementations }
 
 
