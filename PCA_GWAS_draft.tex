@@ -78,26 +78,28 @@ Due to the existence of multiply hypothesis test in our simulation, the frequenc
 $$RMSD=\sqrt{{(p_{uniform}-p_{null}})^2}$$
 where $p_{null}$ is a list of p-values of null hypothesis after removing causal index and $p_{uniform}$ is a list of expected quantiles of $p_{null}$ in uniform distribution. \\
 
-In many other papers, genetic control is also used to detect or correct for stratification
-
+In many other papers, genomic control is another popular approach to detect the existence of population stratification and written as $\lambda_{GC}$ . The definition of $\lambda_{GC}$ is median chi-square asscociation statistic which has one degree of freedom through SNPs divided by theoretical median based on the null hypothesis. Hence, if hte $\lambda_{GC}$ close to 1, it indicates that there is no or little population stratification. However, if $\lambda_{GC}$ is larger than 1 significantly, it means there exists population stratification, or other confounder factors. Genomic control $\lambda_{GC}$ only use median to measure the existence of stratification, whereas, RMSD make full use of data which should be more powerful. Hence, in this paper, RMSD is used to measure the performance of PCA in terms of p-value (type 1 error).
 
 
 \subsection{Comparison among PCA and Existing Implementations }
-
+SNP is one package on Github which aims to accelerate the computation of PCA.
 
 \subsection{true or biased kinship matrices has the same performance}
 
 
 
 \section{Result}
+
+We use simulation data where genotypes and trait will be simulated following procedure mentioned above. We first set the sample size to be 1000 and then, we reduce the sample size to 100 to investigate whether PCA still have similar performance under new scenario. We will conduct 10 times simulation so that the extra variance can be reduced. For each simulation, performance of PCA will be collected in terms of RMSD and AUC for PCs from 2 to 90. Also, real data set will also be introduced to test the performance of PCA and trait will be simulated in the same way to simulation data. Fianlly, We will test the performance of PCA when family structure exists with sample size equals to 1000.
 \subsection{RMSD Evaluation}
-\subsubsection{No Family Structure}
-We compare the performances of PCA with different quantity of eigenvectors when the number of sub-population (k) equals to 10 and 50 separately in terms of RMSD. In this case,  RMSD is used measure to find the optimal p under different situation. At each p, the simulations are repeated for 10 times in order to remove the extra variance.\\
+\subsubsection{No Family Structure $\&$ N=1000}
+RMSD is used to measure the approximation of distribution of p-values of null hypothesis to uniform distribution. If RMSD is low, it shows good control of FDR, whereas, high RMSD represents bad control of FDR. Results will be illustrated by boxplot which can demonstrate the distribution and tendency of test statistics. \\
+According to the result of RMSD boxplot of PCA when k equals to 10, it can be seen that RMSD values remain relatively high when p is smaller than 9, which satisfies the actual rank of genotype matrix or kinship matrix which is (k-1). It demonstrates that the distribution of p-values of null hypothesis deviates from the expected quantiles of uniform distribution and therefore, PCA fails to control FDR.Though the performance of PCA is relatively bad, there still exists an decreasing tendency. It indicates that when the number of PCs used in PCA is smaller than true rank of genotype matrix, PCA will benefit forom using more PCs in terms of controlling FDR. However, once the number of PCs used in PCA reaches the actual rank of genotype matrix or kinship matrix, the RSDM will junmp to a small value and in this case the RMSD will be XXX. It remains stable as the number of PCA increases. 
 
-According to the result of RMSD box-plot of PCA when k equals to 10, it can be seen that RMSD values remain relatively high when p is smaller than 9, which satisfies the actual rank of genotype matrix (k-1). It illustrates that the performances of PCA are bad of piece of eigenvalues is smaller than rank of genotype. Additionally, there exists an obvious tendency that RMSD values decreases as p increases before p increases to 9. Once p reaches 9, RMSD value jump downwards immediately. After that, RMSD values are relatively small and stable. It shows that the piece of eigenvalues can not impose extra statistical power of PCA after p reaches the rank of genotype matrix\\
+\subsubsection{No Family Structure $\&$ N=100}
+Here we reduce the sample size to 100 and in this scenario, there is not significant difference between boxplot of sample size equals to 1000 and boxplot of sample size equals to 100. PCA fails to control FDR when the number of PCs is smaller than rank of genotype matrix but there exists a decreasing tendency of RMSD. When the number of PCs no longer smaller than true rank of genotype matrix, RMSD will be small and keep stable. Hence, PCA is roboust to sample size in terms of FDR or type 1 error.
 
-Similarly to previous result, RMSD box-plot indicates that pieces of eigenvalues should be at least the rank of genotype matrix in order to obtain a good performance of PCA. Hence, these two examples show that RMSD requires p to be no smaller than the true rank of genotype matrix or number of sub-population minus 1.
-\subsubsection{Family Structure Exists}
+\subsubsection{Family Structure Exists $\&$ N=1000}
 
 
 \subsection{AUC Evaluation}
