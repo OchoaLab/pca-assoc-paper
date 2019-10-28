@@ -1,29 +1,15 @@
 \documentclass[12pt]{article}
 \usepackage{amsmath, amsthm, amssymb, pdfpages} 
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[capitalize]{cleveref}
 
 
-
-\title{GWAS PCA investigation (title pending)}
+\title{Test the Effectiveness of Principal Components in Adjusting for Relatedness in Genetic Association Studies}
 
 \author{Alex, Yiqi }
 
-
-\theoremstyle{definition}
-\newtheorem{df}{Definition}
-\newtheorem{ex}{Example}
-\newtheorem{as}{Assumption}
-\newtheorem{ax}{Axiom}
-\newtheorem{note}{Note}
-%\newtheorem{memo}{Memo}
-
-\theoremstyle{plain}
-\newtheorem{theorem}{Theorem}
-\newtheorem{lem}{Lemma}
-\newtheorem{prop}{Proposition}
-\newtheorem{cor}{Corollary}
-\newtheorem{assump}{Assumption}
-\newtheorem{claim}{Claim}
-\newtheorem{fact}{Fact}
 
 
 
@@ -74,7 +60,7 @@ In our simulation,the function of trait can be written as $$Y=G+ \epsilon$$
 \subsection{Result Examination Method}
 In this paper, precision-recall curves (AUC) and uniformity p-value test (RMSD) will be used to test the performance of PCA under different scenarios. Both two methods will be illustrated by boxplot.
 \subsubsection{Precision-Recall Curves}
-Precision-recall curve (AUC) is a plot whose y-axis represents precision and x-axis represents recall. Precision is calculated as the number of true positives divided by sum of both true positives which indicates the performance of model in predicting positives. Similarly, recall measures the ratio of number of true negatives and sum of true negatives and false negatives, which measures the performance of model in predicting negatives. The higher value of AUC, the better performance of statistical model.
+Precision-recall curve (AUC) is a plot whose y-axis represents precision and x-axis represents recall. Precision is calculated as the number of true positives divided by sum of both true positives which indicates the performance of model in predicting positives. Similarly, recall measures the ratio of number of true negatives and sum of true negatives and false negatives, which measures the performance of model in predicting negatives.Hence, the precision measures the relevancy of result which indicates the proportion of selected items are relevant. The recall shows the proportion of relevant items are selected. The precision and recall curve demonstrates the trade-oﬀ among precision and recall. The area under the curve (AUC) is calculated as the integration of curve of precision and recall and stands for the area under precision and recall curve. It measures the aggregated performance of through diﬀerent thresholds. The range of AUC is from 1 to 0. When AUC equals to 1, it can be interpreted as the predictions of model is $100\%$ correct, whereas, AUC equals to 0 indicates that all predictions of this model are wrong. 
 \subsubsection{Uniform P-Value Test (RMSD)}
 Due to the existence of multiply hypothesis test in our simulation, the frequency of erroneous inferences will increase. Altough Bonferroni Correction can be used to deal with this problem, it can result in high false negative rate (FNR). The better strategy is to controlling the False Discovery Rate (FDR). FDR is calculated as the ratio of flase positives and the sum of true positives and false positives.For multiple independent and identical hypothesis tests, if the null hypothesis is true, the distribution of p-values will approximate to a uniform distribution [8]. In this case, a bette strategy is to use the q-value rather than p-value to control the FDR. Therefore, we should evaluate the performance of PCA by quantifying the distribution of p-value of null hypothesis. If distribution of p-vlaues of null hypothesis is significantly below the quantiles of uniform distribution, the resulting q-values are anti-conservative.Thus, we use root mean square deviation (RMSD) to measure the fittness of quantiles p-values to the expected quantiles of uniform distribution. The RMSD is calculated as the root of mean square of the difference among sorted p-values of null hypothesis and expected quantiles of sorted p-values of null hypothesis after removing causal indexes.The numerical values of RMSD is inversely  performance of PCA. The formula of RMSD is:
 $$RMSD=\sqrt{{(p_{uniform}-p_{null}})^2}$$
@@ -92,22 +78,41 @@ SNP is one package on Github which aims to accelerate the computation of PCA.
 
 \section{Result}
 
-We use simulation data where genotypes and trait will be simulated following procedure mentioned above. We first set the sample size to be 1000 and then, we reduce the sample size to 100 to investigate whether PCA still have similar performance under new scenario. We will conduct 10 times simulation so that the extra variance can be reduced. For each simulation, performance of PCA will be collected in terms of RMSD and AUC for PCs from 2 to 90. Also, real data set will also be introduced to test the performance of PCA and trait will be simulated in the same way to simulation data. Fianlly, We will test the performance of PCA when family structure exists with sample size equals to 1000.
-\subsection{RMSD Evaluation}
-\subsubsection{No Family Structure $\&$ N=1000}
+We use simulation data where genotypes and trait will be simulated following procedure mentioned above. We first set the sample size to be 1000 and then, we reduce the sample size to 100 to investigate whether PCA still have similar performance under new scenario. We will conduct 10 times simulation so that the extra variance can be reduced. For each simulation, performance of PCA will be collected in terms of RMSD and AUC for PCs from 2 to 90. Also, real data set will also be introduced to test the performance of PCA and trait will be simulated in the same way to simulation data. Then, We will test the performance of PCA when family structure exists with sample size equals to 1000 and 100 separately. Finally, we test the performance of PCA with the existence of complex family structure and here we set the generation to be 20.
+
+\subsection{PCA performance under N=1000}
+\begin{figure}[bp!]
+  \centering
+  \includegraphics[width=4in]{C:/Users/yiqiy/Desktop/n=1000.pdf}
+  \caption{
+    {\bf boxplot of rmsd and auc}
+    The first panel is the boxplot of RMSD when sample size is 1000. Here the y axis represents value of rmsd and x axis is the number of PCs used in PCA.
+    The second panel is the boxplot of AUC and here y axis is value of AUC.}
+  \label{fig:example}
+\end{figure}
 RMSD is used to measure the approximation of distribution of p-values of null hypothesis to uniform distribution. If RMSD is low, it shows good control of FDR, whereas, high RMSD represents bad control of FDR. Results will be illustrated by boxplot which can demonstrate the distribution and tendency of test statistics. \\
-According to the result of RMSD boxplot of PCA when k equals to 10, it can be seen that RMSD values remain relatively high when p is smaller than 9, which satisfies the actual rank of genotype matrix or kinship matrix which is (k-1). It demonstrates that the distribution of p-values of null hypothesis deviates from the expected quantiles of uniform distribution and therefore, PCA fails to control FDR.Though the performance of PCA is relatively bad, there still exists an decreasing tendency. It indicates that when the number of PCs used in PCA is smaller than true rank of genotype matrix, PCA will benefit forom using more PCs in terms of controlling FDR. However, once the number of PCs used in PCA reaches the actual rank of genotype matrix or kinship matrix, the RSDM will junmp to a small value and in this case the RMSD will be XXX. It remains stable as the number of PCA increases. 
+According to the first panel in Figure 1 which is the boxplot of RSMD when the number of subpopulation is 10 and sample size is 1000, it can be seen that RMSD values remain relatively high when p is smaller than 9, which satisfies the actual rank of genotype matrix or kinship matrix which is (k-1). It demonstrates that the distribution of p-values of null hypothesis deviates from the expected quantiles of uniform distribution and therefore, PCA fails to control FDR.Though the performance of PCA is relatively bad, there still exists an decreasing tendency. It indicates that when the number of PCs used in PCA is smaller than true rank of genotype matrix, PCA will benefit forom using more PCs in terms of controlling FDR. However, once the number of PCs used in PCA reaches the actual rank of genotype matrix or kinship matrix, the RSDM will junmp to a small value and in this case the value of RMSD is close to 0. It remains stable as the number of PCA increases. Apart from this, it can be seen that before the number of PCs reaches the rank of genotype matrix, the distance among minimum and maximun of RMSD is larger. It tends to be smaller after number of PCs used in PCA is larger than the rank of genotype matrix, which shows less fluctuations in terms of type 1 error controlling.\\
 
-\subsubsection{No Family Structure $\&$ N=100}
-Here we reduce the sample size to 100 and in this scenario, there is not significant difference between boxplot of sample size equals to 1000 and boxplot of sample size equals to 100. PCA fails to control FDR when the number of PCs is smaller than rank of genotype matrix but there exists a decreasing tendency of RMSD. When the number of PCs no longer smaller than true rank of genotype matrix, RMSD will be small and keep stable. Hence, PCA is roboust to sample size in terms of FDR or type 1 error.
+The seond pandel of Figure 1 illustrates the pattern of AUC for the same scenario to the first panel. In this case, we can see a increasing tendency for AUC when the number of PCs is samller than the true rank of genotype or kinship matrix. Such a tendency indicates that the increase of number of PCs can increase predictive power of PCA when it is smaller than the rank of genotype matrix. Once the number of PCs used in PCA exceeds the rank of PCA, the value of AUC will be increased to around 0.8, which indicates that $80\%$ predictions of PCA are correct. After that, PCA does not benefit from adding more PCs as it can not increase the value of AUC obviously. Similarly, the range of AUC tends to be smaller than it when the number of PCs used in PCA is greater than rank of genotype matrix. \\
 
-\subsubsection{Family Structure Exists $\&$ N=1000}
 
-\subsubsection{No Family Structure}
-The situation of AUC evaluation is slightly different from RMSD evaluations. Although AUC still requires the piece of eigenvalues to be no smaller than the rank of genotype matrix, our simulation indicates that the AUC value will decrease when number of eigenvectors used in PCA is extremely large while the true rank of kinship matrix in small or sample size is small. It means the excessively adding number of eigenvectors in PCA will not strengthen the performance of PCA in GWAS.
-When sample size is 1000, when PCs of eigenvectors used in PCA is among the interval from 1p to 100, there exists fluctuation in terms of AUC, but no obvious decreasing tendency. Then we test the AUC value with the same environment but increase PCs of eigenvector to 200 with 5 repeats. Compared with AUC values of PCs from 10 to 100, AUC values is much smaller when PCs is 200.\\
- Considering the large calculation cost when PCs of eigenvectors used in PCA are large, we reduce the individual number from 1000 to 100. The reason for us to set the sample size to 100 is that it can better illustrate the tendency of AUC and save time for simulation. Based on the boxplot of AUC, it can be seen that the AUC will keep increasing when number of eigenvectors is smaller than 10. Once the PCs of eigenvectors reach 10, there exists a decreasing pattern of AUC though fluctuations exist. To better illustrate the pattern, we take absolute logarithm of AUC and then generate the boxplot again. In this case, the plot absolute logarithm of AUC has a bell-shaped and hence, it can be seen that the excessive use of eigenvector can impose negative influences on prediction accuracy.\\
- \subsubsection{Family Structure Exists}
+
+\subsubsection{PCA performance under N=100}
+
+Then we want to investigate the performance of PCA when samlpe size is samll. Here we set the sample size to be 100. From the first panel of Figure 2, it can be seen that the pattern is similar to the boxplot of RMSD in the case of sample size equals to 1000. It illustrates an decreasing when the number of PCs is smaller than true rank of genotype matrix. It indicates that PCA can better control type 1 error in this situation. If the number of PCs is greater than true rank of genotype matrix, the RSMD will decrease immediately and approximate to zero, which shows type 1 error is excellently controlled. Hence, PCA is insensitive to the smaple size in terms of RMSD or type 1 error controlling. \\
+
+Concerned with the boxplot of AUC, the pattern is obviously different from the boxplot of AUC when smaple size is 1000. Although we still can find an increasing pattern of AUC before the number of PCs reaches the k. However, it can be seen that there is an decreasing  
+\begin{figure}[bp!]
+  \centering
+  \includegraphics[width=4in]{C:/Users/yiqiy/Desktop/n=100.pdf}
+  \caption{
+    {\bf boxplot of rmsd and auc}
+    The first panel is the boxplot of RMSD when sample size is 1000. Here the y axis represents value of rmsd and x axis is the number of PCs used in PCA.
+    The second panel is the boxplot of AUC and here y axis is value of AUC.}
+  \label{fig:example}
+\end{figure}
+
+
 
 
 \section{Discussion}
@@ -162,5 +167,3 @@ $
 Simonsohn U, Nelson L D, Simmons J P. P-curve: a key to the file-drawer[J]. Journal of experimental psychology: General, 2014, 143(2): 534.
 $
 \end{document}
-
-
