@@ -4,48 +4,103 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage[capitalize]{cleveref}
-\usepackage{cite}
 
-\title{Test the Effectiveness of Principal Components in Adjusting for Relatedness in Genetic Association Studies}
+\title{Testing the effectiveness of principal components in adjusting for relatedness in genetic association studies}
+\author{Yiqi Yao, Alejandro Ochoa}
 
-\author{Alex, Yiqi }
+% To set proper spacing
+\renewcommand{\baselinestretch}{1.2}
 
-
-
-
-
-\usepackage{color}
-\newcommand{\myred}[1]{{\color{red} #1}}
-
-
-
-%%% To set proper spacing
-\usepackage[vcentering,dvips]{geometry} 
-\geometry{papersize={8.5in,11in},total={6.5in,8.5in}} 
-\renewcommand{\baselinestretch}{1.15}
 \begin{document}
-	\maketitle
-	
+\maketitle
 	
 \section{Introduction} 
 
-Genome-wide association study (GWAS) has been widely used to investigate whether target Single Nucleotide Polymorphism (SNP) is associated with certain trait (association study). However, considering admixture population is involved in recent study, failure to correct for population structure can reduce statistical power of GWAS. Hence, principal component analysis (PCA) which is a dimensionality-reduction method is used to provide examination for admixture population to identify the causal locus [2,3]. Although in recent study PCA has been a standard method to investigate the GWAS, doubts are cast on its statistical power and type one error controlling when comparing with other existing implementation such as linear mixed model (LMM) and Linear Regression (LM) [4]. Since current studies mainly focus on simple simulations or observation on real data, existing evaluation can be limited to fully investigate the type one error controlling and power of PCA. In this paper, both simulation and real data set are used to evaluate the performance of PCA under different situations and comparison are made between PCA, LM and LMM.\\
+The goal of a genome-wide association study (GWAS) is to identify loci whose genotypes are correlated significantly with a certain trait.
+An important assumption made by basic association tests is that genotypes at non-associated loci are drawn independently from a common allele frequency, so that they are in Hardy-Weinberg Equilibrium (HWE).
+However, HWE does not hold for structured populations, which includes multiethnic cohorts and admixed individuals.
+When approaches for association not designed for structured populations are incorrectly applied to structured populations, association statistics (such as $\chi^2$) become inflated relative to the null expectation, resulting in greater numbers of false positives than expected.
 
-In this paper, we run the simulation of PCA in the scenario of large sample size, small sample size and complex family stucture with desirbale admixture simulatoin and trait simulation. In addition to this, we also test the performance of LMM and LM with the samle situation to PCA to make comparison. We use the root mean square difference (RMSD) and areas under curve (AUC) to measure the type one error and power separately. In the case of large sample size, we find out that PCA has well control in both type one error and power when the number of Principal Components (PC) reaches the ture rank of genotype matrix or subpoulation minus one. However, PCA will be punished in power when the sample size is small and the number of PCs are much larger than the ture rank of genotype matrix but it is still robust to type one error. With the existence of family structure, the performance of PCA is not so well in type one error controlling but in terms of power, it is similar to the performance of PCA without complex family strcuture. Compared with the performance of LM, it can be seen that if the number of PCs used in PCA is larger than true rank of genotype matrix, PCA has better performance than LM in both type one error and power. Seldom do previous researches make comparison between PCA and LMM under the same situatoin directly. In this paper, we also test the performacne of LMM and PCA under the same situation. According to the results of simulation, it can be seen that LMM has similar performance to PCA in both large sample size and small sample size. However, LMM has advantage over PCA in terms of power and the advantage is more obvious when sample size is small. In the case of family structrue, we find the pattern of RMSD and AUC boxplots when complex family structure exists is close to boxplots without complex family strcuture. The RMSD value in the case of family structure exists approximates to 0.5, however, it approximates to 0 without family structure, which indicates that the existence of complex family structure will lead to wrose type one error controlling.\\
+Modern approaches for conducting genetic association studies with structured populations involve modeling the population structure via covariates.
+Such covariates may be inferred ancestry proportions or transformations of these.
+Principal components analysis (PCA) represents the most common of these variants, in which the top eigenvectors of the kinship matrix are used to model the population structure.
+These top eigenvectors are commonly referred to as Principal Components (PCs) in the genetics literature (the convention we adopt here), but it is worth noting that in other fields the PCs would instead denote the projections of the data onto the eigenvectors.
+Various works have found that PCs map to ancestry, and in GWAS work as well as ancestry but without the computational expense of inferring ancestry proportions.
 
-We want to use the result of this project to 
- 
-\section{Method} 
-\subsection{Theory connecting to kinship}
+The other dominant approach for genetic association studies under population structure is the Linear Mixed-effect Model (LMM), in which population structure is a random effect drawn from a covariance model parametrized by the kinship matrix.
+LMM and PCA share deep connections that suggest that both models ought to perform similarly.
+However, many previous studies have found that LMM outperforms the PCA approach, although many evaluations are inconclusive or are limited in the kinds of population structures they study, the magnitude of their differentiation, and other aspects of study design.
+Moreover, various explanations for why LMM outperforms PCA are vague and have not been tested directly.
+Since LMMs tend to be considerably slower than the PCA approach, it is important to understand when the difference in performance between these two approaches is outweighed by their difference in runtime.
 
-\subsection{PCA GWAS  is Equivalent to linear regression with covariate}
-The original model in our project has the same structure to linear regression. We assume that in this model, there are n individuals and m genetic marker. The formula can be written as: $$Y=\mu+X \vec{\beta}+\vec{\epsilon}$$. Here, Y is a n*1 vector which represents trait value for each individual and X is a n*m genotype matrix. In addition, $\vec{\beta}$ and $\vec{\epsilon}$ are a n*1 vectors representing the coefficient of genetics marker and residuals separately. Here $\epsilon$ follows a normal distribution $N(0,\sigma)$. This model sometimes fails beacause the number of genetic market is much larger than the number of indivudual. Then, we introduce PCA to make approximations\\
+In this work, we study the performance of the PCA method for GWAS, comparing it to a leading LMM approach, characterizing its behavior under various numbers of PCs and varying sample sizes, under a reasonable admixture model and a model with admixture and family structure.
+We find that the performance of the PCA approach is favorable when sample sizes are large (at least 1,000 individuals), matching the performance of LMMs as long as enough PCs are used.
+Remarkably, the approach is robust even when the number of PCs far exceeds the optimal number, suggesting that the degrees of freedom is not a concern in reasonably large studies.
+However, for smaller studies (100 individuals) there is a more pronounced loss of power when the number of PCs exceeds the optimal number.
+Moreover, PCA fails to perform as well as LMM in the presence of family structure, which is a scenario where the problematic structure is not low-dimensional so PCA naturally cannot model it entirely.
+All together, our simulation studies provide clear criteria under which use of PCA results in acceptable performance compared to LMMs.
 
-In a PCA linear regression model, we can write it in the form of $$y=\mu+ \vec{X_{j}} {\beta}_{j}+U_{1:i} \nu+\vec{\epsilon}$$
+Missing:
+\begin{itemize}
+\item Proposed simulation to infer optimal number of PCs from real data, predict gap between PCA and LMM?
+\item ...
+\end{itemize}
 
-Here Y still repesents the numerical value of trait of different individual and $\mu$ is the intercept. Both of them are n*1 vector. Meanwhile, $\vec{X_{j}}$ is a n*1 vector of $j_{th}$ genetic marker and in this csae, $\beta$ is a scale regression coefficient. Then, $U_{1:i}$ is a n*i matrix which is the first i Principal Components and $\nu$ is a n*1 coefficient vector for $U_{1:i}$. In the end, $\epsilon$ represnets the residual which follows a normal distribution $N(0,\sigma)$ which is the same to previous model. Then, we need to test the significance of each gemetic marker. The null hypothesis is ${\beta}_{j}$ equals to 0 and the model in this case can be written as $y=\mu+U_{1:i} \nu+\vec{\epsilon}$ for $j_{th}$ market. The alternative hypothesis is ${\beta}_{j}$ does not equal to 0. Therefore, we will conduct the F test to investigate whether the reduced model can have the same statistical power. If the p-values is small, which indicates this market is associated with trait.\\
+\section{Methods}
 
-In our simulation, each individual will be test 100000 SNPs (Single Nucleotide Polymorphism) and each for each loci (in total 100000), we will conduct linear regression separately.  The genotype of each loci will be combined with eigenvector of principal components matrix which is composed of eigenvectors we used in PCA.Regarding the eigenvector of principal component, it is calculated by decomposing the kinship matrix.  
+\subsection{The additive quantitative trait model and PCA approximation}
+
+Suppose there are $n$ individuals and $m$ loci,
+$\mathbf{X}$ is their $n \times m$ genotype matrix, and
+$\mathbf{y}$ is the length-$n$ (column) vector which represents trait value for each individual.
+The PCA approach can be derived from the following additive linear model for a quantitative (continuous) trait:
+$$
+\mathbf{y}
+=
+\mathbf{1} \alpha + \mathbf{X} \mathbf{\beta} + \mathbf{\epsilon}
+,
+$$
+where
+$\mathbf{1}$ is a length-$n$ vector of ones,
+$\alpha$ is the scalar intercept coefficient,
+$\mathbf{\beta}$ is the length-$m$ vector of locus effect sizes, and
+$\mathbf{\epsilon}$ is a length-$n$ vector of residuals.
+The residuals are assumed to follow a normal distribution: $\mathbf{\epsilon} \sim \text{Normal}(0, \sigma^2)$, for some residual variance parameter $\sigma^2$.
+
+Typically the number of loci $m$ is in the order of millions while the number of individuals $n$ is in the thousands.
+Hence, the full model above cannot be fit in this typical $n \ll m$ case, as there are only $n$ datapoints to fit (the trait vector) but there are $m+1$ parameters to fit ($\alpha$ and the $\mathbf{\beta}$ vector).
+The PCA model with $p$ PCs corresponds to the following approximation to the full model, corresponding to a model fit at a single locus $i$:
+$$
+\mathbf{y}
+=
+\mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{U}_p \mathbf{\gamma}_p + \mathbf{\epsilon}
+,
+$$
+where $\mathbf{x}_i$ is the length-$n$ vector of genotypes at locus $i$ only,
+$\beta_i$ is the effect size coefficient for that locus,
+$\mathbf{U}_p$ is an $n \times p$ matrix of PCs, and
+$\mathbf{\gamma}_p$ is the length-$p$ vector of coefficients for the PCs.
+This approximation is explained by first noticing that the genotype matrix has the following singular value decomposition:
+$\mathbf{X} = \mathbf{U} \mathbf{D} \mathbf{V}^\intercal$,
+where
+$\mathbf{U}$ are its left singular vectors of $\mathbf{X}$,
+$\mathbf{V}$ are its right singular vectors, and
+$\mathbf{D}$ is a diagonal matrix of its singular values.
+Thus, in the full model we have
+$\mathbf{X} \mathbf{\beta} = \mathbf{U} \mathbf{\gamma}$,
+where
+$\mathbf{\gamma} = \mathbf{D} \mathbf{V}^\intercal \mathbf{\beta}$.
+The approximation consists solely of replacing $\mathbf{U} \mathbf{\gamma}$ (the full set of $n$ left singular vectors and their coefficients) with $\mathbf{U}_p \mathbf{\gamma}_p$ (the top $p$ singular vectors only, which constitutes the best approximation of rank $p$).
+Thus, the extra terms in the PCA approach approximate the polygenic effect of the whole genome, and assumes that the locus $i$ being tested does not contribute greatly to this signal.
+An equivalent model can be arrived at after standardizing each locus of the genotype matrix, in which case $\mathbf{U}$ is also equal to the eigenvectors of the kinship matrix.
+
+Statistical significance is tested as follows.
+The null hypothesis is $\beta_j = 0$ (no association).
+The null and alternative models are each fit (fitting the coefficients of the multiple regression, where $\beta_j$ is excluded under the null while it is fit under the alternative).
+The resulting regression residuals are compared to each other using the F-test, which results in a p-value where here a two-tailed test is used.
+Note that many common PCA implementations trade the more exact F-test for a $\chi^2$ test, which is simpler to implement but only asymptotically accurate.
+As this is a multiple hypothesis test, there are a large number of loci ($m$) tested for association, so it is best to control the FDR rather than setting a fixed p-value threshold.
+We recommend estimating q-values and setting a threshold of $q < 0.05$ so that the FDR is controlled at the 5\% level.
 
 \subsection{Admixture Simulation}
 The construction of admixture population is mainly based on admixture simulation of Alex (2016). The related code of admixture simulation has been uploaded to Github with a R package called "bnpsd".  Some parameters are changed in order to better simulate under different situation. According to Alex (2016), the number of independent loci is 30000, in this paper the number of independent locus is 10000. The default value of Alex (2016) is 3, whereas in this project, it can be variable. Considering the difference among number of sub-population, the sample size of $i_{th}$ sub-population will be set as the smaller integer of the ratio of total sample divided by number of sub-population.\\
@@ -60,26 +115,41 @@ In our simulation,the function of trait can be written as $$y=G+ \epsilon$$
 
 
 \subsection{Result Examination Method}
-In this paper, precision-recall curves and uniformity p-value test will be used to test the performance of PCA under different scenarios. Both two methods will be illustrated by boxplot.
-\subsubsection{Precision-Recall Curves}
-Precision-recall curve is a plot whose y-axis represents precision and x-axis represents recall. Precision is calculated as the number of true positives divided by sum of both true positives which indicates the performance of model in predicting positives. Similarly, recall measures the ratio of number of true negatives and sum of true negatives and false negatives, which measures the performance of model in predicting negatives.Hence, the precision measures the relevancy of result which indicates the proportion of selected items are relevant. The recall shows the proportion of relevant items are selected. The precision and recall curve demonstrates the trade-oﬀ among precision and recall. Hence, the formula of precision and recall can be written as:
-$$Precision=\frac{True Posotive}{True Positive+Flase Positive}$$
-$$Recall=\frac{True Posotive}{True Positive+Flase Negative}$$
 
-The area under the curve (AUC) is calculated as the integration of curve of precision and recall. It measures the aggregated performance of through diﬀerent thresholds. The range of AUC is from 1 to 0. When AUC equals to 1, it can be interpreted as the predictions of model is $100\%$ correct, whereas, AUC equals to 0 indicates that all predictions of this model are wrong. 
+In this paper, precision-recall curves and uniformity p-value test will be used to test the performance of PCA under different scenarios. Both two methods will be illustrated by boxplot.
+
+\subsubsection{Precision-Recall Curves}
+
+Precision-recall curve is a plot whose y-axis represents precision and x-axis represents recall. Precision is calculated as the number of true positives divided by sum of both true positives which indicates the performance of model in predicting positives. Similarly, recall measures the ratio of number of true negatives and sum of true negatives and false negatives, which measures the performance of model in predicting negatives.Hence, the precision measures the relevancy of result which indicates the proportion of selected items are relevant. The recall shows the proportion of relevant items are selected. The precision and recall curve demonstrates the trade-off among precision and recall. Hence, the formula of precision and recall can be written as:
+$$Precision=\frac{TP}{TP + FP}$$
+$$Recall=\frac{TP}{TP + FN}$$
+
+The area under the curve (AUC) is calculated as the integration of curve of precision and recall. It measures the aggregated performance of through different thresholds. The range of AUC is from 1 to 0. When AUC equals to 1, it can be interpreted as the predictions of model is $100\%$ correct, whereas, AUC equals to 0 indicates that all predictions of this model are wrong. 
 \subsubsection{Uniform P-Value Test }
 Due to the existence of multiply hypothesis test in our simulation, the frequency of erroneous inferences will increase. Altough Bonferroni Correction can be used to deal with this problem, it can result in high false negative rate (FNR). The better strategy is to controlling the False Discovery Rate (FDR). FDR is calculated as the ratio of flase positives and the sum of true positives and false positives.For multiple independent and identical hypothesis tests, if the null hypothesis is true, the distribution of p-values will approximate to a uniform distribution [8]. In this case, a bette strategy is to use the q-value rather than p-value to control the FDR. Therefore, we should evaluate the performance of PCA by quantifying the distribution of p-value of null hypothesis. If distribution of p-vlaues of null hypothesis is significantly deviates from the quantiles of uniform distribution, the resulting q-values are anti-conservative.Thus, we use root mean square deviation (RMSD) to measure the fittness of quantiles p-values to the expected quantiles of uniform distribution. The RMSD is calculated as the root mean square difference among sorted p-values of null hypothesis and expected quantiles of sorted p-values of null hypothesis after removing causal indexes.The numerical values of RMSD is inversely  performance of PCA. The formula of RMSD is:
-$$RMSD=\sqrt{\sum{(p_{uniform}-p_{null}})^2}$$
-where $p_{null}$ is a list of p-values of null hypothesis after removing causal index and $p_{uniform}$ is a list of expected quantiles of $p_{null}$ in uniform distribution. \\
+$$
+\text{RMSD}
+=
+\sqrt{ \frac{1}{m_0} \sum_{i = 1}^{m_0} \left( u_i - p_{(i)} \right)^2 },
+$$
+where
+$m_0$ is the number of null loci (truly not trait-associated),
+here $i$ indexes null loci only,
+$p_{(i)}$ is the $i$th ordered null p-value, and
+$u_i$ is its expectation (the $i/m_0$ percentile of the uniform distribution).
 
-In many other papers, genomic control is another popular approach to detect the existence of population stratification and written as $\lambda_{GC}$ . The definition of $\lambda_{GC}$ is median chi-square asscociation statistic which has one degree of freedom through SNPs divided by theoretical median based on the null hypothesis. Hence, if hte $\lambda_{GC}$ close to 1, it indicates that there is no or little population stratification. However, if $\lambda_{GC}$ is larger than 1 significantly, it means there exists population stratification, or other confounder factors. Genomic control $\lambda_{GC}$ only use median to measure the existence of stratification, whereas, RMSD make full use of data which should be more powerful. Hence, in this paper, RMSD is used to measure the performance of PCA in terms of p-value (type 1 error).
-
+In previous evaluations, genomic control has been used to measure test statistic inflation, which results in non-uniform p-values.
+The inflation factor $\lambda$ is defined as the median $\chi^2$ association statistic divided by theoretical median under the null hypothesis.
+Hence, $\lambda = 1$ indicates no inflation, equivalent to uniform p-values (RMSD $ = 0$ above).
+On the other hand, $\lambda > 1$ (results in RMSD $ > 0$) corresponds to inflated statistics, which occurs when residual population structure is present;
+for PCA, this occurs when not enough PCs were used.
+Although $\lambda < 1$ is possible, it is not expected for genetic association studies, although that case also results in RMSD $ > 0$.
+Note that $\lambda$ only use the median of the null distribution to measure the non-uniformity of p-values, whereas the RMSD makes use of the complete p-value distribution to make this assessment, which should be more powerful.
 
 \subsection{Comparison among PCA and Existing Implementations }
-Some current research argue that Linear Mixed Model (LMM) can outperform PCA in correcting for population strcuture. In Linear Mixed Model, population strcuture is treated as ramddom effect. Gengxin and Hongjiang (2013) demonstrate that efficient
-mixed-model association eXpedited (EMMAX) which is based on linear mixed model outperforms PCA in both the population cohort study and case-control study. In this project, LMM will be tested under the same admixture simulation and trait simulation to PCA and thus, comparison between LMM and PAC with different PCs used under different situations can be made. Additionally, PCA with no PC used is equivalent to Linear Regression (LM). We will also consider the performance comparision among PCA and LM. 
 
-\subsection{true or biased kinship matrices has the same performance}
+Some current research argue that Linear Mixed Model (LMM) can outperform PCA in correcting for population strcuture. In Linear Mixed Model, population strcuture is treated as random effect. Gengxin and Hongjiang (2013) demonstrate that efficient
+mixed-model association eXpedited (EMMAX) which is based on linear mixed model outperforms PCA in both the population cohort study and case-control study. In this project, LMM will be tested under the same admixture simulation and trait simulation to PCA and thus, comparison between LMM and PAC with different PCs used under different situations can be made. Additionally, PCA with no PC used is equivalent to Linear Regression (LM). We will also consider the performance comparision among PCA and LM. 
 
 
 
@@ -90,7 +160,7 @@ We use simulation data where genotypes and trait will be simulated following pro
 \subsection{PCA performance under N=1000}
 \begin{figure}[bp!]
   \centering
-  \includegraphics[width=4in]{C:/Users/yiqiy/Desktop/gas-rgls/PCA_gwas/PCA_n_1000_m_10_k_10.pdf}
+  \includegraphics[width=4in]{PCA_n_1000_m_10_k_10.pdf}
   \caption{
     {\bf boxplot of rmsd and auc}
     The first panel is the boxplot of RMSD when sample size is 1000. Here the y axis represents value of rmsd and x axis is the number of PCs used in PCA.
@@ -106,7 +176,7 @@ The seond pandel of Figure 1 illustrates the pattern of AUC for the same scenari
 \subsection{PCA performance under N=100}
 \begin{figure}[bp!]
   \centering
-  \includegraphics[width=4in]{C:/Users/yiqiy/Desktop/gas-rgls/PCA_gwas/PCA_n_100_m_10_k_10.pdf}
+  \includegraphics[width=4in]{PCA_n_100_m_10_k_10.pdf}
   \caption{
     {\bf boxplot of rmsd and auc}
    The first panel is the boxplot of RMSD when sample size is 100. The pattern of panel A in Figure 2 is similar to the first panel in Figure 1. The converging value of RMSD here is also close to zero indicating that even in a small sample size, PCA is still robust to type one error controlling. Moreover, the LMM and PCA has similar RSMD values which demonstrates that these two methods have almost the same performance in type one error controlling. The pattern of second panel in Figure 2 is bell-shapled. The AUC value reaches the peak when the number of PCs used in PCA equals to 9 and begins to decrease with the increase of PCs used. It illustrates that PCA fails in terms of power when the sample size is small. The decrease tendency is more obvious when the number of PCs is around 68 and it can be seen that LMM which is located at the last point of y-axis has better performance in power, compared with PCA and LM.  }
@@ -122,7 +192,7 @@ Concerned with the boxplot of AUC, the pattern is obviously different from the b
 
 \begin{figure}[bp!]
   \centering
-  \includegraphics[width=4in]{C:/Users/yiqiy/Desktop/gas-rgls/PCA_gwas/PCA_n_1000_m_100_family_structure.pdf}
+  \includegraphics[width=4in]{PCA_n_1000_m_100_family_structure.pdf}
   \caption{
     {\bf boxplot of rmsd and auc}
     The first panel is the boxplot of RMSD when sample size is 100. The pattern of panel A in Figure 2 is similar to the first panel in Figure 1. The converging value of RMSD here is also close to one indicating that even in a small sample size, PCA is still robust to type one error controlling. The pattern of second panel in Figure 2 is bell-shapled. The AUC value reaches the peak when the number of PCs used in PCA equals to 9 and begins to decrease with the increase of PCs used. It illustrates that PCA fails in terms of power when the sample size is small. E}
