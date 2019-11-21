@@ -13,15 +13,19 @@
 % import biblatex with prefered settings
 % reuse code and library from RGLS paper in the same repository
 \input{../manuscripts/headerBiblatexHarvard.tex}
-\bibliography{../manuscripts/zotero} % biblatex wants this in the preamble...
+\bibliography{../manuscripts/zotero, ../manuscripts/dummy} % biblatex wants this in the preamble...
 
 % To set proper spacing
 \renewcommand{\baselinestretch}{1.2}
 
 % define shortcuts for awkward math symbols
 % this also helps us change them more easily later, if needed
-\DeclareMathOperator{\rmsd}{\text{RMSD}_p}
-\DeclareMathOperator{\auc}{\text{AUC}_\text{PR}}
+\newcommand{\rmsd}{\text{RMSD}_p}
+\newcommand{\auc}{\text{AUC}_\text{PR}}
+\usepackage[noT]{kinshipsymbols}
+% % copy of \Fst from package `kinshipsymbols`
+%\newcommand{\Fst}{F_\text{ST}}
+
 
 \title{Testing the effectiveness of principal components in adjusting for relatedness in genetic association studies}
 \author{Yiqi Yao, Alejandro Ochoa}
@@ -33,19 +37,19 @@
 
 The goal of a genome-wide association study (GWAS) is to identify loci whose genotypes are correlated significantly with a certain trait.
 An important assumption made by basic association tests is that genotypes at non-associated loci are drawn independently from a common allele frequency, so that they are in Hardy-Weinberg Equilibrium (HWE).
-However, HWE does not hold for structured populations, which includes multiethnic cohorts and admixed individuals.
-When approaches for association not designed for structured populations are incorrectly applied to structured populations, association statistics (such as $\chi^2$) become inflated relative to the null expectation, resulting in greater numbers of false positives than expected \citep{devlin_genomic_1999, astle_population_2009}.
+However, HWE does not hold for structured populations, which includes multiethnic cohorts and admixed individuals, and for family data.
+When naive approaches are incorrectly applied to structured populations and/or family data, association statistics (such as $\chi^2$) become inflated relative to the null expectation, resulting in greater numbers of false positives than expected \citep{devlin_genomic_1999, voight_confounding_2005, astle_population_2009}.
 
 Modern approaches for conducting genetic association studies with structured populations involve modeling the population structure via covariates.
 Such covariates may be inferred ancestry proportions \citep{pritchard_association_2000} or transformations of these.
 Principal components analysis (PCA) represents the most common of these variants, in which the top eigenvectors of the kinship matrix are used to model the population structure \citep{price_principal_2006}.
-These top eigenvectors are commonly referred to as Principal Components (PCs) in the genetics literature (the convention we adopt here), but it is worth noting that in other fields the PCs would instead denote the projections of the data onto the eigenvectors.
-Various works have found that PCs map to ancestry, and in GWAS work as well as ancestry but without the computational expense of inferring ancestry proportions.
+These top eigenvectors are commonly referred to as Principal Components (PCs) in the genetics literature (the convention we adopt here; \cite{patterson_population_2006}), but it is worth noting that in other fields the PCs would instead denote the projections of the data onto the eigenvectors.
+Various works have found that PCs map to ancestry, and PCs work as well as ancestry in GWAS and can be inferred more quickly \citep{patterson_population_2006}.
 
 The other dominant approach for genetic association studies under population structure is the Linear Mixed-effect Model (LMM), in which population structure is a random effect drawn from a covariance model parametrized by the kinship matrix.
 LMM and PCA share deep connections that suggest that both models ought to perform similarly \citep{hoffman_correcting_2013}.
-However, many previous studies have found that LMM outperforms the PCA approach, although many evaluations are inconclusive or are limited to unrealistic population structures often with unrealistically low differentiation \citep{astle_population_2009, kang_variance_2010, wang_analytical_2013}.
-Moreover, various explanations for why LMM outperforms PCA are vague and have not been tested directly.
+However, many previous studies have found that LMM outperforms the PCA approach, although many evaluations are inconclusive or are limited to unrealistic population structures often with unrealistically low differentiation \citep{astle_population_2009, kang_variance_2010, price_new_2010, wang_analytical_2013}.
+Moreover, various explanations for if and why LMM outperforms PCA are vague and have not been tested directly \citep{price_new_2010, sul_mixed_2013, price_response_2013}.
 Since LMMs tend to be considerably slower than the PCA approach, it is important to understand when the difference in performance between these two approaches is outweighed by their difference in runtime.
 
 In this work, we study the performance of the PCA method for GWAS, comparing it to a leading LMM approach, characterizing its behavior under various numbers of PCs and varying sample sizes, under a reasonable admixture model and a model with admixture and family structure.
@@ -53,7 +57,7 @@ Our evaluation is more thorough than previous ones, directly measuring the unifo
 We find that the performance of the PCA approach is favorable when sample sizes are large (at least 1,000 individuals), matching the performance of LMMs as long as enough PCs are used.
 Remarkably, the approach is robust even when the number of PCs far exceeds the optimal number, suggesting that the degrees of freedom is not a concern in reasonably large studies.
 However, for smaller studies (100 individuals) there is a more pronounced loss of power when the number of PCs exceeds the optimal number.
-Moreover, PCA fails to perform as well as LMM in the presence of family structure, which is a scenario where the problematic structure is not low-dimensional so PCA naturally cannot model it entirely.
+Moreover, LMMs outperform PCA in the presence of family structure, which is a well-known scenario where the problematic structure is not low-dimensional so PCA naturally cannot model it entirely \citep{patterson_population_2006, price_new_2010}.
 All together, our simulation studies provide clear criteria under which use of PCA results in acceptable performance compared to LMMs.
 
 Missing:
@@ -66,8 +70,9 @@ Missing:
 
 \subsection{The additive quantitative trait model and PCA approximation}
 
+Let $\xij \in \{ 0, 1, 2 \}$ be the genotype at locus $i$ for individual $j$, which counts the number of reference alleles.
 Suppose there are $n$ individuals and $m$ loci,
-$\mathbf{X}$ is their $n \times m$ genotype matrix, and
+$\mathbf{X} = ( \xij )^\intercal$ is their $n \times m$ genotype matrix, and
 $\mathbf{y}$ is the length-$n$ (column) vector which represents trait value for each individual.
 The PCA approach can be derived from the following additive linear model for a quantitative (continuous) trait:
 $$
@@ -86,12 +91,13 @@ The residuals are assumed to follow a normal distribution: $\mathbf{\epsilon} \s
 Typically the number of loci $m$ is in the order of millions while the number of individuals $n$ is in the thousands.
 Hence, the full model above cannot be fit in this typical $n \ll m$ case, as there are only $n$ datapoints to fit (the trait vector) but there are $m+1$ parameters to fit ($\alpha$ and the $\mathbf{\beta}$ vector).
 The PCA model with $p$ PCs corresponds to the following approximation to the full model, corresponding to a model fit at a single locus $i$:
-$$
-\mathbf{y}
-=
-\mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{U}_p \mathbf{\gamma}_p + \mathbf{\epsilon}
-,
-$$
+\begin{equation}
+  \label{eq:pca_gwas}
+  \mathbf{y}
+  =
+  \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{U}_p \mathbf{\gamma}_p + \mathbf{\epsilon}
+  ,
+\end{equation}
 where $\mathbf{x}_i$ is the length-$n$ vector of genotypes at locus $i$ only,
 $\beta_i$ is the effect size coefficient for that locus,
 $\mathbf{U}_p$ is an $n \times p$ matrix of PCs, and
@@ -108,9 +114,8 @@ where
 $\mathbf{\gamma} = \mathbf{D} \mathbf{V}^\intercal \mathbf{\beta}$.
 The approximation consists solely of replacing $\mathbf{U} \mathbf{\gamma}$ (the full set of $n$ left singular vectors and their coefficients) with $\mathbf{U}_p \mathbf{\gamma}_p$ (the top $p$ singular vectors only, which constitutes the best approximation of rank $p$).
 Thus, the extra terms in the PCA approach approximate the polygenic effect of the whole genome, and assumes that the locus $i$ being tested does not contribute greatly to this signal.
-An equivalent model can be arrived at after standardizing each locus of the genotype matrix, in which case $\mathbf{U}$ is also equal to the eigenvectors of the kinship matrix.
 
-Statistical significance is tested as follows.
+The statistical significance of a given association test is performed as follows.
 The null hypothesis is $\beta_j = 0$ (no association).
 The null and alternative models are each fit (fitting the coefficients of the multiple regression, where $\beta_j$ is excluded under the null while it is fit under the alternative).
 The resulting regression residuals are compared to each other using the F-test, which results in a p-value where here a two-tailed test is used.
@@ -118,23 +123,83 @@ Note that many common PCA implementations trade the more exact F-test for a $\ch
 As this is a multiple hypothesis test, there are a large number of loci ($m$) tested for association, so it is best to control the FDR rather than setting a fixed p-value threshold.
 We recommend estimating q-values and setting a threshold of $q < 0.05$ so that the FDR is controlled at the 5\% level.
 
+\subsection{Estimation of principal components from genotype data}
+
+In practice, the matrix of principal components $\mathbf{U}_p$ above is determined from a ``standardized'' genotype matrix, as follows.
+The ancestral allele frequency at each locus $i$ is estimated as
+$$
+\pith = \frac{1}{2n} \sum_{j = 1}^n \xij,
+$$
+then the kinship matrix is estimated as
+$$
+\ktHat
+=
+\frac{1}{m} \sum_{i = 1}^m
+\frac{
+  \left( \xij - 2 \pith \right) \left( \xij[k] - 2 \pith \right)
+}{
+  4 \pith \left( 1 - \pith \right)
+}
+.
+$$
+This is equivalent to first removing the mean ($2 \pith$) of every locus of the genotype matrix, followed by dividing each locus by the scaling factor $2 \sqrt{\pith \left( 1 - \pith \right)}$, prior to performing the singular value decomposition of the genotype matrix \citep{patterson_population_2006}.
+The principal components are the top eigenvectors of this kinship matrix estimate.
+This kinship estimate and minor variants are also employed in LMMs \citep{yang_gcta:_2011}.
+
+This estimator of the kinship matrix is biased, and this bias is different for every individual pair \citep{ochoa_fst2, ochoa_human}.
+However, in the present context of PCA regression in genetic association studies, the existing approach performs as well as when the above estimate is replaced by the true kinship matrix (not shown).
+Thus, it appears that in combination with the intercept term ($\mathbf{1} \alpha$ in \cref{eq:pca_gwas}), the rowspace of this kinship matrix estimate approximately equals that of the true kinship matrix.
+
 \subsection{Simulations}
 
-\subsubsection{Genotype simulations from admixture and family models}
+\subsubsection{Genotype simulation from the admixture model}
 
-The construction of admixture population is mainly based on admixture simulation of Alex (2016).
-The related code of admixture simulation has been uploaded to Github with a R package called "bnpsd".
-Some parameters are changed in order to better simulate under different situation.
-According to Alex (2016), the number of independent loci is 30000, in this paper the number of independent locus is 10000.
-The default value of Alex (2016) is 3, whereas in this project, it can be variable.
-Considering the difference among number of sub-population, the sample size of $i_{th}$ sub-population will be set as the smaller integer of the ratio of total sample divided by number of sub-population.
+We consider three simulation scenarios, refered to as (1) large sample size, (2) small sample size, and (3) family structure.
+All cases are based on the admixture model described previously \citep{ochoa_fst1, ochoa_fst2}, and which is implemented in the R package \texttt{bnpsd} available on GitHub and the Comprehensive R Archive Network (CRAN).
 
-Regarding the family structure, the generation will be set to be 20 to simulate admixture population with the existence of family structure.
-Considering the large calculation cost during the generation process of admixture population with family structure, this data set will be treated as real data set.
-It will be used repeatedly to test performance of PCA under different situations with random traits.
+Here we consider scenarios where the number of individuals $n$ varies:
+the large sample size and family structure scenarios have $n = 1,000$ whereas small sample size has $n = 100$.
+The number of loci in all cases is $m = 100,000$.
+Individuals are admixed from $K = 10$ intermediate subpopulations, where each subpopulation $S_u$ has an inbreeding coefficient $\ft[S_u] = u \tau$, individual-specific admixture proportions $q_{ju}$ for individual $j$ and intermediate subpopulation $S_u$ arise from a random walk model for the intermediate subpopulations on a 1-dimensional geography with spread $\sigma$, where the free parameters $\tau$ and $\sigma$ are fit such that $\Fst = 0.1$ for the admixed individuals and the bias coefficient is $s = 0.5$, exactly as before \citep{ochoa_fst2}.
+
+Random genotypes are drawn from this model, as follows.
+First, uniform ancestral allele frequencies \pit are drawn.
+The allele frequency $p_i^{S_u}$ at locus $i$ of each intermediate subpopulation $S_u$ is drawn from the Beta distribution with mean \pit and variance $\pit(1-\pit) \ft[S_u]$ \citep{balding_method_1995}.
+The individual-specific allele frequency of individual $j$ and locus $i$ is given by
+$
+\pi_{ij} = \sum_{u = 1}^K q_{ju} p_i^{S_u}.
+$
+Lastly, genotypes are drawn from $\xij \sim \text{Binomial}(2, \pi_{ij})$.
+Loci that are fixed (where for some $i$ we had $\xij = 0$ for all $j$, or $\xij = 2$ for all $j$) are drawn again from the model, starting from \pit, iterating until no loci are fixed.
+
+\subsubsection{Genotype simulation from the family model}
+
+Here we describe a simulation of a family structure with admixture that aims to be realistic by:
+(1) pairing all individuals in every generation, resulting in two children per couple;
+(2) strictly avoiding close relatives when pairing individuals;
+(3) strongly favoring pairs that are nearby in their 1-dimensional geography, which helps preserve the population structure across the generations by preferentially pairing individuals with more similar admixture proportions (a form of assortative mating); and
+(4) iterating for many generations so that a distribution of close and distant relatives are present in the data.
+
+Generation 1 has individuals with genotypes drawn from the large sample size scenario described earlier, which features admixture.
+In subsequent generations, every individual is paired as follows.
+The local kinship matrix of individuals is stored and updated after every generation, which records the pedigree relatedness; in the first generation, everybody is locally unrelated.
+Also, individuals are ordered, initially by the 1-dimensional geography, and in subsequent generations paired individuals are grouped and reordered by their average coordinate, preserving the original order when there are ties.
+For every remaining unpaired individual, one is drawn randomly from the population, and it is paired with the nearest individual that is not a second cousin or closer relative (local kinship must be $< 1/4^3$).
+Note that every individual is initially genderless, and after pairing one individual in the pair may be set to male and the other to female without giving rise to contradictions.
+If there are individuals that could not be paired (occurs if unpaired individuals are all close relatives), then the process of pairing individuals randomly is repeated entirely for this generation.
+If after 100 iterations no solution could be found randomly (there were always unpaired individuals), then the simulation restarts from the very first generation; this may occur for very small populations, but was not observed when $n = 1000$.
+Once individuals are paired, two children per pair have their genotypes drawn independently of each other.
+In particular, at every locus, one allele is drawn randomly from one of the parents and the other allele from the other parent.
+Loci are constructed independently of the rest (no linkage disequilibrium).
+The simulation continues for 20 generations.
+As this simulation is very computationally expensive, it was run only once (genotypes did not change as new random traits were constructed as described next).
 
 \subsubsection{Trait Simulation}
 
+For a given genotype matrix (simulated or real), a simulated complex trait is constructed as follows.
+
+
+TODO:
 The construction of trait simulation is based on a R package called "simtrait".
 This package constructs the complex trait simulation with user-defined causal loci and the desirable heritability of the trait.
 It can be used in both simulated data set and real data set if the kinship matrix is estimated correctly.
@@ -171,12 +236,12 @@ $p_{(i)}$ is the $i$th ordered null p-value, and
 $u_i = i / m_0$ is its expectation.
 Thus, $\rmsd = 0$ corresponds to the best performance in this test, and larger $\rmsd$ values correspond to worse performance.
 
-In previous evaluations, test statistic inflation has been used to measure the success of corrections for population structure \citep{astle_population_2009}.
+In previous evaluations, test statistic inflation has been used to measure the success of corrections for population structure \citep{astle_population_2009, price_new_2010}.
 The inflation factor $\lambda$ is defined as the median $\chi^2$ association statistic divided by theoretical median under the null hypothesis \citep{devlin_genomic_1999}.
 Hence, when null test statistics have their expected distribution, we get $\lambda = 1$ (same as $\rmsd = 0$ above).
 However, any other null test statistic distribution with the same median results in $\lambda = 1$ as well, which is a flaw of this test that $\rmsd$ overcomes ($\rmsd = 0$ if and only if null test statistics have their expected distribution).
 The $\lambda > 1$ case (gives $\rmsd > 0$) corresponds to inflated statistics, which occurs when residual population structure is present.
-$\lambda < 1$ is possible but not expected for genetic association studies (also gives $\rmsd > 0$).
+$\lambda < 1$ is not expected for genetic association studies (also gives $\rmsd > 0$).
 Note that $\lambda$ only use the median of the null distribution, whereas the $\rmsd$ makes use of the complete p-value distribution to evaluate its uniformity, which is more accurate.
 
 \subsubsection{The area under the precision-recall curve}
@@ -412,9 +477,6 @@ In addition to this, in the case of small smaple size, advantage of LMM is more 
 As mentioned before, PCA will receive punishment when the number of PCs is much larger than the true rank of genotype matrix.
 The maximum of AUC value of PCA in this scenario decreases to 0.2 and the average AUC value of LMM is around 0.24.
 However, when complicated family structure exists, PCA outperforms LMM in terms of power. 
-
-\citep{sul_mixed_2013}
-\citep{price_response_2013}
 
 \citep{tucker_improving_2014}
 
