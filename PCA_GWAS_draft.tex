@@ -22,6 +22,7 @@
 % this also helps us change them more easily later, if needed
 \newcommand{\rmsd}{\text{RMSD}_p}
 \newcommand{\auc}{\text{AUC}_\text{PR}}
+
 \usepackage[noT]{kinshipsymbols}
 % % copy of \Fst from package `kinshipsymbols`
 %\newcommand{\Fst}{F_\text{ST}}
@@ -74,13 +75,14 @@ Let $\xij \in \{ 0, 1, 2 \}$ be the genotype at locus $i$ for individual $j$, wh
 Suppose there are $n$ individuals and $m$ loci,
 $\mathbf{X} = ( \xij )^\intercal$ is their $n \times m$ genotype matrix, and
 $\mathbf{y}$ is the length-$n$ (column) vector which represents trait value for each individual.
-The PCA approach can be derived from the following additive linear model for a quantitative (continuous) trait:
-$$
-\mathbf{y}
-=
-\mathbf{1} \alpha + \mathbf{X} \mathbf{\beta} + \mathbf{\epsilon}
-,
-$$
+The approaches we consider are based on the following additive linear model for a quantitative (continuous) trait:
+\begin{equation}
+  \label{eq:trait}
+  \mathbf{y}
+  =
+  \mathbf{1} \alpha + \mathbf{X} \mathbf{\beta} + \mathbf{\epsilon}
+  ,
+\end{equation}
 where
 $\mathbf{1}$ is a length-$n$ vector of ones,
 $\alpha$ is the scalar intercept coefficient,
@@ -90,18 +92,18 @@ The residuals are assumed to follow a normal distribution: $\mathbf{\epsilon} \s
 
 Typically the number of loci $m$ is in the order of millions while the number of individuals $n$ is in the thousands.
 Hence, the full model above cannot be fit in this typical $n \ll m$ case, as there are only $n$ datapoints to fit (the trait vector) but there are $m+1$ parameters to fit ($\alpha$ and the $\mathbf{\beta}$ vector).
-The PCA model with $p$ PCs corresponds to the following approximation to the full model, corresponding to a model fit at a single locus $i$:
+The PCA model with $r$ PCs corresponds to the following approximation to the full model, corresponding to a model fit at a single locus $i$:
 \begin{equation}
   \label{eq:pca_gwas}
   \mathbf{y}
   =
-  \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{U}_p \mathbf{\gamma}_p + \mathbf{\epsilon}
+  \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{U}_r \mathbf{\gamma}_r + \mathbf{\epsilon}
   ,
 \end{equation}
 where $\mathbf{x}_i$ is the length-$n$ vector of genotypes at locus $i$ only,
 $\beta_i$ is the effect size coefficient for that locus,
-$\mathbf{U}_p$ is an $n \times p$ matrix of PCs, and
-$\mathbf{\gamma}_p$ is the length-$p$ vector of coefficients for the PCs.
+$\mathbf{U}_r$ is an $n \times r$ matrix of PCs, and
+$\mathbf{\gamma}_r$ is the length-$r$ vector of coefficients for the PCs.
 This approximation is explained by first noticing that the genotype matrix has the following singular value decomposition:
 $\mathbf{X} = \mathbf{U} \mathbf{D} \mathbf{V}^\intercal$,
 where
@@ -112,7 +114,7 @@ Thus, in the full model we have
 $\mathbf{X} \mathbf{\beta} = \mathbf{U} \mathbf{\gamma}$,
 where
 $\mathbf{\gamma} = \mathbf{D} \mathbf{V}^\intercal \mathbf{\beta}$.
-The approximation consists solely of replacing $\mathbf{U} \mathbf{\gamma}$ (the full set of $n$ left singular vectors and their coefficients) with $\mathbf{U}_p \mathbf{\gamma}_p$ (the top $p$ singular vectors only, which constitutes the best approximation of rank $p$).
+The approximation consists solely of replacing $\mathbf{U} \mathbf{\gamma}$ (the full set of $n$ left singular vectors and their coefficients) with $\mathbf{U}_r \mathbf{\gamma}_r$ (the top $r$ singular vectors only, which constitutes the best approximation of rank $r$).
 Thus, the extra terms in the PCA approach approximate the polygenic effect of the whole genome, and assumes that the locus $i$ being tested does not contribute greatly to this signal.
 
 The statistical significance of a given association test is performed as follows.
@@ -160,7 +162,8 @@ All cases are based on the admixture model described previously \citep{ochoa_fst
 Here we consider scenarios where the number of individuals $n$ varies:
 the large sample size and family structure scenarios have $n = 1,000$ whereas small sample size has $n = 100$.
 The number of loci in all cases is $m = 100,000$.
-Individuals are admixed from $K = 10$ intermediate subpopulations, where each subpopulation $S_u$ has an inbreeding coefficient $\ft[S_u] = u \tau$, individual-specific admixture proportions $q_{ju}$ for individual $j$ and intermediate subpopulation $S_u$ arise from a random walk model for the intermediate subpopulations on a 1-dimensional geography with spread $\sigma$, where the free parameters $\tau$ and $\sigma$ are fit such that $\Fst = 0.1$ for the admixed individuals and the bias coefficient is $s = 0.5$, exactly as before \citep{ochoa_fst2}.
+Individuals are admixed from $K = 10$ intermediate subpopulations, where $K$ is also the rank of the population structure; this implies that, after excluding the intercept, the population structure can be fit with $r = K-1$ PCs.
+Each subpopulation $S_u$ ($u \in \{ 1, ..., K \}$) has an inbreeding coefficient $\ft[S_u] = u \tau$, individual-specific admixture proportions $q_{ju}$ for individual $j$ and intermediate subpopulation $S_u$ arise from a random walk model for the intermediate subpopulations on a 1-dimensional geography with spread $\sigma$, where the free parameters $\tau$ and $\sigma$ are fit to result in $\Fst = 0.1$ for the admixed individuals and a bias coefficient of $s = 0.5$, exactly as before \citep{ochoa_fst2}.
 
 Random genotypes are drawn from this model, as follows.
 First, uniform ancestral allele frequencies \pit are drawn.
@@ -196,22 +199,28 @@ As this simulation is very computationally expensive, it was run only once (geno
 
 \subsubsection{Trait Simulation}
 
-For a given genotype matrix (simulated or real), a simulated complex trait is constructed as follows.
+For a given genotype matrix (simulated or real), a simulated complex trait that follows the additive quantitative trait model in \cref{eq:trait} is constructed as follows.
+In all cases we set the heritability of the trait to be $h^2 = 0.8$.
+We varied the number of causal loci ($m_1$) together with the number of individuals ($n$) so power would remain balanced:
+for the $n = 1,000$ cases we set $m_1 = 100$, whereas the $n = 100$ simulation had $m_1 = 10$.
+Note that the proportion of loci where the alternative hypothesis holds is $\pi_1 = m_1 / m$.
 
-
-TODO:
-The construction of trait simulation is based on a R package called "simtrait".
-This package constructs the complex trait simulation with user-defined causal loci and the desirable heritability of the trait.
-It can be used in both simulated data set and real data set if the kinship matrix is estimated correctly.
-
-In our simulation,the function of trait can be written as $$y=G+ \epsilon$$ 
-, where G represents the effect of genotype and $\epsilon$ represents the noise.
-The noise follows a normal distribution with mean zero and variacne equals to one minus hertability rate times desired parametric variance factor of the trait which is 1 in default.
-To obtain the genotype effect, marginal allele frequency will be calculated first and then, SNP will be randomly selected as causal index with random SNP coefficients.
-Then  coefficients of causal index will be scaled and centered to estimate the genotype effect, thereby obtaining the numerical value of traits of each causal loci.
-The rank of genotype effect equals to the number of true subpopulation minus one as we take intercept into consideration as well.  
-
-Say what $\pi_1 = m_\text{causal} / m$ below is.
+Each simulation replicate consists of different causal loci with different effect sizes, as follows.
+The non-genetic effects are drawn from $\epsilon_j \sim \text{Normal}(0, 1 - h^2 )$ independently for each individual $j$.
+A subset of size $m_1$ of loci was selected at random from the genotype matrix to be causal loci.
+The effect size $\beta_i$ at each causal locus $i$ is drawn initially from a Standard Normal distribution.
+At non-causal loci $i$ we have $\beta_i = 0$.
+Under the kinship model \citep{ochoa_fst1}, the resulting genetic variance component is given by
+$$
+\sigma^2_0
+=
+\sum_{i = 1}^m 2 \pit ( 1 - \pit ) \beta_i^2 ,
+$$
+where \pit is the true ancestral allele frequency at locus $i$, which is known in our simulations.
+The desired variance of $h^2$ is therefore obtained by multiplying every $\beta_i$ by $\frac{h}{ \sigma_0 }$.
+The intercept coefficient in \cref{eq:trait} is then set to $\alpha = - \sum_{i=1}^m 2 \pit \beta_i$, so that the final trait expectation is zero.
+This trait simulation procedure is implemented in the \texttt{simtrait} R package, available at
+\url{https://github.com/OchoaLab/simtrait}.
 
 \subsection{Evaluation of performance}
 
@@ -230,10 +239,10 @@ $$
 \sqrt{ \frac{1}{m_0} \sum_{i = 1}^{m_0} \left( u_i - p_{(i)} \right)^2 },
 $$
 where
-$m_0$ is the number of null loci ($\beta_i = 0$ cases only),
+$m_0 = m - m_1$ is the number of null loci ($\beta_i = 0$ cases only),
 here $i$ indexes null loci only,
 $p_{(i)}$ is the $i$th ordered null p-value, and
-$u_i = i / m_0$ is its expectation.
+$u_i = ( i - 0.5 ) / m_0$ is its expectation.
 Thus, $\rmsd = 0$ corresponds to the best performance in this test, and larger $\rmsd$ values correspond to worse performance.
 
 In previous evaluations, test statistic inflation has been used to measure the success of corrections for population structure \citep{astle_population_2009, price_new_2010}.
