@@ -44,7 +44,22 @@ $^*$ Corresponding author: \texttt{alejandro.ochoa@duke.edu}
 
 
 \begin{abstract}
-  Abstract goes here...
+  The genome-wide association study is widely used to identify the association between loci and trait.
+  However, admixture population is involved in the current GWAS research which may result in the violation of Hardy-Weinberg Equilibrium (HWE).
+  PCA can be used to correct for the bias result from admixture population.
+  In this paper, we test the performance of PCA with desirable admixture simulation population.
+  Since previous research about comparing PCA and LMM is limited, we also make comparison of performance among PCA, LMM and LM in terms of both power and type one error controlling.
+  The approach we used in this paper is mainly based on the additive linear model.
+  Since the number of loci we consider is much larger than sample size, each loci together with PCs is fitted to test the significance of this loci.
+  According to the admixture simulation structure, three scenarios are considered in this case: large sample size, small sample size and large sample with complicated family structure.
+  In these three scenarios, the number of loci and subpopulation are fixed.
+  In order to fully compare the performance of PCA, LMM and LM under different admixture structures, Root mean square deviation (RMSD) and areas under curve (AUC) to measure the performance of type one error controlling and power separately.
+  According to the results of simulation, it can be seen that PCA fails in both type one error and power when the number of PCA is smaller than the true rank of genotype matrix.
+  Additionally, PCA is robust to type one error once the number of PCs is larger than true rank of genotype matrix regardless of sample size, but the existence of family structure will impose a negative influence on it.
+  In terms of power, PCA will be punished with excessive usage of PCs in the case of small sample size.
+  Once enough PCs are used in PCA, it always outperforms LM in both type one error controlling and power.
+  Regarding LMM, it has similar performance to PCA in type one error controlling without complicated family structure, however, it has advantage over PCA when complex family structure exists.
+  Considering power, LMM has better performance of power than PCA without complex family structure even enough PCs are used, whereas, the existence of complicated family structure will lead to PCA outperforms LMM in terms of power. 
 \end{abstract}
 
 \clearpage
