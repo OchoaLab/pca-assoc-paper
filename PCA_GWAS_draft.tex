@@ -1,4 +1,4 @@
-\documentclass[12pt]{article}
+\documentclass[11pt]{article}
 \usepackage{amsmath, amsthm, amssymb, pdfpages} 
 \usepackage{fullpage}
 \usepackage{hyperref}
@@ -15,9 +15,6 @@
 \input{../manuscripts/headerBiblatexHarvard.tex}
 \bibliography{../manuscripts/zotero, ../manuscripts/dummy} % biblatex wants this in the preamble...
 
-% To set proper spacing
-\renewcommand{\baselinestretch}{1.2}
-
 % define shortcuts for awkward math symbols
 % this also helps us change them more easily later, if needed
 \newcommand{\rmsd}{\text{RMSD}_p}
@@ -27,12 +24,34 @@
 % % copy of \Fst from package `kinshipsymbols`
 %\newcommand{\Fst}{F_\text{ST}}
 
+% double line spacing (PLoS wants this)
+\usepackage{setspace}
+\doublespacing
+% original, smaller spacing
+%\renewcommand{\baselinestretch}{1.2}
 
-\title{Testing the effectiveness of principal components in adjusting for relatedness in genetic association studies}
-\author{Yiqi Yao, Alejandro Ochoa}
+\title{\Large \textbf{Testing the effectiveness of principal components in adjusting for relatedness in genetic association studies}}
+\author{Yiqi Yao$^1$, Alejandro Ochoa$^{1,2,*}$}
+\date{}
 
 \begin{document}
 \maketitle
+
+\noindent
+$^1$ Department of Biostatistics and Bioinformatics, Duke University, Durham, NC 27705, USA \\
+$^2$ Duke Center for Statistical Genetics and Genomics, Duke University, Durham, NC 27705, USA \\
+$^*$ Corresponding author: \texttt{alejandro.ochoa@duke.edu}
+
+
+\begin{abstract}
+  Abstract goes here...
+\end{abstract}
+
+\clearpage
+
+\tableofcontents
+
+\clearpage
 	
 \section{Introduction} 
 
@@ -61,26 +80,30 @@ However, for smaller studies (100 individuals) there is a more pronounced loss o
 Moreover, LMMs outperform PCA in the presence of family structure, which is a well-known scenario where the problematic structure is not low-dimensional so PCA naturally cannot model it entirely \citep{patterson_population_2006, price_new_2010}.
 All together, our simulation studies provide clear criteria under which use of PCA results in acceptable performance compared to LMMs.
 
-Missing:
-\begin{itemize}
-\item Proposed simulation to infer optimal number of PCs from real data, predict gap between PCA and LMM?
-\item ...
-\end{itemize}
+% TODO Missing:
+% \begin{itemize}
+% \item Proposed simulation to infer optimal number of PCs from real data, predict gap between PCA and LMM?
+% \item LMM + 10 PCs approach
+% \end{itemize}
 
 \section{Methods}
 
-\subsection{The additive quantitative trait model and PCA approximation}
+\subsection{Models for genetic association studies}
+
+In this subsection we describe the complex trait model and kinship model that motivates both the PCA and LMM models for genetic association studies, followed by further details regarding the PCA and LMM approaches.
+
+\subsubsection{The additive quantitative trait model and PCA approximation}
 
 Let $\xij \in \{ 0, 1, 2 \}$ be the genotype at locus $i$ for individual $j$, which counts the number of reference alleles.
 Suppose there are $n$ individuals and $m$ loci,
-$\mathbf{X} = ( \xij )^\intercal$ is their $n \times m$ genotype matrix, and
+$\mathbf{X} = ( \xij )$ is their $m \times n$ genotype matrix, and
 $\mathbf{y}$ is the length-$n$ (column) vector which represents trait value for each individual.
 The approaches we consider are based on the following additive linear model for a quantitative (continuous) trait:
 \begin{equation}
   \label{eq:trait}
   \mathbf{y}
   =
-  \mathbf{1} \alpha + \mathbf{X} \mathbf{\beta} + \mathbf{\epsilon}
+  \mathbf{1} \alpha + \mathbf{X}^\intercal \mathbf{\beta} + \mathbf{\epsilon}
   ,
 \end{equation}
 where
@@ -88,7 +111,7 @@ $\mathbf{1}$ is a length-$n$ vector of ones,
 $\alpha$ is the scalar intercept coefficient,
 $\mathbf{\beta}$ is the length-$m$ vector of locus effect sizes, and
 $\mathbf{\epsilon}$ is a length-$n$ vector of residuals.
-The residuals are assumed to follow a normal distribution: $\mathbf{\epsilon} \sim \text{Normal}(0, \sigma^2)$, for some residual variance parameter $\sigma^2$.
+The residuals are assumed to follow a normal distribution: $\mathbf{\epsilon}_j \sim \text{Normal}(0, \sigma^2)$ independently for each individual $j$, for some residual variance parameter $\sigma^2$.
 
 Typically the number of loci $m$ is in the order of millions while the number of individuals $n$ is in the thousands.
 Hence, the full model above cannot be fit in this typical $n \ll m$ case, as there are only $n$ datapoints to fit (the trait vector) but there are $m+1$ parameters to fit ($\alpha$ and the $\mathbf{\beta}$ vector).
@@ -105,52 +128,133 @@ $\beta_i$ is the effect size coefficient for that locus,
 $\mathbf{U}_r$ is an $n \times r$ matrix of PCs, and
 $\mathbf{\gamma}_r$ is the length-$r$ vector of coefficients for the PCs.
 This approximation is explained by first noticing that the genotype matrix has the following singular value decomposition:
-$\mathbf{X} = \mathbf{U} \mathbf{D} \mathbf{V}^\intercal$,
-where
-$\mathbf{U}$ are its left singular vectors of $\mathbf{X}$,
-$\mathbf{V}$ are its right singular vectors, and
-$\mathbf{D}$ is a diagonal matrix of its singular values.
+$\mathbf{X}^\intercal = \mathbf{U} \mathbf{D} \mathbf{V}^\intercal$,
+where assuming $n < m$ we have that
+$\mathbf{U}$ is an $n \times n$ matrix of the left singular vectors of $\mathbf{X}$,
+$\mathbf{V}$ is an $m \times n$ matrix of its right singular vectors, and
+$\mathbf{D}$ is an $n \times n$ diagonal matrix of its singular values.
 Thus, in the full model we have
-$\mathbf{X} \mathbf{\beta} = \mathbf{U} \mathbf{\gamma}$,
+$\mathbf{X}^\intercal \mathbf{\beta} = \mathbf{U} \mathbf{\gamma}$,
 where
-$\mathbf{\gamma} = \mathbf{D} \mathbf{V}^\intercal \mathbf{\beta}$.
+$\mathbf{\gamma} = \mathbf{D} \mathbf{V}^\intercal \mathbf{\beta}$ is a length-$n$ vector.
 The approximation consists solely of replacing $\mathbf{U} \mathbf{\gamma}$ (the full set of $n$ left singular vectors and their coefficients) with $\mathbf{U}_r \mathbf{\gamma}_r$ (the top $r$ singular vectors only, which constitutes the best approximation of rank $r$).
 Thus, the extra terms in the PCA approach approximate the polygenic effect of the whole genome, and assumes that the locus $i$ being tested does not contribute greatly to this signal.
 
 The statistical significance of a given association test is performed as follows.
 The null hypothesis is $\beta_j = 0$ (no association).
 The null and alternative models are each fit (fitting the coefficients of the multiple regression, where $\beta_j$ is excluded under the null while it is fit under the alternative).
-The resulting regression residuals are compared to each other using the F-test, which results in a p-value where here a two-tailed test is used.
+The resulting regression residuals are compared to each other using the F-test, which results in a two-sided p-value.
 Note that many common PCA implementations trade the more exact F-test for a $\chi^2$ test, which is simpler to implement but only asymptotically accurate.
 As this is a multiple hypothesis test, there are a large number of loci ($m$) tested for association, so it is best to control the FDR rather than setting a fixed p-value threshold.
 We recommend estimating q-values and setting a threshold of $q < 0.05$ so that the FDR is controlled at the 5\% level.
 
-\subsection{Estimation of principal components from genotype data}
+\subsubsection{Kinship model for genotypes}
 
-In practice, the matrix of principal components $\mathbf{U}_p$ above is determined from a ``standardized'' genotype matrix, as follows.
-The ancestral allele frequency at each locus $i$ is estimated as
+In order to better motivate the most common estimation procedure of PCs for genotype data, and to connect PCA to LMMs, we shall review the kinship model for genotypes.
+The model states that genotypes are random variables with a mean and covariance structure given by
 $$
-\pith = \frac{1}{2n} \sum_{j = 1}^n \xij,
-$$
-then the kinship matrix is estimated as
-$$
-\ktHat
+\E[ \xij ]
 =
-\frac{1}{m} \sum_{i = 1}^m
-\frac{
-  \left( \xij - 2 \pith \right) \left( \xij[k] - 2 \pith \right)
-}{
-  4 \pith \left( 1 - \pith \right)
-}
-.
+2 \pit,
+\quad\quad
+\Cov( \xij, \xij[k] )
+=
+4 \pit ( 1 - \pit ) \kt,
 $$
-This is equivalent to first removing the mean ($2 \pith$) of every locus of the genotype matrix, followed by dividing each locus by the scaling factor $2 \sqrt{\pith \left( 1 - \pith \right)}$, prior to performing the singular value decomposition of the genotype matrix \citep{patterson_population_2006}.
-The principal components are the top eigenvectors of this kinship matrix estimate.
-This kinship estimate and minor variants are also employed in LMMs \citep{yang_gcta:_2011}.
+where \pit is the ancestral allele frequency at locus $i$ and \kt is the kinship coefficient between individuals $j$ and $k$ \citep{malecot_mathematiques_1948, wright_genetical_1951, jacquard_structures_1970}.
+Thus, if we standardize the genotype matrix as
+$$
+\mathbf{X}_S
+=
+\left(
+  \frac{
+    \xij - 2 \pit
+  }{
+    \sqrt{4 \pit \left( 1 - \pit \right)}
+  }
+\right)
+,
+$$
+then this results in a straightforward kinship matrix estimator:
+$$
+\E
+\left[
+\frac{1}{m}
+\mathbf{X}_S^\intercal
+\mathbf{X}_S
+\right]
+=
+\mathbf{\Phi}
+,
+$$
+where $\mathbf{\Phi} = ( \kt )$ is the $n \times n$ kinship matrix.
+Note that replacing the raw genotype matrix $\mathbf{X}$ with the standardized matrix $\mathbf{X}_S$ in the trait model of \cref{eq:trait} results in an equivalent model, as this covariate differs only by a linear transformation.
+Thus, under the standardized genotype model, the PCs of interest are equal in expectation to the top eigenvectors of the kinship matrix.
 
+\subsubsection{Estimation of principal components from genotype data}
+
+In practice, the matrix of principal components $\mathbf{U}_r$ in \cref{eq:pca_gwas} is determined from an estimate of the earlier standardized genotype matrix $\mathbf{X}_S$, namely
+$$
+\mathbf{\hat{X}}_S
+=
+\left(
+  \frac{
+    \xij - 2 \pith
+  }{
+    \sqrt{4 \pith \left( 1 - \pith \right)}
+  }
+\right)
+,
+$$
+where the true ancestral allele frequency \pit is replaced by the estimate
+$
+\pith = \frac{1}{2n} \sum_{j = 1}^n \xij,
+$
+and results in the kinship estimate
+$
+\mathbf{\hat{\Phi}}
+=
+\frac{1}{m}
+\mathbf{\hat{X}}_S^\intercal
+\mathbf{\hat{X}}_S
+.
+$
+This kinship estimate and minor variants are also employed in LMMs \citep{yang_gcta:_2011}.
 This estimator of the kinship matrix is biased, and this bias is different for every individual pair \citep{ochoa_fst2, ochoa_human}.
 However, in the present context of PCA regression in genetic association studies, the existing approach performs as well as when the above estimate is replaced by the true kinship matrix (not shown).
 Thus, it appears that in combination with the intercept term ($\mathbf{1} \alpha$ in \cref{eq:pca_gwas}), the rowspace of this kinship matrix estimate approximately equals that of the true kinship matrix.
+
+\subsubsection{Linear mixed-effects model}
+
+The LMM is another approximation to the complex trait model in \cref{eq:trait}, given by
+\begin{equation}
+  \label{eq:lmm_gwas}
+  \mathbf{y}
+  =
+  \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{s} + \mathbf{\epsilon}
+  ,
+\end{equation}
+which is like the PCA model in \cref{eq:pca_gwas} except that the PC terms $\mathbf{U}_r \mathbf{\gamma}_r$ are replaced by the random effect $\mathbf{s}$, which is a length-$n$ vector drawn from
+$$
+\mathbf{s} \sim \text{Normal} \left( \mathbf{0}, \sigma^2_s \mathbf{\Phi} \right),
+$$
+where $\mathbf{\Phi}$ is the kinship matrix and $\sigma^2_s$ is a trait-specific scaling factor.
+This model is derived from treating the standardized genotype matrix $\mathbf{X}_S$ as random rather than fixed, so that the standardized genetic effect
+$\mathbf{X}_S^\intercal \mathbf{\beta}_S$
+in \cref{eq:trait} has mean zero and a covariance matrix of
+$$
+\Cov ( \mathbf{X}_S^\intercal \mathbf{\beta} )
+=
+|| \mathbf{\beta}_S ||^2 \mathbf{\Phi}
+.
+$$
+The above random effect $\mathbf{s}$ satisfies those equations, where the variance scale equals $\sigma^2_s = || \mathbf{\beta}_S ||^2$.
+Thus, the PCA approach is the fixed model equivalent of the LMM under the additional approximation that only the top $r$ eigenvectors are used in PCA whereas the LMM uses all eigenvectors.
+
+A key advantage of LMM over PCA is that it has fewer degrees of freedom: ignoring the shared terms in \cref{eq:pca_gwas} and \cref{eq:lmm_gwas}, PCA has $r$ parameters to fit (each PC coefficient in the $\mathbf{\gamma}$ vector), whereas LMMs only fit one additional parameter, namely $\sigma^2_s$.
+The difference is therefore expected to be more substantial when $r$ is very large and when the sample size (the number of individuals $n$) is very small.
+
+Due to its accuracy and speed, the LMM implementation that we chose for our evaluations is GCTA \citep{yang_gcta:_2011}.
 
 \subsection{Simulations}
 
@@ -162,7 +266,7 @@ All cases are based on the admixture model described previously \citep{ochoa_fst
 Here we consider scenarios where the number of individuals $n$ varies:
 the large sample size and family structure scenarios have $n = 1,000$ whereas small sample size has $n = 100$.
 The number of loci in all cases is $m = 100,000$.
-Individuals are admixed from $K = 10$ intermediate subpopulations, where $K$ is also the rank of the population structure; this implies that, after excluding the intercept, the population structure can be fit with $r = K-1$ PCs.
+Individuals are admixed from $K = 10$ intermediate subpopulations, where $K$ is also the rank of the population structure; thus, after taking into account the intercept's rank-1 contribution, the population structure can be fit with $r = K-1$ PCs.
 Each subpopulation $S_u$ ($u \in \{ 1, ..., K \}$) has an inbreeding coefficient $\ft[S_u] = u \tau$, individual-specific admixture proportions $q_{ju}$ for individual $j$ and intermediate subpopulation $S_u$ arise from a random walk model for the intermediate subpopulations on a 1-dimensional geography with spread $\sigma$, where the free parameters $\tau$ and $\sigma$ are fit to result in $\Fst = 0.1$ for the admixed individuals and a bias coefficient of $s = 0.5$, exactly as before \citep{ochoa_fst2}.
 
 Random genotypes are drawn from this model, as follows.
@@ -181,7 +285,7 @@ Here we describe a simulation of a family structure with admixture that aims to 
 (1) pairing all individuals in every generation, resulting in two children per couple;
 (2) strictly avoiding close relatives when pairing individuals;
 (3) strongly favoring pairs that are nearby in their 1-dimensional geography, which helps preserve the population structure across the generations by preferentially pairing individuals with more similar admixture proportions (a form of assortative mating); and
-(4) iterating for many generations so that a distribution of close and distant relatives are present in the data.
+(4) iterating for many generations so that a broad distribution of close and distant relatives is present in the data.
 
 Generation 1 has individuals with genotypes drawn from the large sample size scenario described earlier, which features admixture.
 In subsequent generations, every individual is paired as follows.
@@ -203,22 +307,21 @@ For a given genotype matrix (simulated or real), a simulated complex trait that 
 In all cases we set the heritability of the trait to be $h^2 = 0.8$.
 We varied the number of causal loci ($m_1$) together with the number of individuals ($n$) so power would remain balanced:
 for the $n = 1,000$ cases we set $m_1 = 100$, whereas the $n = 100$ simulation had $m_1 = 10$.
-Note that the proportion of loci where the alternative hypothesis holds is $\pi_1 = m_1 / m$.
 
 Each simulation replicate consists of different causal loci with different effect sizes, as follows.
 The non-genetic effects are drawn from $\epsilon_j \sim \text{Normal}(0, 1 - h^2 )$ independently for each individual $j$.
 A subset of size $m_1$ of loci was selected at random from the genotype matrix to be causal loci.
 The effect size $\beta_i$ at each causal locus $i$ is drawn initially from a Standard Normal distribution.
 At non-causal loci $i$ we have $\beta_i = 0$.
-Under the kinship model \citep{ochoa_fst1}, the resulting genetic variance component is given by
+Under the kinship model, the resulting genetic variance component is given by
 $$
 \sigma^2_0
 =
 \sum_{i = 1}^m 2 \pit ( 1 - \pit ) \beta_i^2 ,
 $$
 where \pit is the true ancestral allele frequency at locus $i$, which is known in our simulations.
-The desired variance of $h^2$ is therefore obtained by multiplying every $\beta_i$ by $\frac{h}{ \sigma_0 }$.
-The intercept coefficient in \cref{eq:trait} is then set to $\alpha = - \sum_{i=1}^m 2 \pit \beta_i$, so that the final trait expectation is zero.
+The desired genetic variance of $h^2$ is therefore obtained by multiplying every $\beta_i$ by $\frac{h}{ \sigma_0 }$.
+Lastly, the intercept coefficient in \cref{eq:trait} is set to $\alpha = - \sum_{i=1}^m 2 \pit \beta_i$, so the trait expectation is zero.
 This trait simulation procedure is implemented in the \texttt{simtrait} R package, available at
 \url{https://github.com/OchoaLab/simtrait}.
 
@@ -291,17 +394,8 @@ Precision and recall at this threshold are given by
 The precision-recall curve results from calculating the above two values at every threshold $t$, tracing a curve as recall goes from zero (everything is classified as null) to one (everything is classified as alternative), and the area under this curve is our final measure $\auc$.
 A method obtains the maximum $\auc = 1$ if there is some threshold that classifies all loci perfectly.
 In contrast, a method that classifies at random (for example, $\hat{c}_i(t) \sim \text{Bernoulli}(p)$ for any $p$) has an expected precision ($= \auc$) approximately equal to the overall proportion of alternative cases:
-$\pi_1 = \frac{1}{m} \sum_{i = 1}^m c_i$.
+$\pi_1 = \frac{m_1}{m} = \frac{1}{m} \sum_{i = 1}^m c_i$.
 The $\auc$ was calculated using the R package \texttt{PRROC}, which computes the area by integrating the correct non-linear piecewise function when interpolating between points \citep{grau_prroc:_2015}.
-
-\subsection{Comparison among PCA and Existing Implementations }
-
-Some current research argue that Linear Mixed Model (LMM) can outperform PCA in correcting for population strcuture.
-In Linear Mixed Model, population strcuture is treated as random effect.
-Gengxin and Hongjiang (2013) demonstrate that efficient mixed-model association eXpedited (EMMAX) which is based on linear mixed model outperforms PCA in both the population cohort study and case-control study.
-In this project, LMM will be tested under the same admixture simulation and trait simulation to PCA and thus, comparison between LMM and PAC with different PCs used under different situations can be made.
-Additionally, PCA with no PC used is equivalent to Linear Regression (LM).
-We will also consider the performance comparision among PCA and LM. 
 
 
 
@@ -409,7 +503,7 @@ In this case, LMM performs better than PCA in terms of power.
   \label{fig:family_structure}
 \end{figure}
 
-\subsubsection{PCA performance when familty structure exists}
+\subsection{PCA performance when familty structure exists}
 
 The introduction of family structure will make the original admixture populatio more complicated.
 In this case, we assume that there are 20 generations in total while other factors fixed.
@@ -433,7 +527,7 @@ Hence, PCA also outperforms LMM in terms of power.
 
 \section{Discussion}
 
-\subsection{PCA GWAS fails without enough PCs}
+%\subsection{PCA GWAS fails without enough PCs}
 
 Right now, both LMM and PCA have become standard approaches to correct for admixture population. In current PCA GWAS research, the number of PCs used in PCA is ususally assmued to be 10.
 For instance, based on the simulation of \citet{hoffman_correcting_2013}, 10 PCs are randomly selected from the first 30 PCs.
@@ -448,8 +542,7 @@ On the contraty, the lack of PCs will lead to the failure of PCA regardless of t
 Seokho et al.(2012) state that considering the large number of single-nucleotide polymorphisms (SNP) used in GWAS to infer structure, it is necessary to remove SNPs that have negligible loadings in PCA.
 Whereas, our simulation indicates that if there is no enough PCs used in PCA GWAS, its performance can be bad as SNPs that have significant loadings are vanished from the analysis.
 
-
-\subsection{PCA GWAS still works even too many PCs are used}
+%\subsection{PCA GWAS still works even too many PCs are used}
 
 PCA GWAS is still robust even though PCs are excessively used for type one error controlling. However, for power, it will receive punishment if the number of PCs are excessive and the sample size is small.
 Jason and Anna (2009) point out that PCA with large sample size has better sample size than it with small sample size.
@@ -461,9 +554,9 @@ This may result from that the number of causal loci in small sample size is redu
 However, the boxplot of AUC has a bell shap with downward-sloping line on each side of the peak.
 It demonstrates that in small sample size, punishment of excessive use of PCs will come occur immdeiately.
 Considering in the study of GWAS, we will expect to use thousnds of SNPs and number of individuals are also much larger than 100, the situation of small sample size may not be common (Seokho et al., 2012).
-Hence, although PCA will fail when the number of PCs is much larger than the true rank of genotype matrix, it is still encouraged to use more PCs in PCA GWAS .
+Hence, although PCA will fail when the number of PCs is much larger than the true rank of genotype matrix, it is still encouraged to use more PCs in PCA GWAS.
 
-\subsection{PCA GWAS fails with the existence of complex family strcuture }
+%\subsection{PCA GWAS fails with the existence of complex family strcuture}
 
 \citep{price_new_2010} point out that GWAS may fail in the case of dataset contains  family structure.
 The result of our simulation also supports this argument.
@@ -474,7 +567,8 @@ Concerning power, it can be seen that in both siutations, AUC will converge to 0
 Whereas, the range of AUC in \cref{fig:family_structure} will increase when excessive PCs are used in PCA.
 It illustrates that excessive use of PCs will result in the extra variance. 
 Hence, in the case of complex family structure, we need to be cautious about using PCs to aviod unnecessary variance. 
-\subsection{LMM outperforms PCA }
+
+%\subsection{LMM outperforms PCA}
 
 \citet{wang_analytical_2013} argues that mixed effects model is preferred in the case of existence cryptic relatedness but not population stratification.
 In their paper, only first four PCs are used in PCA and performance of PCA may be underestimated.
@@ -488,6 +582,10 @@ The maximum of AUC value of PCA in this scenario decreases to 0.2 and the averag
 However, when complicated family structure exists, PCA outperforms LMM in terms of power. 
 
 \citep{tucker_improving_2014}
+
+TODO:
+Gengxin and Hongjiang (2013) demonstrate that efficient mixed-model association eXpedited (EMMAX) which is based on linear mixed model outperforms PCA in both the population cohort study and case-control study.
+
 
 \printbibliography
 
