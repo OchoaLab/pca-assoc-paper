@@ -71,19 +71,23 @@ M_rmsd_LM_n_1000_family<-read.table("M_rmsd_LM_n_1000_family.txt")
 M_auc_LM_n_1000_family<-read.table("M_auc_LM_n_1000_family.txt")
 M_rmsd_LMM_n_1000_family<-read.table("M_rmsd_LMM_n_1000_family.txt")
 M_auc_LMM_n_1000_family<-read.table("M_auc_LMM_n_1000_family.txt")
-rmsd_1000_family<-read.table("rmsd_k_fixed_k_10_pcs_2_90_n_1000_10_19_family.txt")
+rmsd_1000_family<-read.table("rmsd_k_fixed_k_10_pcs_2_90_n_1000_10_31_family.txt")
+rmsd_miss<-read.table("M_rmsd_LM_n_1000_family_miss.txt")
+auc_miss<-read.table("M_auc_LM_n_1000_family_miss.txt")
 rmsd_1000_family<-rmsd_1000_family[,1:90]
+
 rmsd_1000_family<-cbind(M_rmsd_LM_n_1000_family,rmsd_1000_family)
 
 colnames(rmsd_1000_family)[1]<-"LM"
 colnames(rmsd_1000_family)[2:91]<-1:90
 rmsd_1000_family<-cbind(rmsd_1000_family,M_rmsd_LMM_n_1000_family)
 colnames(rmsd_1000_family)[92]<-"LMM"
+
 boxplot(rmsd_1000_family,main="Boxplot of RMSD when n=1000 & family structure exists", xlab="The number of PCs", ylab="RMSD")
 
 
 
-auc_1000_family<-read.table("auc_k_fixed_k_10_pcs_2_90_n_1000_10_19_family.txt")
+auc_1000_family<-read.table("auc_k_fixed_k_10_pcs_2_90_n_1000_10_31_family.txt")
 auc_1000_family<-auc_1000_family[,1:90]
 auc_1000_family<-cbind(M_auc_LM_n_1000_family,auc_1000_family)
 
