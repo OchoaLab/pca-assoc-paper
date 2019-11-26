@@ -48,13 +48,10 @@ $^*$ Corresponding author: \texttt{alejandro.ochoa@duke.edu}
   However, admixture population is involved in the current GWAS research which may result in the violation of Hardy-Weinberg Equilibrium (HWE).
   PCA can be used to correct for the bias result from admixture population.
   In this paper, we test the performance of PCA with desirable admixture simulation population.
-  Since previous research about comparing PCA and LMM is limited, we also make comparison of performance among PCA, LMM and LM in terms of both power and type one error controlling.
-  The approach we used in this paper is mainly based on the additive linear model.
-  Since the number of loci we consider is much larger than sample size, each loci together with PCs is fitted to test the significance of this loci.
+  Since previous research about comparing PCA and LMM is limited, we also make comparison of performance among PCA and LMM in terms of both power and type one error controlling.
   According to the admixture simulation structure, three scenarios are considered in this case: large sample size, small sample size and large sample with complicated family structure.
-  In these three scenarios, the number of loci and subpopulation are fixed.
-  In order to fully compare the performance of PCA, LMM and LM under different admixture structures, Root mean square deviation (RMSD) and areas under curve (AUC) to measure the performance of type one error controlling and power separately.
-  According to the results of simulation, it can be seen that PCA fails in both type one error and power when the number of PCA is smaller than the true rank of genotype matrix.
+  In order to fully compare the performance of PCA and LMM under different admixture structures, Root mean square deviation (RMSD) and areas under curve (AUC) to measure the performance of type one error controlling and power separately.
+  According to the results of simulation, PCA fails in both type one error and power when the number of PCA is smaller than the true rank of genotype matrix.
   Additionally, PCA is robust to type one error once the number of PCs is larger than true rank of genotype matrix regardless of sample size, but the existence of family structure will impose a negative influence on it.
   In terms of power, PCA will be punished with excessive usage of PCs in the case of small sample size.
   Once enough PCs are used in PCA, it always outperforms LM in both type one error controlling and power.
@@ -107,7 +104,7 @@ All together, our simulation studies provide clear criteria under which use of P
 
 In this subsection we describe the complex trait model and kinship model that motivates both the PCA and LMM models for genetic association studies, followed by further details regarding the PCA and LMM approaches.
 
-\subsubsection{The additive quantitative trait model and PCA approximation}
+\subsubsection{The complex trait model and PCA approximation}
 
 Let $\xij \in \{ 0, 1, 2 \}$ be the genotype at locus $i$ for individual $j$, which counts the number of reference alleles.
 Suppose there are $n$ individuals and $m$ loci,
@@ -253,12 +250,12 @@ which is like the PCA model in \cref{eq:pca_gwas} except that the PC terms $\mat
 $$
 \mathbf{s} \sim \text{Normal} \left( \mathbf{0}, \sigma^2_s \mathbf{\Phi} \right),
 $$
-where $\mathbf{\Phi}$ is the kinship matrix and $\sigma^2_s$ is a trait-specific scaling factor.
+where $\mathbf{\Phi}$ is the kinship matrix and $\sigma^2_s$ is a trait-specific variance scaling factor.
 This model is derived from treating the standardized genotype matrix $\mathbf{X}_S$ as random rather than fixed, so that the standardized genetic effect
 $\mathbf{X}_S^\intercal \mathbf{\beta}_S$
 in \cref{eq:trait} has mean zero and a covariance matrix of
 $$
-\Cov ( \mathbf{X}_S^\intercal \mathbf{\beta} )
+\Cov \left( \mathbf{X}_S^\intercal \mathbf{\beta}_S \right)
 =
 || \mathbf{\beta}_S ||^2 \mathbf{\Phi}
 .
@@ -267,7 +264,7 @@ The above random effect $\mathbf{s}$ satisfies those equations, where the varian
 Thus, the PCA approach is the fixed model equivalent of the LMM under the additional approximation that only the top $r$ eigenvectors are used in PCA whereas the LMM uses all eigenvectors.
 
 A key advantage of LMM over PCA is that it has fewer degrees of freedom: ignoring the shared terms in \cref{eq:pca_gwas} and \cref{eq:lmm_gwas}, PCA has $r$ parameters to fit (each PC coefficient in the $\mathbf{\gamma}$ vector), whereas LMMs only fit one additional parameter, namely $\sigma^2_s$.
-The difference is therefore expected to be more substantial when $r$ is very large and when the sample size (the number of individuals $n$) is very small.
+Therefore, PCA is expected to overfit more substantially than LMM---and thus lose power---when $r$ is very large, and especially when the sample size (the number of individuals $n$) is very small.
 
 Due to its accuracy and speed, the LMM implementation that we chose for our evaluations is GCTA \citep{yang_gcta:_2011}.
 
@@ -414,161 +411,119 @@ The $\auc$ was calculated using the R package \texttt{PRROC}, which computes the
 
 
 
-\section{Result}
+\section{Results}
 
-We use simulation data where genotypes and trait will be simulated following procedure mentioned above.
-We first set the sample size to be 1000 and then, we reduce the sample size to 100 to investigate whether PCA still have similar performance under new scenario.
-We will conduct 10 times simulation so that the extra variance can be reduced.
-For each simulation, performance of PCA will be collected in terms of RMSD and AUC for PCs from 2 to 90.
-Also, real data set will also be introduced to test the performance of PCA and trait will be simulated in the same way to simulation data.
-Then, we will test the performance of PCA when family structure exists with sample size equals to 1000 and 100 separately.
-Finally, we test the performance of PCA with the existence of complex family structure and here we set the generation to be 20.
+We simulate genotype matrices and traits to go with the genotypes, in order to control important features of the population structure and to test all methods in an ideal setting where the true causal loci are known.
+Our simulations permit exact identification of true positives, false positives, and false negatives, ultimately yielding two measures of interest: $\rmsd$ measure null p-value uniformity and relates to the accuracy of type-I error control (smaller is better), while $\auc$ measures predictive power (higher is better) and serves as a proxy for statistical power when $\rmsd \approx 0$.
+However, the simulation of genotypes followed by simulation of the trait leads to a considerable amount of variance in the final measured $\rmsd$ and $\auc$, which are random variables.
+For that reason, every evaluation was replicated at least 10 times (varies by scenario), resulting in a distribution of $\rmsd$ and $\auc$ values per method.
+Except when noted, each replicate consisted of a new genotype matrix drawn from the same structure model of the scenario, followed by a new simulated trait based on this genotype matrix, which included selecting new causal loci with new effect sizes.
 
-\subsection{PCA performance under N=1000}
+All scenarios are based on an admixture simulation from $K=10$ subpopulations and a resulting generalized $\Fst = 0.1$, which establishes the population structure.
+We vary the sample size (number of individuals) in order to test the extent to which PCA overfits the population structure as the number of PCs increases ($r \in \{0, ..., 90\}$), particularly in comparison to the LMM.
+Keep in mind that the ideal choice for the number of PCs in this simulation is $r = K-1 = 9$ (the rank of the data minus the rank of the intercept).
+Lastly, to push all methods to their limits, we evaluate them in a scenario with both admixture and a complex family structure.
+
+%\subsection{Evaluation in large sample size admixture scenario}
+
+First we evaluate all methods in the large sample size scenario, which has a reasonable number of individuals ($n = 1,000$) typical for genetic association studies.
+In this scenario we find a clear transition around the ideal number of PCs of $r = 9$, below of which performance is poor and above of which performance is satisfactory (\cref{fig:large_sample_size}).
+In particular, when $r < 9$ we find the largest $\rmsd$ values, which indicate that p-values are highly non-uniform and would therefore result in inaccurate type-I error control.
+The smallest $\auc$ values also occur for $r < 9$, showing that not enough PCs results in loss of predictive power as well.
+As expected, $r = 9$ has the best performance in terms of both $\rmsd$ and $\auc$.
+Remarkably, as $r$ is increased up to $r = 90$, there is no noticeable change in the $\rmsd$ distribution, and only a small decrease in $\auc$ compared to the optimal $r = 9$ case.
+The LMM performs about as well as PCA with $r = 9$ here, with small $\rmsd$ values (though somewhat larger than those of $r=9$) and larger $\auc$ values than PCA's with $r=9$.
+Thus, in this common scenario where sample sizes are large enough, the PCA approach with enough PCs performs as well as LMM.
+
 \begin{figure}[bp!]
   \centering
   \includegraphics[width=4in]{PCA_n_1000_m_10_k_10.pdf}
   \caption{
-    {\bf boxplot of rmsd and auc}
-    The first panel is the boxplot of RMSD when sample size is 1000. Here the y axis represents value of rmsd and x axis is the number of PCs used in PCA.
-    The second panel is the boxplot of AUC and here y axis is value of AUC. RMSD is used to measure the deviation of distribution of p values of null hypothesis from uniform distribution. In the case of multiple null hypothesis holds, the distribution of p-values of null hypothesis should approximate to unifrom distribution. The small value of RMSD implies type one error is well controlled. Regaring AUC, it's calculated by integration of predicion and recall curve. The value of AUC can be interpreted as the proportion of predictions made by this model is correct. The large AUC value implies better performance in predictive power. The result of Linear Regression is put at the position of PC equals to zero and the result of LMM is put at the position of PC equals to 91.}
+    {\bf Evaluation in large sample size admixture scenario.}
+    Here there are $n = 1,000$ individuals in the simulation.
+    The PCA approach is tested under varying number of PCs ($r \in \{0, ..., 90\}$), alongside the LMM approach (x-axis), with boxplots for 10 replicates (y-axis) for the distributions of $\rmsd$ (top panel) and $\auc$ (bottom panel).
+    Small $\rmsd$ and large $\auc$ correspond with better performance.
+    The ideal number of PCs is $r = K-1 = 9$, where $K$ is the number of subpopulations prior to admixture, which results in near zero $\rmsd$ and peak $\auc$, and performs nearly as well as the LMM.
+    PCA with $r < 9$ has incorrect p-values ($\rmsd \gg 0$ cases) and lowest predictive power (small $\auc$).
+    Remarkably, PCA remains robust even in extreme $r > 9$ cases, with $\rmsd$ near zero up to $r = 90$ and minimal loss of power as $r$ increases to 90.
+  }
   \label{fig:large_sample_size}
 \end{figure}
 
-According to \cref{fig:large_sample_size}A which is the boxplot of RSMD when the number of subpopulation is 10 and sample size is 1000, it can be seen that RMSD values remain relatively high when p is smaller than 9, which satisfies the actual rank of genotype matrix or kinship matrix which is (k-1).
-It demonstrates that the distribution of p-values of null hypothesis deviates from the expected quantiles of uniform distribution and therefore, PCA fails to control FDR.
-Though the performance of PCA is relatively bad, there still exists an decreasing tendency.
-It indicates that when the number of PCs used in PCA is smaller than true rank of genotype matrix, PCA will benefit forom using more PCs in terms of controlling FDR.
-However, once the number of PCs used in PCA reaches the actual rank of genotype matrix or kinship matrix, the RSDM will junmp to a small value and in this case the value of RMSD is close to 0.
-It remains stable as the number of PCA increases.
-Apart from this, it can be seen that before the number of PCs reaches the rank of genotype matrix, the distance among minimum and maximun of RMSD is larger.
-It tends to be smaller after number of PCs used in PCA is larger than the rank of genotype matrix, which shows less fluctuations in terms of type 1 error controlling.
-The RMSD value of LM is around 0.13 and it is smaller than PCA's RMSD value when PCs used in PCA is smaller than true rank of genotype matrix.
-However, once the number of PCs is larger than true rank of genotype matrix, it can be seen that PCA has better performance in type one error controlling.
-Compared with the performance of LMM, it can be seen that both PCA and LMM controll type one error well once the number of PCs used in PCA is larger than the true rank of genotype.
+%\subsection{Evaluation in small sample size admixture scenario}
 
-\cref{fig:large_sample_size}B illustrates the pattern of AUC for the same scenario to the first panel.
-In this case, we can see a increasing tendency for AUC when the number of PCs is samller than the true rank of genotype or kinship matrix.
-Such a tendency indicates that the increase of number of PCs can increase predictive power of PCA when it is smaller than the rank of genotype matrix.
-Once the number of PCs used in PCA exceeds the rank of PCA, the value of AUC will be increased to around 0.8, which indicates that $80\%$ predictions of PCA are correct.
-After that, PCA does not benefit from adding more PCs as it can not increase the value of AUC obviously.
-Similarly, the range of AUC tends to be smaller than it when the number of PCs used in PCA is greater than rank of genotype matrix.
-It is clear that LM has better performance when
-Similar to the previous pandel, PCA outperforms LM when the number of PCs is no smaller than the true rank of genotype matrix.
-In terms of LMM, the average AUC value is slightly higher than AUC of PCA even the number of PCs is larger than true rank of genotype matrix. 
+The previous observation, that PCA continues to perform well when the number of PCs is 10 times greater than its optimum value ($r = 90$ vs $r = 9$), propelled us to find a scenario where this is no longer the case.
+We expect the PCA approach to begin overfitting as the number of PCs $r$ approaches the sample size $n$.
+Increasing $r$ beyond 90 does not make sense, as this would never be done in practice.
+Instead, we reduced $n$ to 100, a number of individuals that is small for typical association studies, but which may occur in studies of rare diseases, or be due to low budgets or other constraints.
+To compensate for the loss of power that results from reducing the sample size, we also reduced the number of causal loci from 100 before to $m_1 = 10$, which increases the magnitude of the effect sizes.
+Note that this reduction in the number of causal loci results in more discreteness in $\auc$ values in \cref{fig:small_sample_size}.
+Interestingly, we find that the relationship between $\rmsd$ and $r$ is similar under small and large sample sizes, with ideal near-zero $\rmsd$ distributions for $r \ge 9$.
+On the other hand, we do see a more severe overfitting effect here that results in decreased predictive power: $\auc$ peaks at $r = 9$ as expected, but drops more rapidly as $r$ increases, with performance around $r = 50$ that is as bad as for $r = 0$, and practically zero $\auc$ at $r = 90$ (\cref{fig:small_sample_size}).
+Another notable difference from the large sample size scenario is that here LMM outperforms PCA with $r=9$ by a sizable margin.
 
-
-\subsection{PCA performance under N=100}
 \begin{figure}[bp!]
   \centering
   \includegraphics[width=4in]{PCA_n_100_m_10_k_10.pdf}
   \caption{
-    {\bf boxplot of rmsd and auc}
-    The first panel is the boxplot of RMSD when sample size is 100.
-    The pattern of panel A in here is similar to \cref{fig:large_sample_size}A.
-    The converging value of RMSD here is also close to zero indicating that even in a small sample size, PCA is still robust to type one error controlling.
-    Moreover, the LMM and PCA has similar RSMD values which demonstrates that these two methods have almost the same performance in type one error controlling.
-    The pattern of \cref{fig:large_sample_size}B is bell-shapled.
-    The AUC value reaches the peak when the number of PCs used in PCA equals to 9 and begins to decrease with the increase of PCs used.
-    It illustrates that PCA fails in terms of power when the sample size is small.
-    The decrease tendency is more obvious when the number of PCs is around 68 and it can be seen that LMM which is located at the last point of y-axis has better performance in power, compared with PCA and LM.
+    {\bf Evaluation in small sample size admixture scenario.}
+    Here there are $n = 100$ individuals in the simulation, otherwise the simulation and figure layout is the same as in \cref{fig:large_sample_size}.
+    The pattern for $\rmsd$ in the top panel is similar to the previous figure.
+    However, here there is a more pronounced drop in $\auc$ values as the number of PCs $r$ increases from $r=9$ to $r=90$.
+    Here LMM outperforms PCA with $r=9$ in terms of $\auc$ by a greater margin.
   }
   \label{fig:small_sample_size}
 \end{figure}
 
-Then, we want to investigate the performance of PCA when samlpe size is small.
-Here we set the sample size to be 100.
-From \cref{fig:small_sample_size}A it can be seen that the pattern is similar to the boxplot of RMSD in the case of sample size equals to 1000.
-It illustrates an decreasing when the number of PCs is smaller than true rank of genotype matrix.
-It indicates that PCA can better control type 1 error in this situation.
-If the number of PCs is greater than true rank of genotype matrix, the RSMD will decrease immediately and approximate to zero, which shows type one error is excellently controlled.
-Hence, PCA is insensitive to the smaple size in terms of RMSD or type 1 error controlling.
-Compared with the RMSD value of LM, RMSD value of PCA is smaller when the number of PCs is greater than 3.
-It implies that PCA control type one error better than LM.
-Moreover,the performance of LMM in this case is similar to \cref{fig:small_sample_size} which is close to previous figure.
-The RMSD value of LMM approximates to 0 which indicates that there is no significant difference among PCA and LMM in this case.
+%\subsection{Evaluation in family structure admixture scenario}
 
-\cref{fig:small_sample_size}B concerned with the boxplot of AUC, the pattern is obviously different from the boxplot of AUC when smaple size is 1000.
-Although we still can find an increasing pattern of AUC before the number of PCs reaches the k.
-However, it can be seen that there is an decreasing pattern of AUC value once the number of PCs exceeds the true rank of PCA.
-It demonstrates that, even though fluctuations exist, performance of PCA in terms of power can be wrose with the increase of PCs used in PCA.
-The position of peak of AUC in this case is located at PCs equal to 9 which is exactly the true rank of genotype.
-Since we take the intercept into consideration, the true rank of genotype matrix equals to the number of subpopulation minus one.
-The bell-shaled distribution of AUC boxpolot implies that PCA receives punishment in power once the number of PCs used in PCA is larger than true rank of genotype matrix.
-Moreover, in terms of LM, it can be seen that even only one PC is used in PCA, the AUC value of PCA is still no worse than LM.
-However, when excessive PCs are used, performance of LMM can be better with a larger AUC value.
-Considering LMM, the average` AUC value is 0.25, whereas, the maximum AUC of PCA is 0.2 and it decreases immediately due to the excessive use of PCs.
-In this case, LMM performs better than PCA in terms of power. 
-
-
-
+Previous work has shown that PCA performs poorly in the presence of family structure.
+Here we aim to characterize PCA's behavior in a much more complex structure than before, by simulating a family of admixed founders for 20 generations, so that we may observe numerous siblings, first cousins, etc.
+In this case $r = 9$ is not the optimal choice, as the rank of the genotype matrix is much greater due to the family structure.
+We find that, although $\rmsd$ decreases monotonically as $r$ increases, this distribution does not go to zero, instead converging to around 0.05 (\cref{fig:family_structure}).
+Additionally, the $\auc$ increases until $r = 4$ is reached (as opposed to $r = 9$ as before), then plateaus with marginal decreases in performance as $r$ goes to 90.
+In contrast, the LMM does achieve a near-zero $\rmsd$, although the $\auc$ distribution is much wider than the best performing PCA cases.
 
 \begin{figure}[bp!]
   \centering
   \includegraphics[width=4in]{PCA_n_1000_m_100_family_structure.pdf}
   \caption{
-    {\bf boxplot of rmsd and auc}
-    The first panel is the boxplot of RMSD when sample size is 100.
-    The pattern of panel A here is similar to \cref{fig:large_sample_size}A.
-    The converging value of RMSD here is also close to one indicating that even in a small sample size, PCA is still robust to type one error controlling.
-    The pattern of panel B is bell-shapled.
-    The AUC value reaches the peak when the number of PCs used in PCA equals to 9 and begins to decrease with the increase of PCs used.
-    It illustrates that PCA fails in terms of power when the sample size is small.
+    {\bf Evaluation in family structure admixture scenario.}
+    Here there are $n = 1,000$ individuals from a family structure simulation with admixed founders and large numbers of pairs of sibling, first cousins, second cousins, etc, from a realistic random pedigree that spans 20 generations.
+    Unlike previous figures, here $\rmsd$ (top panel) for PCA does not go down to zero as $r$ increases.
+    For this complex relatedness structure $r = 9$ is not the optimal number of PCs, although performance remains steady for all $r \ge 9$ values tested.
+    TODO: LMM looks weird and $r=1$ is missing!
   }
   \label{fig:family_structure}
 \end{figure}
-
-\subsection{PCA performance when familty structure exists}
-
-The introduction of family structure will make the original admixture populatio more complicated.
-In this case, we assume that there are 20 generations in total while other factors fixed.
-Based on the result of \cref{fig:family_structure}A indicates that there is a decreasing pattern of RMSD for the first three PCs.
-It addition, the value of RMSD in this situation is large, which indicates that the distribution of p-value of null hypothesis does not approximate to uniform distribution.
-It illustrates that PCA fails to control type one error when the number of PCs is not enough.
-When the number of PCs is larger than 4, values of RMSD beome stable around 0.05 which demonstrates that there exists evidence of the distribution of p-value of null hypothesis does not deviate from uniform distribution but the evidence is weaker than previous simulation where RSDM approximates to 0.
-Considering the range of RMSD, it decreases first and then begins to increase.
-It shows that excessive use of PCs will lead to extra variance.
-In terms of LM, it can be seen that its RMSD value is around 0.28, which indicates that the distribution of p-value of null hypothesis is significantly deviated from uniform distribution. Hence, LM fails in the case of complicated family strcuture exists.  
-For LMM, the value of RMSD still close to zero illustrating that type one error can be excellently controlled even when complicated family strcuture exists.
-For AUC, it illustrates an increasing tendency for the first three PCs (\cref{fig:family_structure}B).
-When the number of PCs is larger than 3, AUC fluctuates around 0.2.
-This shows the power of PCA is small and hence, PCA's performance is not pretty well in this csae in terms of power even though enough PCs are used. 
-Regarding LM, the value of AUC is smaller than PCA with 1 PC used. 
-It shows that PCA outperforms LM in this case.
-Considering LMM, the AUC value of PCA is larger than LMM when enough PCs are used in PCA and the range of AUC value of LMM is large.
-Hence, PCA also outperforms LMM in terms of power.
-
-
 
 \section{Discussion}
 
 %\subsection{PCA GWAS fails without enough PCs}
 
-Right now, both LMM and PCA have become standard approaches to correct for admixture population. In current PCA GWAS research, the number of PCs used in PCA is ususally assmued to be 10.
+Right now, both LMM and PCA have become standard approaches to correct for admixture population.
+In current PCA GWAS research, the number of PCs used in PCA is ususally assumed to be 10.
+The default in EIGENSTRAT is to use 10 PCs \citep{price_principal_2006}.
 For instance, based on the simulation of \citet{hoffman_correcting_2013}, 10 PCs are randomly selected from the first 30 PCs.
 Furthermore, \citet{wojcik_genetic_2019} also performed PCA GWAS for 26 traits with first 10 PCs.
 According to the result of \citet{wojcik_genetic_2019}, the correlation plot between SNP genotype and PC1–PC10 illustrates different populations has different correlations over some PCs.
-It seems that there exists a tradition that when PCA GWAS is performed, the top 10 PCs will be used.
-Since the result of PCA GWAS in this convention is good, right now most paprs will assume the number of PCs used in PCA GWAS to be 10.
-However, in this paper, we further investigate about the optimal choice of number of PCA under different population structures.
+Here, we further investigate about the optimal choice of number of PCA under different population structures.
 In most current research, the number of subpopulation is smaller 10 and thus, based on results of previous three scenarios, the number of PCs used in PCA is enough which certifies the good performance of PCA  in current research.
-For instance, based on the scatter plot of first two principal components with HapMap3 dataset which contains 11 populations, it can be divided into three subpopulations (Gad and Machiel, 2014).
-On the contraty, the lack of PCs will lead to the failure of PCA regardless of the sample size or family structure in both type one error and power.
-Seokho et al.(2012) state that considering the large number of single-nucleotide polymorphisms (SNP) used in GWAS to infer structure, it is necessary to remove SNPs that have negligible loadings in PCA.
+For instance, based on the scatter plot of first two principal components with HapMap3 dataset which contains 11 populations, it can be divided into three subpopulations \citep{abraham_fast_2014}.
+On the contrary, the lack of PCs will lead to the failure of PCA regardless of the sample size or family structure in both type one error and power.
+\citet{lee_sparse_2012} state that considering the large number of single-nucleotide polymorphisms (SNP) used in GWAS to infer structure, it is necessary to remove SNPs that have negligible loadings in PCA.
 Whereas, our simulation indicates that if there is no enough PCs used in PCA GWAS, its performance can be bad as SNPs that have significant loadings are vanished from the analysis.
 
 %\subsection{PCA GWAS still works even too many PCs are used}
 
 PCA GWAS is still robust even though PCs are excessively used for type one error controlling. However, for power, it will receive punishment if the number of PCs are excessive and the sample size is small.
-Jason and Anna (2009) point out that PCA with large sample size has better sample size than it with small sample size.
-This is because that PCA with large sample size can have smaller probability error and larger accuracy of population estimation ( Jason and Anna ,2009).
 The small sample size in our research project only has 100 individuals in total.
 In a GWAS study, this is an extreme situation which it not realistic in research.
 The AUC boxplot of small sample size indicates that the peak of AUC is close to AUC value for large sample size.
 This may result from that the number of causal loci in small sample size is reduced from 100 to 10.
 However, the boxplot of AUC has a bell shap with downward-sloping line on each side of the peak.
 It demonstrates that in small sample size, punishment of excessive use of PCs will come occur immdeiately.
-Considering in the study of GWAS, we will expect to use thousnds of SNPs and number of individuals are also much larger than 100, the situation of small sample size may not be common (Seokho et al., 2012).
+Considering in the study of GWAS, we will expect to use thousnds of SNPs and number of individuals are also much larger than 100, the situation of small sample size may not be common \citep{lee_sparse_2012}
 Hence, although PCA will fail when the number of PCs is much larger than the true rank of genotype matrix, it is still encouraged to use more PCs in PCA GWAS.
 
 %\subsection{PCA GWAS fails with the existence of complex family strcuture}
@@ -587,7 +542,7 @@ Hence, in the case of complex family structure, we need to be cautious about usi
 
 \citet{wang_analytical_2013} argues that mixed effects model is preferred in the case of existence cryptic relatedness but not population stratification.
 In their paper, only first four PCs are used in PCA and performance of PCA may be underestimated.
-Fruthermore, EMMAX which is a kind of linear mixed model is claimed to be better than PCA (Gengxin and Hongjiang, 2013).
+Fruthermore, EMMAX which is a kind of linear mixed model is claimed to be better than PCA (TODO review: Gengxin and Hongjiang, 2013).
 Based on the result of our simulations, it can be seen that in both large sample size and small sample size, LMM are slightly better than PCA in terms of power.
 When sample size is large such as the scenario in \cref{fig:large_sample_size}B, it can be seen that although both two methods's are not good.
 However, the maximum AUC value of PCA is around 0.25 and LMM's AUC value is slightly larger than PCA.
@@ -599,6 +554,7 @@ However, when complicated family structure exists, PCA outperforms LMM in terms 
 \citep{tucker_improving_2014}
 
 TODO:
+This is a review:
 Gengxin and Hongjiang (2013) demonstrate that efficient mixed-model association eXpedited (EMMAX) which is based on linear mixed model outperforms PCA in both the population cohort study and case-control study.
 
 
