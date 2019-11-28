@@ -435,8 +435,6 @@ We vary the sample size (number of individuals) in order to test the extent to w
 Keep in mind that the ideal choice for the number of PCs in this simulation is $r = K-1 = 9$ (the rank of the data minus the rank of the intercept).
 Lastly, to push all methods to their limits, we evaluate them in a scenario with both admixture and a complex family structure.
 
-%\subsection{Evaluation in large sample size admixture scenario}
-
 First we evaluate all methods in the large sample size scenario, which has a reasonable number of individuals ($n = 1,000$) typical for genetic association studies.
 In this scenario we find a clear transition around the ideal number of PCs of $r = 9$, below of which performance is poor and above of which performance is satisfactory (\cref{fig:large_sample_size}).
 In particular, when $r < 9$ we find the largest $\rmsd$ values, which indicate that p-values are highly non-uniform and would therefore result in inaccurate type-I error control.
@@ -454,14 +452,12 @@ Thus, in this common scenario where sample sizes are large enough, the PCA appro
     Here there are $n = 1,000$ individuals in the simulation.
     The PCA approach is tested under varying number of PCs ($r \in \{0, ..., 90\}$), alongside the LMM approach (x-axis), with boxplots for 10 replicates (y-axis) for the distributions of $\rmsd$ (top panel) and $\auc$ (bottom panel).
     Small $\rmsd$ and large $\auc$ correspond with better performance.
-    The ideal number of PCs is $r = K-1 = 9$, where $K$ is the number of subpopulations prior to admixture, which results in near zero $\rmsd$ and peak $\auc$, and performs nearly as well as the LMM.
+    The ideal number of PCs is $r = K-1 = 9$, where $K$ is the number of subpopulations prior to admixture, which results in near zero $\rmsd$ and peak $\auc$, and performs as well as the LMM.
     PCA with $r < 9$ has incorrect p-values ($\rmsd \gg 0$ cases) and lowest predictive power (small $\auc$).
     Remarkably, PCA remains robust even in extreme $r > 9$ cases, with $\rmsd$ near zero up to $r = 90$ and minimal loss of power as $r$ increases to 90.
   }
   \label{fig:large_sample_size}
 \end{figure}
-
-%\subsection{Evaluation in small sample size admixture scenario}
 
 The previous observation, that PCA continues to perform well when the number of PCs is 10 times greater than its optimum value ($r = 90$ vs $r = 9$), propelled us to find a scenario where this is no longer the case.
 We expect the PCA approach to begin overfitting as the number of PCs $r$ approaches the sample size $n$.
@@ -471,7 +467,7 @@ To compensate for the loss of power that results from reducing the sample size, 
 Note that this reduction in the number of causal loci results in more discreteness in $\auc$ values in \cref{fig:small_sample_size}.
 Interestingly, we find that the relationship between $\rmsd$ and $r$ is similar under small and large sample sizes, with ideal near-zero $\rmsd$ distributions for $r \ge 9$.
 On the other hand, we do see a more severe overfitting effect here that results in decreased predictive power: $\auc$ peaks at $r = 9$ as expected, but drops more rapidly as $r$ increases, with performance around $r = 50$ that is as bad as for $r = 0$, and practically zero $\auc$ at $r = 90$ (\cref{fig:small_sample_size}).
-Another notable difference from the large sample size scenario is that here LMM outperforms PCA with $r=9$ by a sizable margin.
+Compared to the large sample size scenario, here LMM better matches the performance of PCA with $r=9$.
 
 \begin{figure}[bp!]
   \centering
@@ -481,12 +477,9 @@ Another notable difference from the large sample size scenario is that here LMM 
     Here there are $n = 100$ individuals in the simulation, otherwise the simulation and figure layout is the same as in \cref{fig:large_sample_size}.
     The pattern for $\rmsd$ in the top panel is similar to the previous figure.
     However, here there is a more pronounced drop in $\auc$ values as the number of PCs $r$ increases from $r=9$ to $r=90$.
-    Here LMM outperforms PCA with $r=9$ in terms of $\auc$ by a greater margin.
   }
   \label{fig:small_sample_size}
 \end{figure}
-
-%\subsection{Evaluation in family structure admixture scenario}
 
 Previous work has shown that PCA performs poorly in the presence of family structure.
 Here we aim to characterize PCA's behavior in a much more complex structure than before, by simulating a family of admixed founders for 20 generations, so that we may observe numerous siblings, first cousins, etc.
@@ -663,7 +656,7 @@ We can now firmly state that it is far safer to err on the side of larger $r$, e
 Previous work has mostly ruled in favor of LMM instead of PCA, or otherwise tend to show comparable performance.
 The clearest advantage of LMM is its ability to model family relatedness.
 We confirm this to some extent in our family structure simulation, finding that LMM performs best in many (but not all) of our simulation replicates (\cref{fig:family_structure}).
-The other clear advantage of LMM over PCA is in having fewer degrees of freedom, an advantage that is most evident in our small sample size simulation (\cref{fig:small_sample_size}).
+The other clear advantage of LMM over PCA is in having fewer degrees of freedom, which is most evident in our small sample size simulation (\cref{fig:small_sample_size}).
 Poor performance for PCA under small sample sizes may explain early claims that PCA was not effective in preventing test statistic inflation \citep{epstein_simple_2007, kimmel_randomization_2007, luca_use_2008}.
 
 Unexpectedly, sometimes we see LMM perform much more poorly compared to PCA in our simulation scenarios (lower quartiles in boxplots in \cref{fig:large_sample_size,fig:family_structure}).
