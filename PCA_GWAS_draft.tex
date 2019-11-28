@@ -44,35 +44,29 @@ $^*$ Corresponding author: \texttt{alejandro.ochoa@duke.edu}
 
 
 \begin{abstract}
-  The genome-wide association study is widely used to identify the association between loci and trait.
-  However, admixture population is involved in the current GWAS research which may result in the violation of Hardy-Weinberg Equilibrium (HWE).
-  PCA can be used to correct for the bias result from admixture population.
-  In this paper, we test the performance of PCA with desirable admixture simulation population.
-  Since previous research about comparing PCA and LMM is limited, we also make comparison of performance among PCA and LMM in terms of both power and type one error controlling.
-  According to the admixture simulation structure, three scenarios are considered in this case: large sample size, small sample size and large sample with complicated family structure.
-  In order to fully compare the performance of PCA and LMM under different admixture structures, Root mean square deviation (RMSD) and areas under curve (AUC) to measure the performance of type one error controlling and power separately.
-  According to the results of simulation, PCA fails in both type one error and power when the number of PCA is smaller than the true rank of genotype matrix.
-  Additionally, PCA is robust to type one error once the number of PCs is larger than true rank of genotype matrix regardless of sample size, but the existence of family structure will impose a negative influence on it.
-  In terms of power, PCA will be punished with excessive usage of PCs in the case of small sample size.
-  Once enough PCs are used in PCA, it always outperforms LM in both type one error controlling and power.
-  Regarding LMM, it has similar performance to PCA in type one error controlling without complicated family structure, however, it has advantage over PCA when complex family structure exists.
-  Considering power, LMM has better performance of power than PCA without complex family structure even enough PCs are used, whereas, the existence of complicated family structure will lead to PCA outperforms LMM in terms of power. 
+  Modern genetic association studies require modeling population structure and family relatedness in order to calculate correct statistics.
+  Principal Components Analysis (PCA) is one of the most common approaches for modeling this population structure, but nowadays the Linear Mixed-Effects Model (LMM) is believed by many to be a superior model.
+  Remarkably, previous comparisons have been limited by testing PCA without varying the number of principal components (PCs), by simulating unrealistically simple population structures, and by not always measuring both type-I error control and predictive power.
+  In this work, we thoroughly evaluate PCA with varying number of PCs alongside LMM in various realistic scenarios, including admixture together with family structure, measuring both null p-value uniformity and the area under the precision-recall curves.
+  We find that PCA performs as well as LMM when enough PCs are used and the sample size is large, and find a remarkable robustness to extreme number of PCs.
+  However, we notice decreased performance for PCA relative to LMM when sample sizes are small and when there is family structure, although LMM performance is highly variable.
+  Altogether, our work suggests that PCA is a favorable approach for association studies when sample sizes are large and no close relatives exist in the data, and a hybrid approach of LMM with PCs may be the best of both worlds.
 \end{abstract}
 
-\clearpage
+% \clearpage
 
-\tableofcontents
+% \tableofcontents
 
 \clearpage
 	
 \section{Introduction} 
 
 The goal of a genetic association study is to identify loci whose genotypes are correlated significantly with a certain trait.
-An important assumption made by classical association tests is that genotypes are unstructured: drawn independently from a common allele frequency, so that they are in Hardy-Weinberg Equilibrium (HWE).
-However, HWE does not hold for structured populations, which includes multiethnic cohorts and admixed individuals, and for family data.
+An important assumption made by classical association tests is that genotypes are unstructured: drawn independently from a common allele frequency.
+However, this assumption does not hold for structured populations, which includes multiethnic cohorts and admixed individuals, and for family data.
 When naive approaches are incorrectly applied to structured populations and/or family data, association statistics (such as $\chi^2$) become inflated relative to the null expectation, resulting in greater numbers of false positives than expected and loss of power \citep{devlin_genomic_1999, voight_confounding_2005, astle_population_2009}.
 
-The most popular modern approaches for conducting genetic association studies with structured populations involve modeling the population structure via covariates.
+The most popular approaches for conducting genetic association studies with structured populations involve modeling the population structure via covariates.
 Such covariates may be inferred ancestry proportions \citep{pritchard_association_2000} or transformations of these.
 Principal components analysis (PCA) represents the most common of these variants, in which the top eigenvectors of the kinship matrix are used to model the population structure \citep{zhang_semiparametric_2003, price_principal_2006, bouaziz_accounting_2011}.
 These top eigenvectors are commonly referred to as Principal Components (PCs) in the genetics literature (the convention we adopt here; \cite{patterson_population_2006}), but it is worth noting that in other fields the PCs would instead denote the projections of the data onto the eigenvectors \citep{jolliffe_principal_2002}.
