@@ -69,39 +69,37 @@ name_out <- paste0(
 
 
 
-  style <- read_tsv('style.txt', col_types = 'cci')
-  
 
-  
-  # else run simulation
-  
-  library(readr)       # to write kinship matrix
-  library(tibble)      # to store data
-  library(genio)       # to write BED files for external software
-  library(popkin)      # to estimate kinship in RGLS
-  library(popkinsuppl) # for PCA's kinship estimator
-  library(lfa)         # GWAS gcatest
-  library(gcatest)     # GWAS gcatest
-  #library(qvalue)      # multiple hypothesis tests
-  
-  # standard code for a complex trait and an admixed population
-  source('sim_geno_trait_k3.R')
-  
-  # load new functions from external scripts
-  source('kinship_to_evd.R')
-  source('gas_lm_optim.R')
-  source('gas_pca_optim.R')
-  source('gas_rgls.R')
-  source('gas_lmm_gemma.R')
-  source('gas_lmm_emmax.R')
-  source('gas_lmm_gcta.R')
-  source('gas_plots.R')
-  gcta_bin<-"'C:/Users/yiqiy/Documents/gcta_1.92.4beta2_win/bin/gcta64'"
-  
-  ############
-  ### SIMS ###
-  ############
-  for (i in 1:2){
+
+
+# else run simulation
+library(readr)       # to write kinship matrix
+library(tibble)      # to store data
+library(genio)       # to write BED files for external software
+library(popkin)      # to estimate kinship in RGLS
+library(popkinsuppl) # for PCA's kinship estimator
+library(lfa)         # GWAS gcatest
+library(gcatest)     # GWAS gcatest
+#library(qvalue)      # multiple hypothesis tests
+
+# standard code for a complex trait and an admixed population
+source('sim_geno_trait_k3.R')
+
+# load new functions from external scripts
+source('kinship_to_evd.R')
+source('gas_lm_optim.R')
+source('gas_pca_optim.R')
+source('gas_rgls.R')
+source('gas_lmm_gemma.R')
+source('gas_lmm_emmax.R')
+source('gas_lmm_gcta.R')
+source('gas_plots.R')
+style <- read_tsv('style.txt', col_types = 'cci')
+
+############
+### SIMS ###
+############
+for (i in 1:10){
   obj <- sim_geno_trait_k3(
     n_ind = n_ind,
     m_loci = m_loci,
@@ -146,13 +144,13 @@ name_out <- paste0(
   ########################
   ### ASSOCIATION TEST ###
   ########################
-
-    # store runtimes in these tibbles
-    times_kin <- tibble(.rows = 1)
-    times_gas <- tibble(.rows = 1)
-    pvals <- tibble(.rows = m_loci)
-    
-    for (pcs in 1:2){
+  
+  # store runtimes in these tibbles
+  times_kin <- tibble(.rows = 1)
+  times_gas <- tibble(.rows = 1)
+  pvals <- tibble(.rows = m_loci)
+  
+  for (pcs in 1:90){
     ###########
     ### PCA ###
     ###########
@@ -172,12 +170,13 @@ name_out <- paste0(
     
     name <- "GCTA"
     message(name)
-    gcta_bin<-"C:/Users/yiqiy/Documents/gcta_1.92.4beta2_win/bin/gcta64"
-    obj <- gas_lmm_gcta_kin(gcta_bin, name_out, debug = debug)
+    gcta_bin<-"/hpc/group/biostat/yy222/gcta_1.92.4beta123/gcta64"
+    obj <- gas_lmm_gcta_kin(gcta_bin, name_out)
     #    file_gcta_kin <- obj$file
     times_kin[[name]] <- obj$runtime
+    gcta_bin<-"/hpc/group/biostat/yy222/gcta_1.92.4beta123/gcta64"
     
-    obj <- gas_lmm_gcta(gcta_bin, name_out, m_loci = m_loci, threads = threads, debug = debug)
+    obj <- gas_lmm_gcta(gcta_bin, name_out, m_loci = m_loci, threads = threads)
     times_gas[[name]] <- obj$runtime
     pvals[[name]] <- obj$pvals
     
@@ -188,10 +187,10 @@ name_out <- paste0(
     
     # a new test, no timing this one
     # gets PCs, saves them on a file
-    gas_lmm_gcta_pca(gcta_bin, name_out, debug = debug, n_pcs = r)
+    gas_lmm_gcta_pca(gcta_bin, name_out,  n_pcs = r,debug=debug)
     
     # don't record runtime here either
-    pvals[[name]] <- gas_lmm_gcta(gcta_bin, name_out, m_loci = m_loci, threads = threads, debug = debug, n_pcs = r)$pvals
+    pvals[[name]] <- gas_lmm_gcta(gcta_bin, name_out, m_loci = m_loci, threads = threads, n_pcs = r)$pvals
     
     # clean up when we're done with gcta
     delete_files_gcta(name_out)
@@ -240,15 +239,23 @@ name_out <- paste0(
     
     #store mean of p and auc values after removing the casual index
     p<-pvals_auc_collect(name_out, causal_indexes, pvals, times_kin, times_gas, style=style)
-   
+    
     
     M_auc[i,pcs]<-unlist(p[2,2])
     M_rmsd[i,pcs]<-unlist(p[2,1])
-    M_rmsd_LMM_n_1000_family[i,pcs]<-unlist(p[4,2])
-    M_auc_LMM_n_1000_family[i,pcs]<-unlist(p[4,2])
-    M_rmsd_LM_n_1000_family[i,pcs]<-unlist(p[1,1])
-    M_auc_LM_n_1000_family[i,pcs]<-unlist(p[1,2])
+    M_rmsd_LMM_n_1000[i,pcs]<-unlist(p[4,2])
+    M_auc_LMM_n_1000[i,pcs]<-unlist(p[4,2])
+    M_rmsd_LM_n_1000[i,pcs]<-unlist(p[1,1])
+    M_auc_LM_n_1000[i,pcs]<-unlist(p[1,2])
   }
   
-  }
+}
+
+setwd("/dscrhome/yy222/fix_k/overall")
+write.table(M_auc, file="auc_k_fixed_k_10_pcs_1_90_n_100_1_2_repeat_10.txt")
+write.table(M_rmsd, file="rmsd_k_fixed_k_10_pcs_1_90_n_100_1_2_repeat_10.txt")
+write.table(M_auc_LMM_n_1000, file="auc_k_fixed_k_10_pcs_1_90_n_100_1_2_repeat_10_GCTAPC.txt")
+write.table(M_rmsd_LMM_n_1000, file="rmsd_k_fixed_k_10_pcs_1_90_n_100_1_2_repeat_10_GCTAPC.txt")
+write.table(M_auc_LM_n_1000, file="auc_k_fixed_k_10_pcs_1_90_n_100_1_2_repeat_10_LM.txt")
+write.table(M_rmsd_LM_n_1000, file="rmsd_k_fixed_k_10_pcs_1_90_n_100_1_2_repeat_10_LM.txt")
 
