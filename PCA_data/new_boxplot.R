@@ -1,18 +1,35 @@
-# code to make PDFs
-source('../scripts/myFig.R')
+#read data from different repliction 
+read_data<-function(name,rep){
+  data<-c()
+  for (i in 1:rep){
+    name_read<-paste0(name,"_",i,".","txt")
+    data_temp<-read.table(name_read)
+    data<-rbind(data,data_temp)
+  }
+  return(data)
+}
 
-# shared stuff
-# fancy y-axis lab!
+rmsd_pca_100<-read_data('rmsd_k_fixed_k_10_pcs_1_90_n_100_1_28_repeat_10',5)
+auc_pca_100<-read_data('auc_k_fixed_k_10_pcs_1_90_n_100_1_28_repeat_10',5)
+
+rmsd_pca_1000<-read_data('rmsd_k_fixed_k_10_pcs_1_90_n_1000_1_28_repeat_10',5)
+auc_pca_1000<-read_data('auc_k_fixed_k_10_pcs_1_90_n_1000_1_28_repeat_10',5)
+
+rmsd_gcta_1000<-read_data("rmsd_k_fixed_k_10_pcs_1_90_n_1000_1_28_repeat_10_GCTAPC",5)
+auc_gcta_1000<-read_data("auc_k_fixed_k_10_pcs_1_90_n_1000_1_28_repeat_10_GCTAPC",5)
+
+rmsd_gcta_100<-read_data("rmsd_k_fixed_k_10_pcs_1_90_n_100_1_28_repeat_10_GCTAPC",5)
+auc_gcta_100<-read_data("auc_k_fixed_k_10_pcs_1_90_n_100_1_28_repeat_10_GCTAPC",5)
+
+rmsd_lm_1000<-read_data("auc_k_fixed_k_10_pcs_1_90_n_1000_1_28_repeat_10_LM",5)
+auc_lm_1000<-read_data("auc_k_fixed_k_10_pcs_1_90_n_1000_1_28_repeat_10_lm",5)
+
+rmsd_lm_100<-read_data("auc_k_fixed_k_10_pcs_1_90_n_100_1_28_repeat_10_LM",5)
+auc_lm_100<-read_data("auc_k_fixed_k_10_pcs_1_90_n_100_1_28_repeat_10_lm",5)
 lab_rmsd <- expression( bold( RMSD[p] ) )
 lab_auc <- expression( bold( AUC[PR] ) )
 
-# lazy shortcut
-read_mat <- function(name) {
-  # add extension
-  name <- paste0(name, '.txt')
-  # read dataframe, convert to numerical matrix right away so column names can be NA later
-  as.matrix( read.table( name ) )
-}
+
 
 # main plotting code!
 boxplots_rmsd_auc <- function(name_out, rmsd, rmsd_lm, rmsd_lmm, auc, auc_lm, auc_lmm, r_max = 90) {
@@ -58,28 +75,9 @@ boxplots_rmsd_auc <- function(name_out, rmsd, rmsd_lm, rmsd_lmm, auc, auc_lm, au
     adj = 0.55,
     outer = TRUE
   )
-  # close PDF
   invisible( dev.off() )
 }
 
-# move to data location
-setwd("PCA_data")
 
-#####
-#Boxplot of RMSD and AUC when N=100 &k=10 & no family strcuture 
-####
-#n = 100 and m = 10
-# read data
-rmsd <- read_mat( "rmsd_k_fixed_k_10_pcs_1_90_n_1000_1_2_repeat_10" )
-rmsd_lm <- read_mat( "rmsd_k_fixed_k_10_pcs_1_90_n_1000_1_2_repeat_10_LM" )
-
-rmsd_lm <-as.data.frame(rmsd_lm[,1])
-rmsd_lmm <- read_mat( "rmsd_k_fixed_k_10_pcs_1_90_n_1000_1_2_repeat_10_GCTAPC" )
-auc <- read_mat( "auc_k_fixed_k_10_pcs_1_90_n_1000_1_2_repeat_10" )
-auc_lm <- read_mat( "auc_k_fixed_k_10_pcs_1_90_n_1000_1_2_repeat_10_LM" )
-auc_lm <-as.data.frame(auc_lm[,1])
-auc_lmm <- read_mat( "auc_k_fixed_k_10_pcs_1_90_n_1000_1_2_repeat_10_GCTAPC" )
-# make plot!
-
-
-
+boxplots_rmsd_auc(name_out="boxplot", rmsd=rmsd_pca_100, rmsd_lm=rmsd_lm_100, rmsd_lmm=rmsd_gcta_100, auc=auc_pca_100, auc_lm
+                  =auc_lm_100, auc_lmm=auc_gcta_100, r_max = 90)
