@@ -14,6 +14,16 @@ read_data<-function(name,rep){
   return(data)
 }
 
+read_data_family<-function(name,rep){
+  data<-c()
+  for (i in 1:rep){
+    name_read<-paste0(name,"_",i,"_family",".","txt")
+    data_temp<-read.table(name_read)
+    data<-rbind(data,data_temp)
+  }
+  return(data)
+}
+
 rmsd_pca_100<-read_data('rmsd_k_fixed_k_10_pcs_1_90_n_100_1_28_repeat_10',5)
 auc_pca_100<-read_data('auc_k_fixed_k_10_pcs_1_90_n_100_1_28_repeat_10',5)
 
@@ -31,10 +41,23 @@ auc_lm_1000<-read_data("auc_k_fixed_k_10_pcs_1_90_n_1000_1_28_repeat_10_lm",5)
 
 rmsd_lm_100<-read_data("auc_k_fixed_k_10_pcs_1_90_n_100_1_28_repeat_10_LM",5)
 auc_lm_100<-read_data("auc_k_fixed_k_10_pcs_1_90_n_100_1_28_repeat_10_lm",5)
+
+
+rmsd_pca_1000_family<-read_data_family('rmsd_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10',5)
+auc_pca_1000_family<-read_data_family('auc_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10',5)
+
+rmsd_gcta_1000_family<-read_data_family("rmsd_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_GCTAPC",5)
+auc_gcta_1000_family<-read_data_family("auc_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_GCTAPC",5)
+
+rmsd_lm_1000_family<-read_data_family("rmsd_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_LM",5)
+auc_lm_1000_family<-read_data_family("auc_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_LM",5)
+
+
+
 lab_rmsd <- expression( bold( RMSD[p] ) )
 lab_auc <- expression( bold( AUC[PR] ) )
 
-
+auc_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_3_family
 
 # main plotting code!
 boxplots_rmsd_auc <- function(name_out, rmsd, rmsd_lm, rmsd_lmm, auc, auc_lm, auc_lmm, r_max = 90) {
@@ -88,3 +111,5 @@ boxplots_rmsd_auc(name_out="boxplot_n_100", rmsd=rmsd_pca_100, rmsd_lm=rmsd_lm_1
                   =auc_lm_100, auc_lmm=auc_gcta_100, r_max = 90)
 boxplots_rmsd_auc(name_out="boxplot_n_1000", rmsd=rmsd_pca_1000, rmsd_lm=rmsd_lm_1000, rmsd_lmm=rmsd_gcta_1000, auc=auc_pca_1000, auc_lm
                   =auc_lm_1000, auc_lmm=auc_gcta_1000, r_max = 90)
+boxplots_rmsd_auc(name_out="boxplot_n_1000_family", rmsd=rmsd_pca_1000_family, rmsd_lm=rmsd_lm_1000_family, rmsd_lmm=rmsd_gcta_1000_family, auc=auc_pca_1000_family, auc_lm
+                  =auc_lm_1000_family, auc_lmm=auc_gcta_1000_family, r_max = 90)
