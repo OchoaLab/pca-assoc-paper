@@ -3,7 +3,7 @@ library(scales) # for transparency
 source('../../../scripts/myFig.R')
 
 #read data from different repliction 
-read_data<-function(name, rep, family = FALSE, verbose = FALSE){
+read_data<-function(name, rep, family = FALSE, verbose = TRUE){
     if (verbose)
         message('loading repeats for: ', name)
     # figure out file suffixes
@@ -27,6 +27,8 @@ read_data<-function(name, rep, family = FALSE, verbose = FALSE){
         }
         data <- rbind(data, data_temp)
     }
+    if (verbose)
+        message("\tReplicates: ", nrow(data))
     return(data)
 }
 
