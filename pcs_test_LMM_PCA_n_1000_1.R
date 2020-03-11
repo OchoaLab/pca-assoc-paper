@@ -13,7 +13,7 @@ option_list = list(
               help = "simple plot version (for a grant proposal)"),
   make_option(c("-l", "--lite"), action = "store_true", default = FALSE, 
               help = "run lite version (focuses on best and least redundant methods)"),
-  make_option(c("-n", "--n_ind"), type = "integer", default = 100, 
+  make_option(c("-n", "--n_ind"), type = "integer", default = 1000, 
               help = "number of individuals", metavar = "int"),
   make_option(c("-m", "--m_loci"), type = "integer", default = 100000, 
               help = "number of loci", metavar = "int"),
@@ -27,7 +27,7 @@ option_list = list(
               help = "number of generations, for realistic local kinship", metavar = "int"),
   make_option("--herit", type = "double", default = 0.8, 
               help = "heritability", metavar = "double"),
-  make_option("--m_causal", type = "integer", default = 10, 
+  make_option("--m_causal", type = "integer", default = 100, 
               help = "num causal loci", metavar = "int"),
   make_option(c("-t", "--threads"), type = "integer", default = 1, 
               help = "number of threads (affects GCTA only)", metavar = "int"),
@@ -231,10 +231,10 @@ library(readr)       # to write kinship matrix
   }
   
   setwd("/dscrhome/yy222/LMM_PCA_rep_n_100/rep1")
-  write.table(M_auc, file="auc_k_fixed_k_10_pcs_1_90_n_100_2_22_repeat_10_1.txt")
-  write.table(M_rmsd, file="rmsd_k_fixed_k_10_pcs_1_90_n_100_2_22_repeat_10_1.txt")
-  write.table(M_auc_LMM_n_100, file="auc_k_fixed_k_10_pcs_1_90_n_100_2_22_repeat_10_GCTAPC_1.txt")
-  write.table(M_rmsd_LMM_n_100, file="rmsd_k_fixed_k_10_pcs_1_90_n_100_2_22_repeat_10_GCTAPC_1.txt")
-  write.table(M_auc_LM_n_100, file="auc_k_fixed_k_10_pcs_1_90_n_100_2_22_repeat_10_LM_1.txt")
-  write.table(M_rmsd_LM_n_100, file="rmsd_k_fixed_k_10_pcs_1_90_n_100_2_22_repeat_10_LM_1.txt")
+  write.table(M_auc, file="auc_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_1.txt")
+  write.table(M_rmsd, file="rmsd_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_1.txt")
+  write.table(M_auc_LMM_n_100, file="auc_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_GCTAPC_1.txt")
+  write.table(M_rmsd_LMM_n_100, file="rmsd_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_GCTAPC_1.txt")
+  write.table(M_auc_LM_n_100, file="auc_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_LM_1.txt")
+  write.table(M_rmsd_LM_n_100, file="rmsd_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_LM_1.txt")
   
