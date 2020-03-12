@@ -19,7 +19,7 @@ option_list = list(
               help = "number of loci", metavar = "int"),
   make_option(c("-k", "--k_subpops"), type = "integer", default = 10, 
               help = "admixture intermediate subpopulations", metavar = "int"),
-  make_option(c("-f", "--fst"), type = "double", default = 0.3, 
+  make_option(c("-f", "--fst"), type = "double", default = 0.1, 
               help = "FST (fixation index)", metavar = "double"),
   make_option(c("--bias_coeff"), type = "double", default = 0.5, 
               help = "admixture bias coeff", metavar = "double"),
@@ -107,6 +107,9 @@ library(readr)       # to write kinship matrix
   M_auc_LMM_n_100<-matrix(0,rep,90)
   M_rmsd<-matrix(0,rep,90)
   M_auc<-matrix(0,rep,90)
+    M_auc_GCTA<-rep(NA,rep)
+    M_rmsd_GCTA<-rep(NA,rep)
+
   ############
   ### SIMS ###
   ############
@@ -172,6 +175,8 @@ library(readr)       # to write kinship matrix
     
     obj <- gas_lmm_gcta(gcta_bin, name_out, m_loci = m_loci, threads = threads)
     pvals[[name]] <- obj$pvals
+       M_rmsd_GCTA[i]<-pvals_to_null_rmsd(obj$pvals, causal_indexes)$rmsd
+    M_auc_GCTA[i]<-pvals_to_pr_auc(obj$pvals, causal_indexes)
 
  name <- "LM"
     message(name)
@@ -179,10 +184,10 @@ library(readr)       # to write kinship matrix
     obj <- gas_lm_optim(X, trait)
    
     pvals[[name]] <- obj$pvals
-    
-    M_rmsd_LM_n_100[i]<-pvals_to_null_rmsd(obj$pvals, causal_indexes)$rmsd
+     M_rmsd_LM_n_100[i]<-pvals_to_null_rmsd(obj$pvals, causal_indexes)$rmsd
     M_auc_LM_n_100[i]<-pvals_to_pr_auc(obj$pvals, causal_indexes)
-    for (pcs in 1:90){
+
+        for (pcs in 1:90){
     ###########
     ### PCA ###
     ###########
@@ -206,7 +211,7 @@ library(readr)       # to write kinship matrix
     
     obj <- gas_lmm_gcta(gcta_bin, name_out, m_loci = m_loci, threads = threads)
     pvals[[name]] <- obj$pvals
-    
+   
     # GCTA with PCA
 
     name <- "GCTAp"
@@ -230,11 +235,14 @@ library(readr)       # to write kinship matrix
   
   }
   
-  setwd("/dscrhome/yy222/LMM_PCA_rep_n_100/rep1")
-  write.table(M_auc, file="auc_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_1.txt")
-  write.table(M_rmsd, file="rmsd_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_1.txt")
-  write.table(M_auc_LMM_n_100, file="auc_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_GCTAPC_1.txt")
-  write.table(M_rmsd_LMM_n_100, file="rmsd_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_GCTAPC_1.txt")
-  write.table(M_auc_LM_n_100, file="auc_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_LM_1.txt")
-  write.table(M_rmsd_LM_n_100, file="rmsd_k_fixed_k_10_pcs_1_90_n_1000_2_22_repeat_10_LM_1.txt")
+  setwd("/dscrhome/yy222/LMM_PCA_rep_n_1000/rep1")
+  write.table(M_auc, file="auc_k_fixed_k_10_pcs_1_90_n_1000_3_11_repeat_10_1.txt")
+  write.table(M_rmsd, file="rmsd_k_fixed_k_10_pcs_1_90_n_1000_3_11_repeat_10_1.txt")
+  write.table(M_auc_LMM_n_100, file="auc_k_fixed_k_10_pcs_1_90_n_1000_3_11_repeat_10_GCTAPC_1.txt")
+  write.table(M_rmsd_LMM_n_100, file="rmsd_k_fixed_k_10_pcs_1_90_n_1000_3_11_repeat_10_GCTAPC_1.txt")
+  write.table(M_auc_LM_n_100, file="auc_k_fixed_k_10_pcs_1_90_n_1000_3_11_repeat_10_LM_1.txt")
+  write.table(M_rmsd_LM_n_100, file="rmsd_k_fixed_k_10_pcs_1_90_n_1000_3_11_repeat_10_LM_1.txt")
+  write.table(M_auc_GCTA, file="auc_k_fixed_k_10_pcs_1_90_n_1000_3_11_repeat_10_GCTA_1.txt")
+  write.table(M_rmsd_GCTA, file="rmsd_k_fixed_k_10_pcs_1_90_n_1000_3_11_repeat_10_GCTA_1.txt")
   
+
