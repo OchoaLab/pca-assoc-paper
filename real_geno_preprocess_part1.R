@@ -16,7 +16,7 @@ source('gas_plots.R')
 # number of replicates per run
 rep <- 2
 # number of PCs to explore
-n_pcs_max <- 2 # 90
+n_pcs_max <- 90
 # alternate path for GCTA binary
 gcta_bin<-"/hpc/group/biostat/yy222/gcta_1.92.4beta1/gcta64"
 
