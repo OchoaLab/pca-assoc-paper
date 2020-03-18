@@ -1,4 +1,27 @@
 library(optparse)
+library(genio)       # to write BED files for external software
+library(popkinsuppl) # for PCA's kinship estimator
+
+#setwd("../scripts")
+setwd("/dscrhome/yy222/gas-rgls-master/scripts1")
+
+# standard code for a complex trait and an admixed population
+source('sim_geno_trait_k3.R')
+
+# load new functions from external scripts
+source('kinship_to_evd.R')
+source('gas_lm_optim.R')
+source('gas_pca_optim.R')
+source('gas_lmm_gcta.R')
+source('paths.R')
+source("gas_plots.R")
+
+# number of replicates per run
+rep <- 2
+# number of PCs to explore
+n_pcs_max <- 90
+# alternate path for GCTA binary
+gcta_bin <- "/dscrhome/yy222/gcta_1.92.4beta1/gcta64"
 
 ############
 ### ARGV ###
@@ -6,13 +29,7 @@ library(optparse)
 
 # define options
 option_list = list(
-    make_option(c("-p", "--plot"), action = "store_true", default = FALSE, 
-                help = "create plot of existing data"),
-    make_option("--simple", action = "store_true", default = FALSE, 
-                help = "simple plot version (for a grant proposal)"),
-    make_option(c("-l", "--lite"), action = "store_true", default = FALSE, 
-                help = "run lite version (focuses on best and least redundant methods)"),
-    make_option(c("-n", "--n_ind"), type = "integer", default = 1000, 
+    make_option(c("-n", "--n_ind"), type = "integer", default = 1000, # CHANGE: or 100
                 help = "number of individuals", metavar = "int"),
     make_option(c("-m", "--m_loci"), type = "integer", default = 100000, 
                 help = "number of loci", metavar = "int"),
@@ -26,12 +43,12 @@ option_list = list(
                 help = "number of generations, for realistic local kinship", metavar = "int"),
     make_option("--herit", type = "double", default = 0.8, 
                 help = "heritability", metavar = "double"),
-    make_option("--m_causal", type = "integer", default = 100, 
+    make_option("--m_causal", type = "integer", default = 100, # CHANGE: or 10
                 help = "num causal loci", metavar = "int"),
     make_option(c("-t", "--threads"), type = "integer", default = 1, 
                 help = "number of threads (affects GCTA only)", metavar = "int"),
     make_option("--debug", action = "store_true", default = FALSE, 
-                help = "debug mode (GCTA and GEMMA are fully verbose)")
+                help = "debug mode (GCTA is fully verbose)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -46,10 +63,13 @@ bias_coeff <- opt$bias_coeff
 generations <- opt$generations
 m_causal <- opt$m_causal
 herit <- opt$herit
-lite <- opt$lite
 threads <- opt$threads
-simple <- opt$simple
 debug <- opt$debug
+
+# move now to where we want outputs to be
+## dir.create('test_yiqi')
+## setwd('test_yiqi')
+setwd( paste0("/dscrhome/yy222/LMM_PCA_rep_n_", n_ind, "/rep1") )
 
 # output path for BED files and figure
 name_out <- paste0(
@@ -65,88 +85,24 @@ name_out <- paste0(
     '-g', generations
 )
 
-
- library(readr)       # to write kinship matrix
-    library(tibble)      # to store data
-    library(genio)       # to write BED files for external software
-    library(popkin)      # to estimate kinship in RGLS
-    library(popkinsuppl) # for PCA's kinship estimator
-    library(lfa)         # GWAS gcatest
-    library(gcatest)     # GWAS gcatest
-    #library(qvalue)      # multiple hypothesis tests
-
-setwd("/dscrhome/yy222/gas-rgls-master/scripts1")
-
-    # standard code for a complex trait and an admixed population
-    source('sim_geno_trait_k3.R')
-
-    # load new functions from external scripts
-    source('kinship_to_evd.R')
-    source('gas_lm_optim.R')
-    source('gas_pca_optim.R')
-    source('gas_rgls.R')
-    source('gas_lmm_gemma.R')
-    source('gas_lmm_emmax.R')
-    source('gas_lmm_gcta.R')
-    source('paths.R')
-        source("gas_plots.R")
-# number of replicates per run
-rep <- 2
-# number of PCs to explore
-n_pcs_max <- 2
-# alternate path for GCTA binary
-gcta_bin<-"/dscrhome/yy222/gcta_1.92.4beta1/gcta64"
-
-
-############
-### SIMS ###
-############
- obj <- sim_geno_trait_k3(
-        n_ind = n_ind,
-        m_loci = m_loci,
-        m_causal = m_causal,
-        k_subpops = k_subpops,
-        bias_coeff = bias_coeff,
-        generations = generations,
-        herit = herit,
-        verbose = TRUE,
-        fst = fst
-    )
-    X <- obj$X
-    admix_proportions <- obj$admix_proportions
-    kinship <- obj$kinship
-    trait <- obj$trait
-    causal_indexes <- obj$causal_indexes
-    
-    ## how we'd get these values if we weren't setting them on command line
-    ## n_ind <- ncol(X)
-    ## m_loci <- nrow(X)
-    ## k_subpops <- ncol(admix_proportions)
-    ## sanity checks instead
-    stopifnot( ncol(X) == n_ind )
-    stopifnot( nrow(X) == m_loci )
-    stopifnot( ncol(admix_proportions) == k_subpops )
-    
-    # write BED version for external code
-    plink_data <- write_plink(name_out, X, pheno = trait, verbose = FALSE)
-
-    # write phenotype file
-    # shared by EMMAX and GCTA
-    write_phen(name_out, plink_data$fam, verbose = FALSE)# in all cases go up to n_pcs_max + 1 to include the zero PC cases
-
+# in all cases go up to n_pcs_max + 1 to include the zero PC cases
 M_rmsd <- matrix(0, rep, n_pcs_max + 1)
 M_auc <- matrix(0, rep, n_pcs_max + 1)
 M_rmsd_gcta <- matrix(0, rep, n_pcs_max + 1)
 M_auc_gcta <- matrix(0, rep, n_pcs_max + 1)
-eigenvectors <- kinship_to_evd(kinship)
 
 for (i in 1 : rep){
     message('rep: ', i)
+
+    ############
+    ### SIMS ###
+    ############
+    
     # simulate trait!
     # can be done inside an inner loop to simulate thousands of traits per genotype dataset
     message('simtrait')
     # NOTE: using kinship version, only choice for real data
-   obj <- sim_geno_trait_k3(
+    obj <- sim_geno_trait_k3(
         n_ind = n_ind,
         m_loci = m_loci,
         m_causal = m_causal,
@@ -158,40 +114,20 @@ for (i in 1 : rep){
         fst = fst
     )
     X <- obj$X
-    admix_proportions <- obj$admix_proportions
-    kinship <- obj$kinship
     trait <- obj$trait
-    causal_indexes <- obj$causal_indexes    # data dimensions
-    # simulation is only BEDMatrix, but meh
-    m_loci <- if (class(X) == 'BEDMatrix') ncol(X) else nrow(X)
+    causal_indexes <- obj$causal_indexes
     
+    # write plink data for GCTA
+    plink_data <- write_plink(name_out, X, pheno = trait)
+    write_phen(name_out, plink_data$fam)
 
-     ## how we'd get these values if we weren't setting them on command line
-    ## n_ind <- ncol(X)
-    ## m_loci <- nrow(X)
-    ## k_subpops <- ncol(admix_proportions)
-    ## sanity checks instead
-    stopifnot( ncol(X) == n_ind )
-    stopifnot( nrow(X) == m_loci )
-    stopifnot( ncol(admix_proportions) == k_subpops )
+    # estimate kinship (std) and eigenvectors for PCA
+    kinship_estimate_old <- kinship_std(X) # estimate kinship the old way
+    eigenvectors_estimate_old <- kinship_to_evd( kinship_estimate_old ) # get all eigenvalues
 
-   plink_data <- write_plink(name_out, X, pheno = trait, verbose = FALSE)
-
-  write_phen(name_out, plink_data$fam, verbose = FALSE)
-
-        eigenvectors <- kinship_to_evd(kinship)
-
-        # write true kinship matrix in correct format
-        # shared by at least GEMMA and EMMAX
-        file_true_kin <- paste0(name_out, '.true_kinship.txt')
-        kinship_tibble <- as_tibble( 2 * kinship, .name_repair = 'minimal')
-        write_tsv(kinship_tibble, file_true_kin, col_names = FALSE)
-    
-        ########################
+    ########################
     ### ASSOCIATION TEST ###
     ########################
-
-
 
     message("LM")
     
@@ -202,7 +138,9 @@ for (i in 1 : rep){
 
     # GCTA with zero PCs
     message("GCTA")
+    # make GRM (shared by all GCTA runs)
     obj <- gas_lmm_gcta_kin(gcta_bin, name_out, debug = debug)
+    # actual GWAS run
     obj <- gas_lmm_gcta(gcta_bin, name_out, m_loci = m_loci, threads = threads, debug = debug)
     # NOTE zero PCS is position 1
     M_rmsd_gcta[i, 1] <- pvals_to_null_rmsd(obj$pvals, causal_indexes)$rmsd
@@ -213,10 +151,7 @@ for (i in 1 : rep){
         
         message("PCA")
         indexes <- 1 : pcs
-        kinship_estimate_old <- kinship_std(X) # estimate kinship the old way
-        eigenvectors_estimate_old <- kinship_to_evd( kinship_estimate_old ) # get all eigenvalues
         obj <- gas_pca_optim(X, trait, eigenvectors_estimate_old[, indexes ])
-	#    file_gcta_kin <- obj$file	
         # NOTE r PCS is position r+1
         M_rmsd[i, pcs + 1] <- pvals_to_null_rmsd(obj$pvals, causal_indexes)$rmsd
         M_auc[i, pcs + 1] <- pvals_to_pr_auc(obj$pvals, causal_indexes)
@@ -238,11 +173,26 @@ for (i in 1 : rep){
         # these get deleted separately
         delete_files_gcta_pca(name_out, n_pcs = pcs)
     }
+
+    # final cleanup
+    # delete more files after entire GCTA analysis is complete
+    # delete GRM 
+    delete_files_gcta(name_out, grm = TRUE)
+    # delete plink files
+    delete_files_plink(name_out)
+    # delete phen file too
+    file_phen <- paste0(name_out, '.phen')
+    # test that it's actually there!
+    if( file.exists(file_phen) ) {
+        # remove if it was there
+        invisible( file.remove(file_phen) )
+    } else {
+        warning('File to remove did not exist: ', file_phen)
+    }
 }
 
-
-setwd("/dscrhome/yy222/LMM_PCA_rep_n_1000/rep1")
-write.table(M_auc_gcta, file = "auc_gcta_n_1000.txt")
-write.table(M_rmsd_gcta, file = "rmsd_gcta_n_1000.txt")
-write.table(M_auc, file = "auc_pca_n_1000.txt")
-write.table(M_rmsd, file = "rmsd_pca_n_1000.txt")
+# write outputs
+write.table(M_auc_gcta, file = paste0("auc_gcta_n_", n_ind, ".txt") )
+write.table(M_rmsd_gcta, file = paste0("rmsd_gcta_n_", n_ind, ".txt") )
+write.table(M_auc, file = paste0("auc_pca_n_", n_ind, ".txt") )
+write.table(M_rmsd, file = paste0("rmsd_pca_n_", n_ind, ".txt") )
