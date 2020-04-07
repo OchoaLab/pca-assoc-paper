@@ -47,10 +47,10 @@ $^*$ Corresponding author: \texttt{alejandro.ochoa@duke.edu}
   Modern genetic association studies require modeling population structure and family relatedness in order to calculate correct statistics.
   Principal Components Analysis (PCA) is one of the most common approaches for modeling this population structure, but nowadays the Linear Mixed-Effects Model (LMM) is believed by many to be a superior model.
   Remarkably, previous comparisons have been limited by testing PCA without varying the number of principal components (PCs), by simulating unrealistically simple population structures, and by not always measuring both type-I error control and predictive power.
-  In this work, we thoroughly evaluate PCA with varying number of PCs alongside LMM in various realistic scenarios, including admixture together with family structure, measuring both null p-value uniformity and the area under the precision-recall curves.
-  We find that PCA performs as well as LMM when enough PCs are used and the sample size is large, and find a remarkable robustness to extreme number of PCs.
-  However, we notice decreased performance for PCA relative to LMM when sample sizes are small and when there is family structure, although LMM performance is highly variable.
-  Altogether, our work suggests that PCA is a favorable approach for association studies when sample sizes are large and no close relatives exist in the data, and a hybrid approach of LMM with PCs may be the best of both worlds.
+  In this work, we thoroughly evaluate both PCA and LMMs with varying number of PCs in various realistic scenarios, including admixture together with family structure, measuring both null p-value uniformity and the area under the precision-recall curves.
+  We find that LMM without PCs performs best overall, although PCA performs as well as LMM when enough PCs are used, there are no close relatives, and the sample size is large.
+  We also find a remarkable robustness to extreme numbers of PCs.
+  Altogether, we recommend LMMs in general for association studies, but find that PCA performs as well as LMMs in many common scenarios.
 \end{abstract}
 
 % \clearpage
@@ -87,22 +87,27 @@ For example, although there are methods for selecting the numbers of PCs \citep{
 Conversely, only a few studies consider a (small) set of numbers of PCs, where they show remarkable robustness to this choice \citep{price_principal_2006, kang_variance_2010, wojcik_genetic_2019}.
 Moreover, most of these evaluations considered simulated data with only $K = 2$ independent subpopulations or admixture from only two subpopulations (exceptions are \citet{astle_population_2009} with $K=3$, and \citet{wang_analytical_2013} with $K = 4$), although worldwide human population structure is expected to have a larger dimensionality of at least $K = 9$ \citep{wojcik_genetic_2019}.
 Similarly, only one evaluation simulated data from a family pedigree: \citet{price_new_2010} included sibling pairs.
-Some studies did include evaluations involving real data that featured known or cryptic relatedness, but thes analyses did not measure type-I error rates or power calculations, most of which settled for measuring test statistic inflation.
+Some studies include evaluations involving real data that featured known or cryptic relatedness, but these analyses did not measure type-I error rates or power calculations, most of which settled for measuring test statistic inflation.
 Lastly, many of the earlier evaluations employed case-control simulations exclusively (as opposed to quantitative traits as we do here), were based on very small real or simulated datasets relative to today's standards, did not include any LMMs in their evaluations, and often did not measure both type-I error rates and power (or one of their proxies).
-Here we aim to systematically evaluate the robustness of the PCA approach to the choice of number of PCs, especially in cases where the model is grossly misspecified, and to compare to the gold standard LMM approach in more realistic simulations relevant to today's research.
+Here we aim to systematically evaluate the robustness of both the PCA (fixed effects only) and LMM (mixed effects) approaches to the choice of number of PCs, especially in cases where the model is grossly misspecified, in more realistic simulations relevant to today's genetics research.
 
-In this work, we study the performance of the PCA method in genetic association studies, comparing it to a leading LMM approach, characterizing its behavior under various numbers of PCs and varying sample sizes, under a reasonable admixture model with $K = 10$ source subpopulations and also a model with admixture and family structure.
+In this work, we study the performance of the PCA and LMM methods in genetic association studies, characterizing their behavior under various numbers of PCs and varying sample sizes, under a reasonable admixture model with $K = 10$ source subpopulations and also a model with admixture and family structure.
 Our evaluation is more thorough than previous ones, directly measuring the uniformity of null p-values (as required for accurate type-I error control and FDR control via q-values; \cite{storey_positive_2003, storey_statistical_2003}) and predictive power by calculating the area under precision-recall curves.
-We find that the performance of PCA is favorable when sample sizes are large (at least 1,000 individuals), matching the performance of LMMs as long as enough PCs are used.
+We find that the performance of PCA is favorable when sample sizes are large (at least 1,000 individuals) and there are no close relatives in the study, matching the performance of LMMs when enough PCs are used.
 Remarkably, the approach is robust even when the number of PCs far exceeds the optimal number for reasonably large studies.
 However, for smaller studies (100 individuals) there is a more pronounced loss of power when the number of PCs exceeds the optimal number.
 Moreover, LMMs outperform PCA in our small sample size simulation and in the presence of family structure, which is a well-known case where PCA fails \citep{patterson_population_2006, price_new_2010}.
+We also found that LMM without PCs always outperforms use of any number of PCs in the LMM.
 All together, our simulation studies provide clear criteria under which use of PCA results in acceptable performance compared to LMMs.
 
 % TODO Missing:
 % \begin{itemize}
 % \item Proposed simulation to infer optimal number of PCs from real data, predict gap between PCA and LMM?
-% \item LMM + 10 PCs approach
+% \item Small sample size GCTA should change NAs to something bad (0 AUC, but what RMSD?)
+% \item Add independent subpopulations (what Yiqi originally had) alongside for clear higher $r$ cases
+% \item Plot of kinship matrices of each simulation (more useful when Indep Subpops are added)
+% \item Selection simulation
+% \item Rare variant simulation
 % \end{itemize}
 
 \section{Models and Methods}
@@ -135,7 +140,7 @@ The residuals are assumed to follow a normal distribution: $\mathbf{\epsilon}_j 
 
 Typically the number of loci $m$ is in the order of millions while the number of individuals $n$ is in the thousands.
 Hence, the full model above cannot be fit in this typical $n \ll m$ case, as there are only $n$ datapoints to fit (the trait vector) but there are $m+1$ parameters to fit ($\alpha$ and the $\mathbf{\beta}$ vector).
-The PCA model with $r$ PCs corresponds to the following approximation to the full model, corresponding to a model fit at a single locus $i$:
+The PCA model with $r$ PCs approximates the full model fit at a single locus $i$:
 \begin{equation}
   \label{eq:pca_gwas}
   \mathbf{y}
@@ -246,7 +251,8 @@ Thus, it appears that in combination with the intercept term ($\mathbf{1} \alpha
 
 \subsubsection{Linear mixed-effects model}
 
-The LMM is another approximation to the complex trait model in \cref{eq:trait}, given by
+The LMM is another approximation to the complex trait model in \cref{eq:trait}.
+Excluding additional covariates first, the LMM is
 \begin{equation}
   \label{eq:lmm_gwas}
   \mathbf{y}
@@ -275,8 +281,10 @@ A key advantage of LMM over PCA is that it has fewer parameters to fit: ignoring
 Therefore, PCA is expected to overfit more substantially than LMM---and thus lose power---when $r$ is very large, and especially when the sample size (the number of individuals $n$) is very small.
 
 Due to its accuracy and speed, the LMM implementation that we chose for our evaluations is GCTA \citep{yang_gcta:_2011}.
-GCTA uses the same biased kinship matrix estimator $\mathbf{\hat{\Phi}}$ as standard PCA approaches, and the version that incorporates PCs also derives the PCs from the same kinship matrix estimate; thus, when both kinship and PCs are used, the population structure is essentially modeled twice, although previous work has found this apparent redundancy beneficial \citep{zhao_arabidopsis_2007, price_new_2010}.
+GCTA uses the same biased kinship matrix estimator $\mathbf{\hat{\Phi}}$ as standard PCA approaches, and the version that incorporates PCs also derives the PCs from the same kinship matrix estimate; thus, when both kinship and PCs are used, the population structure is essentially modeled twice, although some previous work has found this apparent redundancy beneficial \citep{zhao_arabidopsis_2007, price_new_2010}.
 It is worth noting that earlier LMM approaches estimated kinship matrices using maximum likelihood approaches that excluded population structure from their estimates, and population structure was modeled via admixture proportions rather than PCA \citep{yu_unified_2006, zhao_arabidopsis_2007}.
+When testing LMM with PCs, we use GCTA to estimate the PCs, which are included in GCTA as fixed effect covariantes.
+Statistical significance in GCTA (and most other LMMs) is calculated via a likelihood ratio test, in which the test statistic has an asymptotic $\chi^2$ distribution under the null.
 
 \subsection{Simulations}
 
@@ -431,100 +439,110 @@ For that reason, every evaluation was replicated at least 10 times (varies by sc
 Except when noted, each replicate consisted of a new genotype matrix drawn from the same structure model of the scenario, followed by a new simulated trait based on this genotype matrix, which included selecting new causal loci with new effect sizes.
 
 All scenarios are based on an admixture simulation from $K=10$ subpopulations and a resulting generalized $\Fst = 0.1$, which establishes the population structure.
-We vary the sample size (number of individuals) in order to test the extent to which PCA overfits the population structure as the number of PCs increases ($r \in \{0, ..., 90\}$), particularly in comparison to the LMM.
+We vary the sample size (number of individuals) in order to test the extent to which each of PCA and LMM overfits the population structure as the number of PCs increases ($r \in \{0, ..., 90\}$).
+The theoretically ideal choice for the number of PCs in this simulation, for fixed effects only (PCA), is $r = K-1 = 9$ (the rank of the population structure minus the rank of the intercept).
 Lastly, to push all methods to their limits, we evaluate them in a scenario with both admixture and a complex family structure.
 
-First we evaluate all methods in the large sample size scenario, which has a reasonable number of individuals ($n = 1,000$) typical for genetic association studies.
-In this scenario we find a clear transition around the ideal number of PCs of $r = 2$ for PCA, below of which performance is poor and above of which performance is satisfactory (\cref{fig:large_sample_size}).
-In particular, when $r < 2$ we find the largest $\rmsd$ values, which indicate that p-values are highly non-uniform and would therefore result in inaccurate type-I error control.
-The smallest $\auc$ values also occur for $r < 2$, showing that not enough PCs results in loss of predictive power as well.
-As expected, $r = 2$ has the best performance in terms of both $\rmsd$ and $\auc$.
-Remarkably, as $r$ is increased up to $r = 90$, there is no noticeable change in the $\rmsd$ distribution, and only a small decrease in $\auc$ compared to the optimal $r =2$ case.
-The LMM performs as well as PCA with $r = 2$ here without using PCs, with small $\rmsd$ values (though somewhat larger than those of $r=2$) and larger $\auc$ values than PCA's with $r=2$.
-However, it is noticeable that there is an increaseing pattern of LMM in terms of rmsd and a decraseing pattern of $\auc$ although slopes are not obvious.
-In contrast to previous research results,there is no need to use the combination of PCA adn LMM, which will lead to the worse performance of LMM. 
-Thus, in this common scenario where sample sizes are large enough, the PCA approach with enough PCs performs as well as LMM without PCs.
+\subsection{Large sample size simulation}
+
 \begin{figure}[bp!]
   \centering
-  \includegraphics[width=4in]{boxplot_n_1000.pdf}
+  \includegraphics[width=6in]{boxplot_n_1000.pdf}
   \caption{
     {\bf Evaluation in large sample size admixture scenario.}
     Here there are $n = 1,000$ individuals in the simulation.
-    The PCA approach and LMM approach are tested under varying number of PCs ($r \in \{0, ..., 90\}$), alongside the LMM approach , with boxplots for 10 replicates (y-axis) for the distributions of $\rmsd$ (top panel) and $\auc$ (bottom panel).
+    The PCA and LMM approach are tested under varying number of PCs ($r \in \{0, ..., 90\}$ on x-axis), with boxplots for 10 replicates (y-axis) for the distributions of $\rmsd$ (top panel) and $\auc$ (bottom panel).
     Small $\rmsd$ and large $\auc$ correspond with better performance.
-	 The $\rmsd$ of LMM has an increasing pattern with the usage of PCs and $\auc$ of LMM has a decreasing pattern over PCs. Hence, the optimal number of PCs is $r=0$ for LMM.
-    The ideal number of PCs is $r = 2$ for PCA approach, which results in near zero $\rmsd$ and peak $\auc$, and performs as well as the LMM without PCs.
+    For mixed effects (LMM), the optimal number of PCs is $r=0$ since $\rmsd$ increases and $\auc$ decreases with increasing $r$.
+    For fixed effects only (PCA), the ideal number of PCs is $r = 9$ in theory for PCA approach, but optimal performance is achieved with as few as $r = 2$ PCs, which results in near zero $\rmsd$ and peak $\auc$, and performs as well as the LMM without PCs.
     PCA with $r < 2$ has incorrect p-values ($\rmsd \gg 0$ cases) and lowest predictive power (small $\auc$).
-    Remarkably, PCA remains robust even in extreme $r > 2$ cases, with $\rmsd$ near zero up to $r = 90$ and minimal loss of power as $r$ increases to 90.
-	 It can be seen that there are one increasing pattern of rmsd and one decreasing pattern of $\auc$ for LMM. 
-	 LMM without PCs seems to be the best choice of LMM in GWAS.
+    Remarkably, PCA is robust in extreme $r \gg 2$ cases, with $\rmsd$ near zero up to $r = 90$ and minimal loss of power as $r$ increases to 90.
   }
   \label{fig:large_sample_size}
 \end{figure}
 
-The previous observation, that PCA continues to perform well when the number of PCs is 10 times greater than its optimum value ($r = 90$ vs $r = 9$), propelled us to find a scenario where this is no longer the case.
-We expect the PCA approach to begin overfitting as the number of PCs $r$ approaches the sample size $n$.
-Increasing $r$ beyond 90 does not make sense, as this would never be done in practice.
-Instead, we reduced $n$ to 100, a number of individuals that is small for typical association studies, but which may occur in studies of rare diseases, or be due to low budgets or other constraints.
-To compensate for the loss of power that results from reducing the sample size, we also reduced the number of causal loci from 100 before to $m_1 = 10$, which increases the magnitude of the effect sizes.
-Note that this reduction in the number of causal loci results in more discreteness in $\auc$ values in \cref{fig:small_sample_size}.
-Interestingly, we find that the relationship between $\rmsd$ and $r$ is similar under small and large sample sizes for PCA, with ideal near-zero $\rmsd$ distributions for $r \ge 2$.
-However, for LMM, the relationship of PCs is different from previous situation. 
-When $r \le 60$, the usage of PCs in LMM will lead to an increase in $\rmsd$. 
-Moreover, when $r\ge 60$ and $r \le 75$, fluctuation exists in terms of $\auc$.
-Lastly, when $r \ge 75$, the $\rmsd$ of LMM will close to 0 which indicates that LMM fits well again. 
+First we evaluate all methods in the large sample size scenario without close relatives, which has a reasonable number of individuals ($n = 1,000$) typical for genetic association studies.
 
-On the other hand, we do see a more severe overfitting effect here that results in decreased predictive power: $\auc$ peaks at $r = 2$ as expected, but drops more rapidly as $r$ increases, with performance around $r = 50$ that is as bad as for $r = 0$, and practically zero $\auc$ at $r = 90$ (\cref{fig:small_sample_size}).
-Simialrly,the distribution of auc of LMM in the case of small sample size is also different from the case of large sample size.  
-The auc of LMM will decrease with the number of PCs used in LMM increases for $r \le 70$.
-Notably, when $r \ge 70$, $\auc$ of LMM will begin to increase and will close to the $\auc$ of LMM with 0 PC used for$r \ge 85$.
-Hence, in the case of small sample size, we should always be cautious about using PCs as it is easy to result in overfitting in terms of $\auc$ for both PCA and LMM.
-Moreover, for LMM, it seems that the optimal choice is still set $r=0$ to avoid overfitting problem.
+We being by discussing the performance of the fixed effects model (PCA) as the number of PCs is varied.
+In this scenario we find a clear transition around $r = 2$ number of PCs for PCA, below of which performance is poor and above of which performance is satisfactory (\cref{fig:large_sample_size}).
+In particular, when $r < 2$ we find the largest $\rmsd$ values, which indicate that p-values are highly non-uniform and would therefore result in inaccurate type-I error control.
+The smallest $\auc$ values also occur for $r < 2$, showing that not enough PCs results in loss of predictive power as well.
+Interestingly, performance is optimal when the number of PCs is lower than the ideal value of $r=9$ according to theory (it is not necessary to model all of the 10 ancestries, modeling the most divergent 3 dimensions suffices).
+%As expected, $r = 2$ has the best performance in terms of both $\rmsd$ and $\auc$.
+Remarkably, as $r$ is increased up to $r = 90$, there is no noticeable change in the $\rmsd$ distribution, and only a small decrease in $\auc$ compared to the optimal $r = 2$ case.
+Accurate null p-values under excessive numbers of PCs makes sense since the exact F-test is being used, whose performance is not affected by having too many covariates.
 
+Now we turn to the mixed effects model (LMM), which models structure as a random effect and is tested here in combination with varying numbers of PCs used as fixed effect covariates.
+The LMM without PCs ($r=0$) performs as well as PCA with $r = 2$, with small $\rmsd$ values and larger $\auc$ values than PCA's with $r=2$.
+The performance of LMM worsens monotonically as $r$ increases.
+The decreasing $\auc$ of LMM as $r$ increases tracks closely with the decreasing $\auc$ of the fixed-effects model only, suggesting that overfitting due to including too many covariates is causing the decrease in $\auc$.
+Interestingly, $\rmsd$ increases for LMM as $r$ increases, an effect that was not observed for fixed effects only.
+As we will cover in greater depth in the discussion, this is due to LMMs evaluating significance using asymptotic tests such as the likelihood ratio test, which become less accurate as the number of covariates increases, whereas our fixed effects F-test is accurate for all values of $r$.
 
+Overall, in this common scenario where sample sizes are large enough and there is no family structure, the LMM approach without PCs performs best, but the (fixed effects only) PCA approach performs as well as LMM as long as enough PCs are used.
+
+\subsection{Small sample size simulation}
 
 \begin{figure}[bp!]
   \centering
-  \includegraphics[width=4in]{boxplot_n_100.pdf}
+  \includegraphics[width=6in]{boxplot_n_100.pdf}
   \caption{
     {\bf Evaluation in small sample size admixture scenario.}
     Here there are $n = 100$ individuals in the simulation, otherwise the simulation and figure layout is the same as in \cref{fig:large_sample_size}.
-    The pattern for $\rmsd$ in the top panel is similar to the previous figure for PCA. 
-    However, here there is a more pronounced drop in $\auc$ values as the number of PCs $r$ increases from $r=2$ to $r=90$.
-	The pattern of LMM for $\rmsd$ and $\auc$ are quite different from previous figure. 
-	The pattern in the first panel for LMM will increase first with the increase of number of PCs until $r=60$. 
-	Then, $\rmsd$ will fluctuate a lot for the number of PCs from $r=60$ to $r=75$.
-	After that, it can be seen that rmsd will decrease to 0 immediately when $r \ge 75$ which indicates a good controlling over type one error when enough PCs are used in LMM.
-	On the other side,the second pannel for the mixed effect is also different from the pattern in large sample size. 
-	The pattern of auc decreases until $r=75$ and then, begins to increase for $r \ge 75$ and $r \le 90$.	
+    For fixed effects, the pattern for $\rmsd$ is similar to the previous figure, while $\auc$ drops faster as the number of PCs $r$ increases from $r=2$ to $r=90$.
+    For mixed effects, there is a similar $\auc$ pattern as for fixed effects initially ($r \le 65$), then the pattern reverses.
+    Similarly, for mixed effects $\rmsd$ increases with $r$ more quickly than in the previous figure only initially ($r \le 65$), then the patter reverses.
+    The unexpected pattern for mixed effects is likely explained by ascertainment for simulations that were not underdetermined under extreme numbers of PCs (see main text).
   }
   \label{fig:small_sample_size}
 \end{figure}
 
-Previous work has shown that PCA performs poorly in the presence of family structure.
-Here we aim to characterize PCA's behavior in a much more complex structure than before, by simulating a family of admixed founders for 20 generations, so that we may observe numerous siblings, first cousins, etc.
-In this case $r = 2$ is still the optimal choice for PCA, even though the rank of the genotype matrix is much greater due to the family structure.
-We find that, although $\rmsd$ for PCA decreases monotonically as $r$ increases, this distribution does not go to zero, instead converging to around 0.05 (\cref{fig:family_structure}).
-However, it can be seen that $\rmsd$ for LMM is close although there still exists a decreasing pattern of $\rmsd$ with the increase of PCs used in LMM.'
+In the previous case PCA performed well when the number of PCs was orders of magnitude greater than its ideal value in theory ($r = 90$ vs $r = 9$), which motivated us to find scenarios where this is no longer the case.
+We expect the PCA approach to overfit more severely as the number of PCs $r$ approaches the sample size $n$.
+Increasing $r$ beyond 90 would never be done in practice; 
+instead, we reduced the number of individuals $n$ to 100, which is small for typical association studies, but which may occur in studies of rare diseases, or be due to low budgets or other constraints.
+To compensate for the loss of power that results from reducing the sample size, we also reduced the number of causal loci from 100 before to $m_1 = 10$, which increases the magnitude of the effect sizes.
+Note that this reduction in the number of causal loci results in more discreteness in $\auc$ values in \cref{fig:small_sample_size}.
 
-Additionally, the $\auc$ increases until $r = 2$ is reached (as opposed to $r = 9$ as before), then plateaus with marginal decreases in performance as $r$ goes to 90.
-In contrast, the LMM does achieve a near-zero $\rmsd$ and $\auc$ distribution of LMM is always above $\auc$ distribution of PCA.
-Therefore, it can be seen that LMM out performs PCA in the case of family structure. 
+We find that the relationship between $\rmsd$ and $r$ the same under small and large sample sizes for PCA (fixed-effects), with ideal near-zero $\rmsd$ distributions for $r \ge 2$.
+On the other hand, we see a more severe overfitting effect here that results in decreased predictive power: $\auc$ peaks at $r = 1$, then drops rapidly as $r$ increases, with performance around $r = 25$ that is as bad as for $r = 0$, and practically zero $\auc$ at $r = 90$ (\cref{fig:small_sample_size}).
+Thus, the overfitting effect is quite dramatic in studies with few individuals, where choosing the correct number of PCs is very important.
+
+The behavior of LMM (mixed effects) with varying numbers of PCs was different than in the large sample size simulation.
+We observed two ``phases'':
+In the first phase, when $r \le 65$, the mixed effects model performs increasingly poorly as $r$ increases ($\rmsd$ increases and $\auc$ decreases).
+In the second phase, when $r \ge 65$, the patterns reverse surprisingly, with $\rmsd$ decreasing and $\auc$ increasing again as $r$ increases.
+Note that when running GCTA (the LMM implementation we tested) with large $r$ values in this particular simulation, we often encountered errors such as ``the information matrix is not invertible'', ``analysis stopped because more than half of the variance components are constrained'', and ``Log-likelihood not converged (stop after 100 iteractions)'' (sic), which make sense as we are pushing this complex model hard to be underconstrained, in which cases $\rmsd$ and $\auc$ were treated as missing.
+These errors were not observed in our other simulations.
+Thus, the unexpected high performance of LMM at high $r$ values here is likely explained by the unique ascertainment occuring increasingly frequently as $r$ increases, which is that the most overfit simulations are thrown away rather than evaluated poorly.
+For this reason, performance is not being evaluated accurate here for LMM and $r \ge 65$.
+
+Just as in the first simulation, here the optimal choice is to use LMM without PCs, which successfully avoids overfitting and outperforms the best-performing fixed-effects method with $r=2$ PCs.
+
+
+
+\subsection{Family structure admixture simulation}
 
 \begin{figure}[bp!]
   \centering
-  \includegraphics[width=4in]{boxplot_n_1000_family.pdf}
+  \includegraphics[width=6in]{boxplot_n_1000_family.pdf}
   \caption{
     {\bf Evaluation in family structure admixture scenario.}
     Here there are $n = 1,000$ individuals from a family structure simulation with admixed founders and large numbers of pairs of sibling, first cousins, second cousins, etc, from a realistic random pedigree that spans 20 generations.
-    Unlike previous figures, here $\rmsd$ (top panel) for PCA does not go down to zero as $r$ increases.
-	 However,  $\rmsd$ (top panel) for LMM	will close to 0 which indicates a good control in type one error control.
-    For this complex relatedness structure $r =2$ is still the optimal number of PCs and performance remains steady for all $r \ge 2$ values tested.
-	 In addition to this, for the second panel, $r =2$ is also the best number of PCs for PCA in terms of $\auc$, whereas for LMM, $\auc$ is quite stable regardless of the chang of number of PCs. 
-	Overall, it can be seen that LMM outperforms PCA in both  $\rmsd$ and $\auc$ when family structure exists, which agrees with the previous research.
+    Unlike previous figures, here fixed effects never perform as well as LMM, since $\rmsd$ (top panel) does not go down to zero as $r$ increases, and there is a significant gap in $\auc$ performance.
+    The LMM achieves a near-zero $\rmsd$, and the highest $\auc$, when no PCs are used ($r=0$), as expected because of the presence of family structure.
   }
   \label{fig:family_structure}
 \end{figure}
+
+Previous work has shown that PCA performs poorly in the presence of family structure.
+Here we aim to characterize PCA's behavior in a much more complex structure than before, by simulating a family of admixed founders for 20 generations, so that we may observe numerous siblings, first cousins, etc, while mostly preserving the population structure due to ancestry by biasing pairings for more similar ancestries.
+
+In this case $r \approx 3$ is the optimal choice for PCA, which is surprising since the rank of the genotype matrix is much greater due to the family structure.
+We find that, although $\rmsd$ for PCA decreases monotonically as $r$ increases, this distribution does not go to zero, instead converging to around 0.05 (\cref{fig:family_structure}).
+In contrast, for mixed effects, $\rmsd$ is practically zero at $r=0$, but $\rmsd$ increases with increasing $r$ (similar to the pattern for large sample sizes without family structure in \cref{fig:large_sample_size}).
+In terms of $\auc$, fixed effects has its best performance at $r=3$, but a sizable gap in performance is observed compared to mixed effects with $r = 0$, which performs best.
+Overall, LMM conclusively outperforms PCA (fixed effects only) in the case of family structure. 
 
 \section{Discussion}
 
@@ -671,25 +689,71 @@ Therefore, it can be seen that LMM out performs PCA in the case of family struct
 % \citep{wojcik_genetic_2019}:
 % Modern example with PCA $r = 10$ and a method that determines that this is a good choice (tested $r = 1, ..., 10$).
 
-One important conclusion of our evaluation is that the PCA approach for genetic association studies is robust to the choice of $r$ (number of PCs), as long as $r$ is large enough, especially when the sample size is large enough.
-Thus, while we expect an $r$ that is too small or too large may hurt the performance of PCA (by not modeling enough of the population structure, or by overfitting, respectively), we find that the magnitude of the performance penalty depends very strongly on whether $r$ is too small or too large.
-In our simulations that excluded family structure, the optimal choice was $r = 2$,  and we found that even $r = 1$ paid a large penalty in both type-I error control (measured via $\rmsd$) and predictive power ($\auc$; \cref{fig:large_sample_size,fig:small_sample_size}).
-In contrast, $r$ can be much larger than its optimal value with absolutely no penalty in terms of type-I error (regardless of sample size), and only a negligible cost in predictive power when sample sizes are large (\cref{fig:large_sample_size}).
-The loss of predictive power by using excessive PCs is only pronounced when the number of individuals $n$ is much smaller than is common nowadays, \textit{i.e}. in the hundreds (\cref{fig:small_sample_size}).
-This robustness of PCA to the choice of $r$ has long been anecdotal only \citep{price_principal_2006, kang_variance_2010}.
-We can now firmly state that it is far safer to err on the side of larger $r$, especially for large sample sizes, although testing several $r$ values via simulations is always recommended.
+Our main findings are organized into three areas:
+(1) the robustness of the performance of PCA (fixed effects only) on the number of PCs included;
+(2) the performance of LMM (mixed effects) when PCs are included; and
+(3) the overall comparison between LMM and PCA.
+In each case we will discuss how performance depended on various aspects of each simulation.
 
-Previous work has mostly ruled in favor of LMM instead of PCA, or otherwise tend to show comparable performance.
-The clearest advantage of LMM is its ability to model family relatedness.
-We confirm this to some extent in our family structure simulation, finding that LMM performs best in many (but not all) of our simulation replicates (\cref{fig:family_structure}).
+\subsection{Robustness of PCA (fixed effects only) to the number of PCs}
+
+One important conclusion of our evaluation is that the PCA approach for genetic association studies (fixed effects only) is robust to the choice of $r$ (number of PCs), as long as $r$ is large enough, especially when the sample size is large enough.
+Thus, while we expect an $r$ that is too small or too large may hurt the performance of PCA (by not modeling enough of the population structure, or by overfitting, respectively), we find that the magnitude of the performance penalty depends very strongly on whether $r$ is too small or too large.
+
+In our simulations that excluded family structure, the optimal choice for PCA (fixed effects only) was $r = 2$, which was smaller than the theoretical optimal value of $r=9$ when the number of ancestries ($K=10$) and the intercept coefficient are considered.
+We also found that even $r = 1$ paid a large penalty in both type-I error control (measured via $\rmsd$) and predictive power ($\auc$; \cref{fig:large_sample_size,fig:small_sample_size}).
+In contrast, $r$ can be much larger than its optimal value with no penalty in terms of type-I error control (regardless of sample size), and only a negligible cost in predictive power when sample sizes are large (\cref{fig:large_sample_size}).
+Successful type-I error control (\textit{i.e.}, near zero $\rmsd$) for fixed effects and for large enough numbers of PCs ($r$) follow from our use of the F-test for calculating statistical significance, which holds exactly for all $r$ values and does not rely on asymptotic approximations.
+The loss of predictive power by using excessive PCs is only pronounced when the number of individuals $n$ is much smaller than is common nowadays, \textit{i.e.}, in the hundreds (\cref{fig:small_sample_size}).
+This robustness of PCA to the choice of $r$ has long been anecdotal only \citep{price_principal_2006, kang_variance_2010}.
+Here we conclusively found that it is far safer to err on the side of larger $r$, especially for large sample sizes, although testing several $r$ values via simulations is always recommended.
+
+The presence of family structure is the main weakness of the PCA approach.
+Type-I error is never accurately controlled ($\rmsd$ was non-zero) for any number of PCs we tested (up to $r=90$; \cref{fig:family_structure}).
+The pattern of $\auc$ here resembles that of the simulation without family structure (optimal performance around $r = 3$), but best performance is never as good as for LMMs.
+
+\subsection{Robustness of LMM (mixed effects) to the number of PCs}
+
+We also evaluated use of an LMM (Linear Mixed-effects Model) in combination with PCs, an approach that has performed best in certain previous evaluations \citep{zhao_arabidopsis_2007, price_new_2010}.
+In all of our simulations we found that LMM with zero PCs always outperformed using any non-zero number of PCs \cref{fig:large_sample_size,fig:small_sample_size,fig:family_structure}).
+Our findings make sense since the eigenvectors of the kinship matrix (used as the covariance of the random effects) are the same as the PCs in the PCA approach, so including both results in redundancy.
+It is possible that there are more complex scenarios than considered here, where an LMM with PCs performs better than LMM without PCs.
+
+Although our evaluations favor using LMM without PCs, our tests also revealed that LMMs with large numbers of covariates suffer from inaccurate p-values, an LMM-specific problem that we did not observe for fixed effects.
+The key difference between the two approaches is that p-values for fixed effects are calculated from an exact distribution (F-test), which is robust to large numbers of covariates, while mixed effects necessitate an approximatimation (the likelihood ratio test has test statistics which are only are asymptotically $\chi^2$).
+These approximations become more unreliable the more covariates are present, as observed in our evaluations.
+Unfortunately, there is no alternative to the likelihood ratio test in LMMs.
+Again, LMM with zero PCs is the best performing method and in that case p-values are accurate.
+However, the same issue of problematic statistics can arise where a large number of (non-PC) covariates are being fit in an association study, particularly when the number of individuals is small, as in our small sample size simulation (\cref{fig:small_sample_size}).
+
+\subsection{Overall comparison between LMM and PCA}
+
+Previous work has mostly ruled in favor of LMM (mixed effects) instead of PCA (fixed effects only), or otherwise tend to show comparable performance.
+Our simulations agree that LMM is always the best choice, but the gap in performance of PCA (with the optimal choice of numbers of PCs) varies depending on the simulation.
+The clearest theoretical advantage of the LMM is its ability to model family relatedness.
+We confirm this in our family structure simulation, where LMM (without PCs) significantly outperforms the best PCA model in terms of both type-I error control ($\rmsd$) and predictive performance ($\auc$; \cref{fig:family_structure}).
 The other clear advantage of LMM over PCA is in having fewer degrees of freedom, which is most evident in our small sample size simulation (\cref{fig:small_sample_size}).
 Poor performance for PCA under small sample sizes may explain early claims that PCA was not effective in preventing test statistic inflation \citep{epstein_simple_2007, kimmel_randomization_2007, luca_use_2008}.
 
-Unexpectedly, sometimes we see LMM perform much more poorly compared to PCA in our simulation scenarios (middle quartiles in boxplots in \cref{fig:small_sample_size}).
-Evaluations from others also suggest that PCA can outperform a standard LMM especially when there are loci under selection or otherwise highly differentiated, and rare variants \citep{price_new_2010, wu_comparison_2011, yang_advantages_2014}.
-Thus, it seems that the additional degrees of freedom available in PCA enables it to better model loci when LMM model assumptions break.
-The context-dependent advantages of PCA versus LMM also argues against the simple characterization that either fixed or random effects are in principle superior models for association studies \citep{price_new_2010, sul_mixed_2013, price_response_2013, sul_population_2018}.
-This reasoning also suggests that a model with both fixed and random effects (an LMM with PCs) may inherit the best of both worlds, assuming sample sizes are large enough to prevent overfitting, as some previous evaluations found \citep{zhao_arabidopsis_2007, price_new_2010}.
+Evaluations from others suggest that PCA can outperform LMM when there are loci under selection or otherwise highly differentiated, and rare variants \citep{price_new_2010, wu_comparison_2011, yang_advantages_2014}.
+One potential explanation is that the additional degrees of freedom in PCA enables it to better model loci when LMM model assumptions break.
+However, our simulations indicate that LMM is the best choice for most population structures.
+Since PCA matches the performance of LMM when there is no family structure, this argues against the simple characterization that either fixed or random effects are in principle superior models for association studies \citep{price_new_2010, sul_mixed_2013, price_response_2013, sul_population_2018}.
+The driving principle that explains the PCA and LMM performance is the dimensionality of the genetic structure:
+when there is no family structure, then structure is low dimensional, so either PCA and LMM are well suited for modeling the population structure.
+In contrast, the presence of family relationships increases the dimensionality of the genetic structure, and in that case PCA performs poorly because large numbers of PCs are needed to model the structure, in which case the model is prone to overfit the data.
+LMMs naturally model pedigrees via kinship matrices, and in general they fit arbitrary high-dimensional genetic structures, and with fewer effective parameters than PCA, therefore preventing overfitting of the data.
+
+In addition to our findings, another advantage of LMMs is that the user need not choose parameters arbitrarily, as is sometimes the case for the number of PCs in the PCA approach.
+Thus, the key practical advantage of PCA is its speed, as fitting mixed-effects models has a higher computational complexity.
+However, modern LMM implementations are much faster than the first generation of LMMs for genetic association.
+For this reason, we recommend always using LMMs except when it is computationally infeasible.
+On the other hand, it is important to understand whether use of PCA in past association studies has led to an increase of false positives or false negatives.
+Our simulations suggest that PCA results in accurate association studies as long as
+(1) there are no close relatives present in the study,
+(2) enough PCs were used, and
+(3) sample sizes are large enough.
+Common practice of large sample sizes, excluding close relatives, and using at least 10 PCs suggests that the majority of previous genetic association studies that used PCA have presented valid results on par with what an LMM would have reported.
 
 \printbibliography
 
