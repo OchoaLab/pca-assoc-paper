@@ -126,7 +126,8 @@ boxplots_rmsd_auc <- function(
   
   # other shared params (same as standard boxplot)
   outline <- FALSE # no outliers plotted separately (so busy as it is)
-  range <- 0 # make whiskers extend to full range
+#  range <- 0 # make whiskers extend to full range
+  range <- 1.5 # default whiskers range
   whisklty <- 1 # whisker line type (default 2?)
   
   # start PDF
@@ -161,7 +162,7 @@ boxplots_rmsd_auc <- function(
   # add legend to top panel only
   legend(
     legend_pos,
-    c('Fixed effects', 'Mixed effects'),
+    c('Fixed effects (PCA)', 'Mixed effects (LMM+PCA)'),
     text.col = c( col_fixed, col_mixed ),
     bty = 'n'
   )
@@ -202,7 +203,7 @@ boxplots_rmsd_auc <- function(
 
 boxplots_rmsd_auc(
   name_out = "boxplot_n_1000",
-  rmsd = rmsd_pca_1000,
+  rmsd_pca = rmsd_pca_1000,
   rmsd_lmm = rmsd_gcta_1000,
   auc_pca =  auc_pca_1000,
   auc_lmm = auc_gcta_1000,
@@ -212,7 +213,7 @@ boxplots_rmsd_auc(
 
 boxplots_rmsd_auc(
   name_out = "boxplot_n_1000_family",
-  rmsd = rmsd_pca_1000_family,
+  rmsd_pca = rmsd_pca_1000_family,
   rmsd_lmm = rmsd_gcta_1000_family,
   auc_pca =  auc_pca_1000_family,
   auc_lmm = auc_gcta_1000_family,
@@ -222,10 +223,11 @@ boxplots_rmsd_auc(
 
 boxplots_rmsd_auc(
   name_out = "boxplot_n_100",
-  rmsd = rmsd_pca_100,
+  rmsd_pca = rmsd_pca_100,
   rmsd_lmm = rmsd_gcta_100,
   auc_pca =  auc_pca_100,
   auc_lmm = auc_gcta_100,
-  r_max = 90
+  r_max = 90,
+  legend_pos = 'topleft'
 )
 
