@@ -382,6 +382,35 @@ $p_{(i)}$ is the $i$th ordered null p-value, and
 $u_i = ( i - 0.5 ) / m_0$ is its expectation.
 Thus, $\rmsd = 0$ corresponds to the best performance in this test, and larger $\rmsd$ values correspond to worse performance.
 
+One scenario that achieves the maximum $\rmsd$ (or worst performance) is when all estimated p-values approach zero, which is what happens to anti-conservative approaches.
+In that case all of the observed quantiles approach $p_{(i)} = 0$, and then, in the limit as the number of loci goes to infinity, the statistic in this worst-case scenario approaches
+$$
+\rmsd
+\rightarrow
+\sqrt{ \int_0^1 u^2 du }
+=
+\frac{1}{ \sqrt{ 3 } }
+\approx
+0.577
+.
+$$
+Note that all p-values approaching 1 instead of zero achieves the same worst-case value.
+% Another less extreme extreme case has the lower half of p-values at 0 and the upper half at 1.
+% In that case the value is
+% $$
+% \rmsd
+% \rightarrow
+% \sqrt{ 2 \int_0^\frac{1}{2} u^2 du }
+% =
+% \sqrt{ \frac{2}{3} \cdot \frac{1}{2^3} }
+% =
+% \frac{1}{ \sqrt{ 12 } }
+% \approx
+% 0.289
+% .
+% $$
+
+
 In previous evaluations, test statistic inflation has been used to measure the success of corrections for population structure \citep{astle_population_2009, price_new_2010}.
 The inflation factor $\lambda$ is defined as the median $\chi^2$ association statistic divided by theoretical median under the null hypothesis \citep{devlin_genomic_1999}.
 Hence, when null test statistics have their expected distribution, we get $\lambda = 1$ (same as $\rmsd = 0$ above).
