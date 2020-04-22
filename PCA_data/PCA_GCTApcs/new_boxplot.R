@@ -35,19 +35,19 @@ read_data<-function(name, rep, family = FALSE, verbose = TRUE){
 
 
 # large sample size
-rmsd_pca_1000 <- read_data('rmsd_pca_n_1000_3_19', 5)
-auc_pca_1000 <- read_data('auc_pca_n_1000_3_19', 5)
+rmsd_pca_1000 <- read_data('rmsd_pca_n_1000_4_11', 5)
+auc_pca_1000 <- read_data('auc_pca_n_1000_4_11', 5)
 
-rmsd_gcta_1000 <- read_data('rmsd_gcta_n_1000_3_19', 5)
-auc_gcta_1000 <-  read_data('auc_gcta_n_1000_3_19', 5)
+rmsd_gcta_1000 <- read_data('rmsd_gcta_n_1000_4_11', 5)
+auc_gcta_1000 <-  read_data('auc_gcta_n_1000_4_11', 5)
 
 
 # small sample size
-rmsd_pca_100 <- read_data('rmsd_pca_n_100_3_19', 4)
-auc_pca_100 <- read_data('auc_pca_n_100_3_19', 4)
+rmsd_pca_100 <- read_data('rmsd_pca_n_100_4_11', 5)
+auc_pca_100 <- read_data('auc_pca_n_100_4_11', 5)
 
-rmsd_gcta_100 <- read_data('rmsd_gcta_n_100_3_19', 4)
-auc_gcta_100 <-  read_data('auc_gcta_n_100_3_19', 4)
+rmsd_gcta_100 <- read_data('rmsd_gcta_n_100_4_11', 5)
+auc_gcta_100 <-  read_data('auc_gcta_n_100_4_11', 5)
 
 ## # replace NAs with worse-case values
 ## # Only GCTA small sample size got any
@@ -57,11 +57,11 @@ auc_gcta_100 <-  read_data('auc_gcta_n_100_3_19', 4)
 ## rmsd_gcta_100[ is.na( rmsd_gcta_100 ) ] <- 1/sqrt(3)
 
 # large sample size & family structure
-rmsd_pca_1000_family <- read_data('rmsd_pca_n_1000_3_19_family', 5)
-auc_pca_1000_family <- read_data('auc_pca_n_1000_3_19_family', 5)
+rmsd_pca_1000_family <- read_data('rmsd_pca_n_1000_4_11_family', 5)
+auc_pca_1000_family <- read_data('auc_pca_n_1000_4_11_family', 5)
 
-rmsd_gcta_1000_family <- read_data('rmsd_gcta_n_1000_3_19_family', 5)
-auc_gcta_1000_family <-  read_data('auc_gcta_n_1000_3_19_family', 5)
+rmsd_gcta_1000_family <- read_data('rmsd_gcta_n_1000_4_11_family', 5)
+auc_gcta_1000_family <-  read_data('auc_gcta_n_1000_4_11_family', 5)
 
 
 # plotting labels
