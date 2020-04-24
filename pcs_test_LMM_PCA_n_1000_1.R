@@ -17,7 +17,7 @@ source('paths.R')
 source("gas_plots.R")
 
 # number of replicates per run
-rep <- 2
+rep <- 10
 # number of PCs to explore
 n_pcs_max <- 90
 # alternate path for GCTA binary
@@ -29,7 +29,7 @@ gcta_bin <- "/dscrhome/yy222/gcta_1.92.4beta1/gcta64"
 
 # define options
 option_list = list(
-    make_option(c("-n", "--n_ind"), type = "integer", default = 1000, # CHANGE: or 100
+    make_option(c("-n", "--n_ind"), type = "integer", default = 1000, # CHANGE: or 1000
                 help = "number of individuals", metavar = "int"),
     make_option(c("-m", "--m_loci"), type = "integer", default = 100000, 
                 help = "number of loci", metavar = "int"),
@@ -43,7 +43,7 @@ option_list = list(
                 help = "number of generations, for realistic local kinship", metavar = "int"),
     make_option("--herit", type = "double", default = 0.8, 
                 help = "heritability", metavar = "double"),
-    make_option("--m_causal", type = "integer", default = 100, # CHANGE: or 10
+    make_option("--m_causal", type = "integer", default = 100, # CHANGE: or 100
                 help = "num causal loci", metavar = "int"),
     make_option(c("-t", "--threads"), type = "integer", default = 1, 
                 help = "number of threads (affects GCTA only)", metavar = "int"),
@@ -190,9 +190,9 @@ for (i in 1 : rep){
         warning('File to remove did not exist: ', file_phen)
     }
 }
-
+setwd(paste0("/hpc/group/biostat/yy222/LMM_PCA_rep_n_", n_ind,"/rep1"))
 # write outputs
-write.table(M_auc_gcta, file = paste0("auc_gcta_n_", n_ind, ".txt") )
-write.table(M_rmsd_gcta, file = paste0("rmsd_gcta_n_", n_ind, ".txt") )
-write.table(M_auc, file = paste0("auc_pca_n_", n_ind, ".txt") )
-write.table(M_rmsd, file = paste0("rmsd_pca_n_", n_ind, ".txt") )
+write.table(M_auc_gcta, file = paste0("auc_gcta_n_", n_ind, "_4_11_1.txt") )
+write.table(M_rmsd_gcta, file = paste0("rmsd_gcta_n_", n_ind, "_4_11_1.txt") )
+write.table(M_auc, file = paste0("auc_pca_n_", n_ind, "_4_11_1.txt") )
+write.table(M_rmsd, file = paste0("rmsd_pca_n_", n_ind, "_4_11_1.txt") )

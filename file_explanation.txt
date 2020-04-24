@@ -1,3 +1,12 @@
-pcs_test_LMM_PCA_n_100_1：code for the simulation for k=10; fst = 0.1; n=100; m=10.
+pcs_test_LMM_PCA_n_100_1:code for the simulation for k=10; fst = 0.1; n=100; m=10.
 pcs_test_LMM_PCA_n_1000_1:code for the simulation for k=10; fst = 0.1; n=1000; m=100.
 pcs_test_LMM_PCA_family_1: code for the simulation for k=10; fst = 0.1; n=1000; m=100; g=20.
+
+rmsd_auc_read: function to read rmsd or auc for pca or gcta (example attached)
+
+pcs_test_n_100_trait: code to generate random trait and save all data
+
+pcs_test_n_100_pca: code to conduct association test for pca for one pc (pc need to be set in advance)
+
+pcs_test_n_100_gcta: code to conduct association test for gcta for one pc (pc need to be set in advance & this code still report the error that missing
+mala in both my desktop and laptop)

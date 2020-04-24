@@ -17,7 +17,7 @@ source('paths.R')
 source("gas_plots.R")
 
 # number of replicates per run
-rep <- 2
+rep <- 10
 # number of PCs to explore
 n_pcs_max <- 90
 # alternate path for GCTA binary
@@ -190,9 +190,9 @@ for (i in 1 : rep){
         warning('File to remove did not exist: ', file_phen)
     }
 }
-
+setwd(paste0("/hpc/group/biostat/yy222/LMM_PCA_rep_n_", n_ind,"/rep1"))
 # write outputs
-write.table(M_auc_gcta, file = paste0("auc_gcta_n_", n_ind, ".txt") )
-write.table(M_rmsd_gcta, file = paste0("rmsd_gcta_n_", n_ind, ".txt") )
-write.table(M_auc, file = paste0("auc_pca_n_", n_ind, ".txt") )
-write.table(M_rmsd, file = paste0("rmsd_pca_n_", n_ind, ".txt") )
+write.table(M_auc_gcta, file = paste0("auc_gcta_n_", n_ind, "_4_11_1.txt") )
+write.table(M_rmsd_gcta, file = paste0("rmsd_gcta_n_", n_ind, "_4_11_1.txt") )
+write.table(M_auc, file = paste0("auc_pca_n_", n_ind, "_4_11_1.txt") )
+write.table(M_rmsd, file = paste0("rmsd_pca_n_", n_ind, "_4_11_1.txt") )
