@@ -52,17 +52,19 @@ rm ../data/$name/data-n_pcs_90.log
 # hope for similar average performance, although these PCs are very different than GCTA (except for top 2)
 # NOTE: uses ROM version (known bias, does not match popular versions; I think this is best)
 time Rscript real-01-pca-test.R --bfile $name
-# 6m57.502s
+# 6m57.502s viiiaX6
 
 # this creates auxiliary GCTA PCA files (redundant, will delete when done with this analysis)
 time Rscript real-02-subset-eigenvec.R --bfile $name
-# 0m3.437s
+# 0m3.437s ideapad
 
 # removes redundant, auxiliary GCTA PCA files
 time Rscript real-02-subset-eigenvec.R --bfile $name --clean
-# 0m0.473s
+# 0m0.473s ideapad
 
-
+# calculates kinship matrix with popkin, to get mean kinship to pass to simtrait
+time Rscript real-03-popkin.R --bfile $name
+# 4m54.676s ideapad
 
 ###############
 ### JUNK??? ###
