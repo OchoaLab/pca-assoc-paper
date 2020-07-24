@@ -58,10 +58,6 @@ time Rscript real-01-pca-test.R --bfile $name
 time Rscript real-02-subset-eigenvec.R --bfile $name
 # 0m3.437s ideapad
 
-# removes redundant, auxiliary GCTA PCA files
-time Rscript real-02-subset-eigenvec.R --bfile $name --clean
-# 0m0.473s ideapad
-
 # calculates kinship matrix with popkin, to get mean kinship to pass to simtrait
 time Rscript real-03-popkin.R --bfile $name
 # 4m54.676s ideapad
@@ -69,6 +65,19 @@ time Rscript real-03-popkin.R --bfile $name
 # draws a random trait
 time Rscript real-04-simtrait.R --bfile $name -r 1
 # 0m2.166s ideapad
+
+# GCTA runs, eventually do with all PCs
+time Rscript real-05-gcta.R --bfile $name -r 1 --n_pcs 0
+# 5m36.827s ideapad
+time Rscript real-05-gcta.R --bfile $name -r 1 --n_pcs 10
+# 5m32.453s ideapad
+time Rscript real-05-gcta.R --bfile $name -r 1 --n_pcs 90
+# ... ideapad
+
+# removes redundant, auxiliary GCTA PCA files
+time Rscript real-02-subset-eigenvec.R --bfile $name --clean
+# 0m0.473s ideapad
+
 
 
 ###############
