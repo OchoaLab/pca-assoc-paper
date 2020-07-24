@@ -67,12 +67,21 @@ time Rscript real-04-simtrait.R --bfile $name -r 1
 # 0m2.166s ideapad
 
 # GCTA runs, eventually do with all PCs
+# runtime is remarkably constant!
 time Rscript real-05-gcta.R --bfile $name -r 1 --n_pcs 0
 # 5m36.827s ideapad
 time Rscript real-05-gcta.R --bfile $name -r 1 --n_pcs 10
 # 5m32.453s ideapad
 time Rscript real-05-gcta.R --bfile $name -r 1 --n_pcs 90
-# ... ideapad
+# 5m37.847s ideapad
+
+# PCA runs
+time Rscript real-06-pca.R --bfile $name -r 1 --n_pcs 0
+# 1m13.805s ideapad
+time Rscript real-06-pca.R --bfile $name -r 1 --n_pcs 10
+# 4m56.686s ideapad
+time Rscript real-06-pca.R --bfile $name -r 1 --n_pcs 90
+# 53m24.639s ideapad
 
 # removes redundant, auxiliary GCTA PCA files
 time Rscript real-02-subset-eigenvec.R --bfile $name --clean
