@@ -56,8 +56,8 @@ if ( opt$clean ) {
     )
     # now navigate PCs in output, backwards so subsetting makes sense
     for ( n_pcs in (n_pcs_max - 1 ) : 1 ) {
-        # remove the previous column
-        tib <- tib[ , -( n_pcs + 1 ) ]
+        # remove the previous column (shifted by 2 because of FAM and ID columns)
+        tib <- tib[ , -( n_pcs + 3 ) ]
         # make sure number of columns is as expected
         # +2 because of FAM and ID columns in the beginning
         stopifnot(
