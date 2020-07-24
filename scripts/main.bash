@@ -27,8 +27,10 @@ Rscript pcs_test_LMM_PCA_n_1000_1.R -g 20 # -n 1000 --m_causal 100
 # based on: gas-rgls/scripts/data_links.bash
 # use LD pruned only
 
-DATA_DIR='/home/viiia/dbs/humanOrigins'
+# shared by R script calls further below
 name=HoPacAll_ld_prune_1000kb_0.3
+
+DATA_DIR='/home/viiia/dbs/humanOrigins'
 cd ../data/
 mkdir $name
 cd $name
@@ -51,6 +53,16 @@ rm ../data/$name/data-n_pcs_90.log
 # NOTE: uses ROM version (known bias, does not match popular versions; I think this is best)
 time Rscript real-01-pca-test.R --bfile $name
 # 6m57.502s
+
+# this creates auxiliary GCTA PCA files (redundant, will delete when done with this analysis)
+time Rscript real-02-subset-eigenvec.R --bfile $name
+# 0m3.437s
+
+# removes redundant, auxiliary GCTA PCA files
+time Rscript real-02-subset-eigenvec.R --bfile $name --clean
+# 0m0.473s
+
+
 
 ###############
 ### JUNK??? ###
