@@ -25,6 +25,10 @@ opt <- parse_args(opt_parser)
 # get values
 name <- opt$bfile
 
+# stop if name is missing
+if ( is.na(name) )
+    stop('`--bfile` terminal option is required!')
+
 # move to where the data is
 setwd( '../data/' )
 setwd( name )
@@ -42,5 +46,4 @@ fam <- read_fam( name_in )
 kinship <- popkin( X, fam$fam )
 
 # save matrix for later use
-name_out <- paste0( name_in, '-popkin' )
-write_grm( name_out, kinship, fam = fam )
+write_grm( 'popkin', kinship, fam = fam )

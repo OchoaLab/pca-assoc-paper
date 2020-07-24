@@ -33,6 +33,10 @@ opt <- parse_args(opt_parser)
 # get values
 name <- opt$bfile
 
+# stop if name is missing
+if ( is.na(name) )
+    stop('`--bfile` terminal option is required!')
+
 # move to where the data is
 setwd( '../data/' )
 setwd( name )

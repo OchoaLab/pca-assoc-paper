@@ -66,6 +66,11 @@ time Rscript real-02-subset-eigenvec.R --bfile $name --clean
 time Rscript real-03-popkin.R --bfile $name
 # 4m54.676s ideapad
 
+# draws a random trait
+time Rscript real-04-simtrait.R --bfile $name -r 1
+# 0m2.166s ideapad
+
+
 ###############
 ### JUNK??? ###
 ###############
