@@ -75,6 +75,12 @@ time Rscript real-05-gcta.R --bfile $name -r 1 --n_pcs 10
 time Rscript real-05-gcta.R --bfile $name -r 1 --n_pcs 90
 # 5m37.847s ideapad
 
+# loop that does all PCs in a given rep (local runs)
+for pcs in {0..90}; do
+    time Rscript real-05-gcta.R --bfile $name -r 1 --n_pcs $pcs
+done
+
+
 # PCA runs
 time Rscript real-06-pca.R --bfile $name -r 1 --n_pcs 0
 # 1m13.805s ideapad

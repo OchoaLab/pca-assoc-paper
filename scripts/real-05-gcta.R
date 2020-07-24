@@ -54,15 +54,25 @@ setwd( dir_out )
 ### GCTA ###
 ############
 
+# file to create
+file_out <- paste0( 'pvals_gcta_', n_pcs, '.txt.gz' )
+
+# do not redo run if output was already present!
+if ( file.exists( file_out ) )
+    stop( 'Output already exists, skipping: ', file_out )
+
 # GCTA with PCA
-message("GCTA")
+message("GCTA with ", n_pcs, " PCs")
+
+# output name for GCTA runs should have number of PCs, so concurrent runs don't overwrite each other
+name_out <- paste0( 'gcta_', n_pcs )
 
 # actual GWAS
 obj <- gas_lmm_gcta(
     gcta_bin = gcta_bin,
     name = paste0( '../', name_in ), # genotypes, GRM, PCA are all in lower level (shared across reps)
     name_phen = name_in, # phenotype is in current level
-    name_out = name_in, # write outputs into current level
+    name_out = name_out, # write outputs into current level, add number of PCs
     threads = threads,
     n_pcs = n_pcs
 )
@@ -72,10 +82,10 @@ pvals <- obj$pvals
 # save into a file, simple human-readable format
 write_lines(
     pvals,
-    paste0( 'pvals_gcta_', n_pcs, '.txt.gz' )
+    file_out
 )
 
 # clean up when we're done with gcta
 # deletes GAS table only (mlma and log)
 # files are in current level (matches earlier `name_out` option)
-delete_files_gcta( name_in )
+delete_files_gcta( name_out )

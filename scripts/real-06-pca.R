@@ -56,6 +56,13 @@ setwd( dir_out )
 ### PCA ###
 ###########
 
+# file to create
+file_out <- paste0( 'pvals_pca_', n_pcs, '.txt.gz' )
+
+# do not redo run if output was already present!
+if ( file.exists( file_out ) )
+    stop( 'Output already exists, skipping: ', file_out )
+
 # genotypes, PCs are all in lower level (shared across reps)
 name_in_lower <- paste0( '../', name_in )
 
@@ -68,7 +75,7 @@ X <- BEDMatrix(
 phen <- read_phen( name_in )
 trait <- phen$pheno # extract column of interest
 
-message("PCA")
+message("PCA with ", n_pcs, " PCs")
 
 if ( n_pcs == 0 ) {
     # run basic linear model without covariates
@@ -99,5 +106,5 @@ pvals <- obj$pvals
 # save into a file, simple human-readable format
 write_lines(
     pvals,
-    paste0( 'pvals_pca_', n_pcs, '.txt.gz' )
+    file_out
 )
