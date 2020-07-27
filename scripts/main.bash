@@ -66,6 +66,11 @@ time Rscript real-03-popkin.R --bfile $name
 time Rscript real-04-simtrait.R --bfile $name -r 1
 # 0m2.166s ideapad
 
+# loop for work computer
+for rep in {2..50}; do
+    time Rscript real-04-simtrait.R --bfile $name -r $rep
+done
+
 # GCTA runs, eventually do with all PCs
 # runtime is remarkably constant!
 time Rscript real-05-gcta.R --bfile $name -r 1 --n_pcs 0
@@ -77,7 +82,9 @@ time Rscript real-05-gcta.R --bfile $name -r 1 --n_pcs 90
 
 # loop that does all PCs in a given rep (local runs)
 for pcs in {0..90}; do
-    time Rscript real-05-gcta.R --bfile $name -r 1 --n_pcs $pcs
+    for rep in {1..50}; do
+	time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs
+    done
 done
 
 
