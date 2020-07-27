@@ -57,6 +57,8 @@ time Rscript real-01-pca-test.R --bfile $name
 # this creates auxiliary GCTA PCA files (redundant, will delete when done with this analysis)
 time Rscript real-02-subset-eigenvec.R --bfile $name
 # 0m3.437s ideapad
+# same but with standard PCA estimates (from my R code, kinship_std ROM version)
+time Rscript real-02-subset-eigenvec.R --bfile $name --std
 
 # calculates kinship matrix with popkin, to get mean kinship to pass to simtrait
 time Rscript real-03-popkin.R --bfile $name
