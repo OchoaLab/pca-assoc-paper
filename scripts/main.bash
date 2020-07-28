@@ -104,6 +104,15 @@ time Rscript real-06-pca-plink.R --bfile $name -r 1 --n_pcs 0
 time Rscript real-06-pca-plink.R --bfile $name -r 1 --n_pcs 10
 # 0m13.500s ideapad
 time Rscript real-06-pca-plink.R --bfile $name -r 1 --n_pcs 90
+# 3m45.629s ideapad
+
+# loop that does all PCs in a given rep (local runs)
+for pcs in {0..90}; do
+    for rep in {1..50}; do
+	time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs
+    done
+done
+
 
 # removes redundant, auxiliary GCTA PCA files
 time Rscript real-02-subset-eigenvec.R --bfile $name --clean
