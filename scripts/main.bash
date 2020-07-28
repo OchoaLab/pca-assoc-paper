@@ -98,6 +98,13 @@ time Rscript real-06-pca.R --bfile $name -r 1 --n_pcs 10
 time Rscript real-06-pca.R --bfile $name -r 1 --n_pcs 90
 # 53m24.639s ideapad
 
+# PCA runs (with plink)
+time Rscript real-06-pca-plink.R --bfile $name -r 1 --n_pcs 0
+# 0m4.355s ideapad
+time Rscript real-06-pca-plink.R --bfile $name -r 1 --n_pcs 10
+# 0m13.500s ideapad
+time Rscript real-06-pca-plink.R --bfile $name -r 1 --n_pcs 90
+
 # removes redundant, auxiliary GCTA PCA files
 time Rscript real-02-subset-eigenvec.R --bfile $name --clean
 # 0m0.473s ideapad
