@@ -1,9 +1,8 @@
 library(optparse)
 library(popkinsuppl) # for PCA's kinship estimator
 library(BEDMatrix)
-library(readr)
-library(dplyr)
 library(popkin)
+library(genio)
 library(ochoalabtools)
 
 # load new functions from external scripts
@@ -46,16 +45,11 @@ setwd( name )
 #################
 
 # first load GCTA's precomputed PCs, for comparison
-pcs_gcta <- read_table2(
-    paste0( name_in, '-n_pcs_', n_pcs_max, '.eigenvec' ),
-    col_names = FALSE
+out <- read_eigenvec(
+    file = paste0( name_in, '-n_pcs_', n_pcs_max )
 )
-# first two columns (FAM/ID) are not needed
-# but copy them so we can write table in same format
-fam <- pcs_gcta[ , 1:2 ]
-pcs_gcta <- pcs_gcta[ , -(1:2) ]
-# turn to numeric matrix
-pcs_gcta <- as.matrix( pcs_gcta )
+fam <- out$fam
+eigenvec_gcta <- out$eigenvec
 
 ##############
 ### MY PCA ###
@@ -68,17 +62,15 @@ X <- BEDMatrix( name_in )
 # estimate kinship the old way
 kinship_estimate_old <- kinship_std(X)
 # get all eigenvalues
-eigenvectors_estimate_old <- kinship_to_evd( kinship_estimate_old )
+eigenvec_std <- kinship_to_evd( kinship_estimate_old )
 # subset to match GCTA's (and all we need for our tests, in any case)
-eigenvectors_estimate_old <- eigenvectors_estimate_old[ , 1 : n_pcs_max ]
+eigenvec_std <- eigenvec_std[ , 1 : n_pcs_max ]
 
-# add columns that match GCTA's, to try things both ways
-tib <- bind_cols( fam, as_tibble( eigenvectors_estimate_old ) )
 # save in a file like GCTA's
-write_tsv(
-    tib,
-    paste0( name_in, '-std-n_pcs_', n_pcs_max, '.eigenvec' ),
-    col_names = FALSE
+write_eigenvec(
+    file = paste0( name_in, '-std-n_pcs_', n_pcs_max ),
+    eigenvec = eigenvec_std,
+    fam = fam
 )
 
 ##################
@@ -87,7 +79,7 @@ write_tsv(
 
 # the key comparison is this inner product of vectors, which in a perfect agreement leads to the identity matrix (as these are orthonormal)
 # results in a dim-`n_pcs_max` square matrix (i.e. 90 x 90)
-comparison <- crossprod( pcs_gcta, eigenvectors_estimate_old )
+comparison <- crossprod( eigenvec_gcta, eigenvec_std )
 
 # a crude comparison shows that only the top eigenvectors sort of agree
 # this is ok as r becomes very large, they don't fit well regardless, but some of the reranking is surprising
