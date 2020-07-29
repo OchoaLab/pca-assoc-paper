@@ -113,9 +113,27 @@ for pcs in {0..90}; do
     done
 done
 
+# quickly do all PCs for rep 1 (to have one complete series)
+rep=1
+for pcs in {0..90}; do
+    time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs
+done
+
+
 # summarizes p-values into AUC and RMSD for each method/rep/pc
 time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90
+# 23+7+2m ideapad (ran in parts, progressively)
 
+# read all individual summary tables (tiny files), gather into a master table
+time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
+# 0m21.331s ideapad (partial run)
+
+# creates final plot for paper!
+time Rscript real-09-figs.R --bfile $name
+# 0m1.809s ideapad
+
+
+###
 
 # removes redundant, auxiliary GCTA PCA files
 time Rscript real-02-subset-eigenvec.R --bfile $name --clean

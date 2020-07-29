@@ -1,6 +1,5 @@
 library(scales) # for transparency
-
-source('../../../scripts/myFig.R')
+library(ochoalabtools)
 
 #read data from different repliction 
 read_data<-function(name, rep, family = FALSE, verbose = TRUE){
@@ -137,7 +136,7 @@ boxplots_rmsd_auc <- function(
   whisklty <- 1 # whisker line type (default 2?)
   
   # start PDF
-  myFig(name_out, width = 7, height = 5, botMar = 1.5)
+  fig_start(name_out, width = 7, height = 5, mar_b = 1.5)
   # add lower margin, so inner margins can be even smaller
   par( oma = c(1.5, 0, 0, 0) )
   # two panels
@@ -202,7 +201,7 @@ boxplots_rmsd_auc <- function(
     adj = 0.55,
     outer = TRUE
   )
-  invisible( dev.off() )
+    fig_end()
 }
 
 

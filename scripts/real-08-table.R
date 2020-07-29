@@ -1,18 +1,13 @@
-# this script scans for existing p-value calculations, and summarizes them into AUC and RMSD
+# this script gathers available AUC and RMSD estimates (in separate, tiny files) into a big table
 
 library(optparse)
 library(readr)
-library(tibble)
-
-# load new functions from external scripts
-dir_orig <- getwd()
-setwd("../../scripts") # scripts of main GAS project
-source('pvals_to_null_rmsd.R')
-source('pvals_to_pr_auc.R')
-setwd( dir_orig ) # go back to where we were
+library(dplyr)
 
 # constants
 methods <- c('pca-plink', 'gcta')
+# output file name (big table)
+file_table <- 'sum.txt.gz'
 
 ############
 ### ARGV ###
@@ -44,19 +39,16 @@ if ( is.na(name) )
 setwd( '../data/' )
 setwd( name )
 
+# big table of interest
+# initialize this way, it'll grow correctly
+tib_main <- NULL
+
 for ( rep in 1 : rep_max ) {
     # move higher to the "reps" location
     # this is so GCTA's temporary files don't overwrite files from other parallel runs
     dir_out <- paste0( 'rep-', rep )
     setwd( dir_out )
     
-    # load trait info we need
-    load( 'simtrait.RData' )
-    # loads:
-    ## trait,
-    ## causal_indexes,
-    ## causal_coeffs
-
     # start a big loop
     for ( method in methods ) {
         for ( n_pcs in 0 : n_pcs_max ) {
@@ -67,39 +59,19 @@ for ( rep in 1 : rep_max ) {
             )
             
             # file to read
-            file_pvals <- paste0( 'pvals_', method, '_', n_pcs, '.txt.gz' )
             file_sum <- paste0( 'sum_', method, '_', n_pcs, '.txt.gz' )
 
             # if output is already there, don't do anything (don't recalculate)
-            if ( file.exists( file_sum ) ) {
-                message( 'File already exists, skipping: ', file_sum )
-            } else if ( !file.exists( file_pvals ) ) {
-                message( 'No p-vals, skipping: ', file_pvals )
+            if ( !file.exists( file_sum ) ) {
+                message( 'File missing, skipping: ', file_sum )
             } else {
-                # read the file
-                pvals <- as.numeric(
-                    read_lines(
-                        file_pvals,
-                        na = 'NA' # use this to prevent warnings
-                    )
+                # read table
+                tib <- read_tsv(
+                    file_sum,
+                    col_types = 'ciidd'
                 )
-                # calculate RMSD_p
-                rmsdp <- pvals_to_null_rmsd(pvals, causal_indexes)$rmsd
-                # calculate AUC_PR
-                aucpr <- pvals_to_pr_auc(pvals, causal_indexes)
-                # put everything into a tibble, with all the info we want conveniently in place
-                tib <- tibble(
-                    method = method,
-                    pc = n_pcs,
-                    rep = rep,
-                    rmsd = rmsdp,
-                    auc = aucpr
-                )
-                # save this one row to output file
-                write_tsv(
-                    tib,
-                    file_sum
-                )
+                # concatenate into bigger table
+                tib_main <- bind_rows( tib_main, tib )
             }
         }
     }
@@ -107,3 +79,9 @@ for ( rep in 1 : rep_max ) {
     # move back down when done with this rep
     setwd( '..' )
 }
+
+# write the big table to file!
+write_tsv(
+    tib_main,
+    file_table
+)
