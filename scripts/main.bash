@@ -113,10 +113,14 @@ for pcs in {0..90}; do
     done
 done
 
+# summarizes p-values into AUC and RMSD for each method/rep/pc
+time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90
+
 
 # removes redundant, auxiliary GCTA PCA files
 time Rscript real-02-subset-eigenvec.R --bfile $name --clean
 # 0m0.473s ideapad
+time Rscript real-02-subset-eigenvec.R --bfile $name --clean --std
 
 
 
