@@ -63,22 +63,23 @@ for ( rep in 1 : rep_max ) {
     # start a big loop
     for ( method in methods ) {
         for ( n_pcs in 0 : n_pcs_max ) {
-            message(
-                'rep: ', rep,
-                ', method: ', method,
-                ', pcs: ', n_pcs
-            )
-            
             # file to read
             file_pvals <- paste0( 'pvals_', method, '_', n_pcs, '.txt.gz' )
             file_sum <- paste0( 'sum_', method, '_', n_pcs, '.txt.gz' )
 
             # if output is already there, don't do anything (don't recalculate)
             if ( file.exists( file_sum ) ) {
-                message( 'File already exists, skipping: ', file_sum )
+                ## message( 'File already exists, skipping: ', file_sum )
             } else if ( !file.exists( file_pvals ) ) {
-                message( 'No p-vals, skipping: ', file_pvals )
+                ## message( 'No p-vals, skipping: ', file_pvals )
             } else {
+                # only report files processed in this run
+                message(
+                    'rep: ', rep,
+                    ', method: ', method,
+                    ', pcs: ', n_pcs
+                )
+                
                 # read the file
                 pvals <- as.numeric(
                     read_lines(
