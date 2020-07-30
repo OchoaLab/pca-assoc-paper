@@ -174,6 +174,8 @@ boxplots_rmsd_auc <- function(
     par( oma = c(1.5, 0, 0, 0) )
     # two panels
     par( mfrow = c(2, 1) )
+    # get this param after fig_start (which modifies lwd)
+    medlwd <- par('lwd') # median line width (default is 3 times this)
     # boxplots!
     # top panel
     boxplot(
@@ -186,7 +188,8 @@ boxplots_rmsd_auc <- function(
         col = NA,
         outline = outline,
         range = range,
-        whisklty = whisklty
+        whisklty = whisklty,
+        medlwd = medlwd
     )
     # mark zero line, significant in both metrics
     abline(
@@ -203,7 +206,8 @@ boxplots_rmsd_auc <- function(
         col = NA,
         outline = outline,
         range = range,
-        whisklty = whisklty
+        whisklty = whisklty,
+        medlwd = medlwd
     )
     # add legend to top panel only
     legend(
@@ -223,7 +227,8 @@ boxplots_rmsd_auc <- function(
         col = NA,
         outline = outline,
         range = range,
-        whisklty = whisklty
+        whisklty = whisklty,
+        medlwd = medlwd
     )
     # mark zero line, significant in both metrics
     abline(
@@ -240,7 +245,8 @@ boxplots_rmsd_auc <- function(
         col = NA,
         outline = outline,
         range = range,
-        whisklty = whisklty
+        whisklty = whisklty,
+        medlwd = medlwd
     )
     # add outer margin
     mtext(
@@ -273,6 +279,7 @@ plot(
     tib$lambda,
     xlab = lab_rmsd,
     ylab = lab_lambda,
-    log = 'y'
+    log = 'y',
+    pch = '.'
 )
 fig_end()
