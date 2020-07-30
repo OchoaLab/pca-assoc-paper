@@ -38,7 +38,7 @@ setwd( name )
 # read the big table!
 tib <- read_tsv(
     file_table,
-    col_types = 'ciidd'
+    col_types = 'ciiddd'
 )
 
 # extract methods from table itself
@@ -119,17 +119,13 @@ for ( method in methods ) {
 # plotting labels
 lab_rmsd <- expression( bold( RMSD[p] ) )
 lab_auc <- expression( bold( AUC[PR] ) )
+lab_lambda <- expression( bold( paste("Inflation Factor (", lambda, ")") ) )
 
 # fork of version Yiqi used, inputs are organized differently
 boxplots_rmsd_auc <- function(
                               name_out,
                               data_rmsd,
                               data_auc,
-                              ## rmsd_pca,
-                              ## rmsd_lmm,
-                              ## auc_pca,
-                              ## auc_lmm,
-                              ## r_max = 90,
                               legend_pos = 'topright',
                               name_fixed = 'pca-plink',
                               name_mixed = 'gcta',
@@ -145,8 +141,9 @@ boxplots_rmsd_auc <- function(
     auc_mixed <-  data_auc[[ name_mixed ]]
     
     # get common range of data plotted
-    range_rmsd <- range( unlist(rmsd_fixed), unlist(rmsd_mixed), na.rm = TRUE)
-    range_auc <- range( unlist(auc_fixed), unlist(auc_mixed), na.rm = TRUE)
+    # always include zero in range for both
+    range_rmsd <- range( 0, unlist(rmsd_fixed), unlist(rmsd_mixed), na.rm = TRUE)
+    range_auc <- range( 0, unlist(auc_fixed), unlist(auc_mixed), na.rm = TRUE)
     r_max <- max(
         length( rmsd_fixed ), 
         length( auc_fixed ), 
@@ -191,6 +188,12 @@ boxplots_rmsd_auc <- function(
         range = range,
         whisklty = whisklty
     )
+    # mark zero line, significant in both metrics
+    abline(
+        h = 0,
+        lty = 2,
+        col = 'gray'
+    )
     boxplot(
         rmsd_mixed,
         names = rs_blank,
@@ -222,6 +225,12 @@ boxplots_rmsd_auc <- function(
         range = range,
         whisklty = whisklty
     )
+    # mark zero line, significant in both metrics
+    abline(
+        h = 0,
+        lty = 2,
+        col = 'gray'
+    )
     boxplot(
         auc_mixed,
         names = rs_blank,
@@ -250,3 +259,20 @@ boxplots_rmsd_auc(
     data_rmsd,
     data_auc
 )
+
+######################
+### LAMBDA vs RMSD ###
+######################
+
+# this was surprisingly cleaner than expected
+fig_start(
+    'sum-rmsd-vs-lambda'
+)
+plot(
+    tib$rmsd,
+    tib$lambda,
+    xlab = lab_rmsd,
+    ylab = lab_lambda,
+    log = 'y'
+)
+fig_end()

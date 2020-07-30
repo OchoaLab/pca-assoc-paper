@@ -52,23 +52,15 @@ for ( rep in 1 : rep_max ) {
     # start a big loop
     for ( method in methods ) {
         for ( n_pcs in 0 : n_pcs_max ) {
-            message(
-                'rep: ', rep,
-                ', method: ', method,
-                ', pcs: ', n_pcs
-            )
-            
             # file to read
             file_sum <- paste0( 'sum_', method, '_', n_pcs, '.txt.gz' )
 
             # if output is already there, don't do anything (don't recalculate)
-            if ( !file.exists( file_sum ) ) {
-                message( 'File missing, skipping: ', file_sum )
-            } else {
+            if ( file.exists( file_sum ) ) {
                 # read table
                 tib <- read_tsv(
                     file_sum,
-                    col_types = 'ciidd'
+                    col_types = 'ciiddd'
                 )
                 # concatenate into bigger table
                 tib_main <- bind_rows( tib_main, tib )

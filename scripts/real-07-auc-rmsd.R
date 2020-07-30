@@ -13,6 +13,9 @@ setwd( dir_orig ) # go back to where we were
 
 # constants
 methods <- c('pca-plink', 'gcta')
+# constant factor needed to transform median p-values into inflation factors lambda from chi-square
+df <- 1
+x_m <- qchisq( 0.5, df = df )
 
 ############
 ### ARGV ###
@@ -87,13 +90,19 @@ for ( rep in 1 : rep_max ) {
                 rmsdp <- pvals_to_null_rmsd(pvals, causal_indexes)$rmsd
                 # calculate AUC_PR
                 aucpr <- pvals_to_pr_auc(pvals, causal_indexes)
+                # calculate inflation (but on p-values instead of Chi-Sq; this makes sense as not all stats are Chi-Sq anyway)
+                # NOTES:
+                # - not subsetting for true nulls (as done in practice)
+                # - exact inversion to chi-sq stat
+                lambda <- qchisq( 1 - median(pvals), df = df ) / x_m
                 # put everything into a tibble, with all the info we want conveniently in place
                 tib <- tibble(
                     method = method,
                     pc = n_pcs,
                     rep = rep,
                     rmsd = rmsdp,
-                    auc = aucpr
+                    auc = aucpr,
+                    lambda = lambda
                 )
                 # save this one row to output file
                 write_tsv(
