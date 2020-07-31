@@ -3,6 +3,7 @@
 library(optparse)
 library(readr)
 library(tibble)
+library(genio)
 
 # load new functions from external scripts
 dir_orig <- getwd()
@@ -13,6 +14,8 @@ setwd( dir_orig ) # go back to where we were
 
 # constants
 methods <- c('pca-plink', 'gcta')
+# the name is for dir only, actual file is just "data"
+name_in <- 'data'
 # constant factor needed to transform median p-values into inflation factors lambda from chi-square
 df <- 1
 x_m <- qchisq( 0.5, df = df )
@@ -28,7 +31,9 @@ option_list = list(
     make_option("--n_pcs", type = "integer", default = 90,
                 help = "Max number of PCs", metavar = "int"),
     make_option(c("-r", "--rep"), type = "integer", default = 50,
-                help = "Max replicates", metavar = "int")
+                help = "Max replicates", metavar = "int"),
+    make_option("--sim", action = "store_true", default = FALSE, 
+                help = "Genotypes are simulated (rather than real; alters location only)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -47,10 +52,19 @@ if ( is.na(name) )
 setwd( '../data/' )
 setwd( name )
 
+# in simulations, each rep has its own bim file, but they all have the same number of loci, so let's just read it from rep-1
+if (opt$sim)
+    name_in <- paste0( 'rep-1/', name_in )
+# get number of loci
+m_loci <- count_lines( name_in, 'bim' )
+
 for ( rep in 1 : rep_max ) {
     # move higher to the "reps" location
     # this is so GCTA's temporary files don't overwrite files from other parallel runs
     dir_out <- paste0( 'rep-', rep )
+    # skip reps that we haven't calculated at all
+    if ( !dir.exists( dir_out ) )
+        next
     setwd( dir_out )
     
     # load trait info we need
@@ -87,6 +101,11 @@ for ( rep in 1 : rep_max ) {
                         na = 'NA' # use this to prevent warnings
                     )
                 )
+                
+                # make sure length is correct!
+                if ( length(pvals) != m_loci )
+                    stop( 'File has ', length(pvals), ' p-values, expected ', m_loci )
+                
                 # calculate RMSD_p
                 rmsdp <- pvals_to_null_rmsd(pvals, causal_indexes)$rmsd
                 # calculate AUC_PR

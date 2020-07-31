@@ -3,8 +3,6 @@
 
 library(optparse)
 library(readr)
-library(BEDMatrix)
-library(genio)
 
 # load new functions from external scripts
 dir_orig <- getwd()
@@ -29,7 +27,9 @@ option_list = list(
     make_option("--n_pcs", type = "integer", default = 0,
                 help = "Number of PCs to use", metavar = "int"),
     make_option(c("-r", "--rep"), type = "integer", default = 1,
-                help = "Replicate number", metavar = "int")
+                help = "Replicate number", metavar = "int"),
+    make_option("--sim", action = "store_true", default = FALSE, 
+                help = "Genotypes are simulated (rather than real; alters location only)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -57,17 +57,26 @@ setwd( dir_out )
 ### PCA ###
 ###########
 
+method <- 'pca-plink'
+
 # file to create
-file_out <- paste0( 'pvals_pca-plink_', n_pcs, '.txt.gz' )
+file_out <- paste0( 'pvals_', method, '_', n_pcs, '.txt.gz' )
 
 # do not redo run if output was already present!
 if ( file.exists( file_out ) )
     stop( 'Output already exists, skipping: ', file_out )
 
-# genotypes, PCs are all in lower level (shared across reps)
-name_in_lower <- paste0( '../', name_in )
+# message so we know where we're at
+message(
+    'rep: ', rep,
+    ', method: ', method,
+    ', pcs: ', n_pcs
+)
 
-message("PCA plink with ", n_pcs, " PCs")
+# genotypes, PCs:
+# - in real data, are all in lower level (shared across reps)
+# - in simulated data, are all in current level (not shared across reps)
+name_in_lower <- if ( opt$sim ) name_in else paste0( '../', name_in )
 
 # output name for plink runs should have number of PCs, so concurrent runs don't overwrite each other
 name_out <- paste0( 'plink_', n_pcs )

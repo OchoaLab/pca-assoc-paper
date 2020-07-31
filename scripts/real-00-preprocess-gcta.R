@@ -43,3 +43,7 @@ gas_lmm_gcta_kin(gcta_bin, name_in, threads = threads)
 
 message("GCTA (PCA)")
 gas_lmm_gcta_pca(gcta_bin, name_in, threads = threads, n_pcs = n_pcs_max)
+
+# cleanup
+invisible( file.remove( paste0( name_in, '.log' ) ) )
+invisible( file.remove( paste0( name_in, '-n_pcs_90.log' ) ) )

@@ -28,7 +28,9 @@ option_list = list(
     make_option("--n_pcs", type = "integer", default = 0,
                 help = "Number of PCs to use", metavar = "int"),
     make_option(c("-r", "--rep"), type = "integer", default = 1,
-                help = "Replicate number", metavar = "int")
+                help = "Replicate number", metavar = "int"),
+    make_option("--sim", action = "store_true", default = FALSE, 
+                help = "Genotypes are simulated (rather than real; alters location only)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -56,15 +58,26 @@ setwd( dir_out )
 ### PCA ###
 ###########
 
+method <- 'pca'
+
 # file to create
-file_out <- paste0( 'pvals_pca_', n_pcs, '.txt.gz' )
+file_out <- paste0( 'pvals_', method, '_', n_pcs, '.txt.gz' )
 
 # do not redo run if output was already present!
 if ( file.exists( file_out ) )
     stop( 'Output already exists, skipping: ', file_out )
 
-# genotypes, PCs are all in lower level (shared across reps)
-name_in_lower <- paste0( '../', name_in )
+# message so we know where we're at
+message(
+    'rep: ', rep,
+    ', method: ', method,
+    ', pcs: ', n_pcs
+)
+
+# genotypes, PCs:
+# - in real data, are all in lower level (shared across reps)
+# - in simulated data, are all in current level (not shared across reps)
+name_in_lower <- if ( opt$sim ) name_in else paste0( '../', name_in )
 
 # load with BEDMatrix
 X <- BEDMatrix(
@@ -74,8 +87,6 @@ X <- BEDMatrix(
 # load trait (in current level)
 phen <- read_phen( name_in )
 trait <- phen$pheno # extract column of interest
-
-message("PCA with ", n_pcs, " PCs")
 
 if ( n_pcs == 0 ) {
     # run basic linear model without covariates

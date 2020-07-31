@@ -47,6 +47,9 @@ for ( rep in 1 : rep_max ) {
     # move higher to the "reps" location
     # this is so GCTA's temporary files don't overwrite files from other parallel runs
     dir_out <- paste0( 'rep-', rep )
+    # skip reps that we haven't calculated at all
+    if ( !dir.exists( dir_out ) )
+        next
     setwd( dir_out )
     
     # start a big loop
