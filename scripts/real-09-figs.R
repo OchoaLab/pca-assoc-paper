@@ -117,7 +117,7 @@ for ( method in methods ) {
 }
 
 # plotting labels
-lab_rmsd <- expression( bold( RMSD[p] ) )
+lab_rmsd <- expression( bold( SRMSD[p] ) )
 lab_auc <- expression( bold( AUC[PR] ) )
 lab_lambda <- expression( bold( paste("Inflation Factor (", lambda, ")") ) )
 

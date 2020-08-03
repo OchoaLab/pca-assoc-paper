@@ -114,7 +114,7 @@ for ( rep in 1 : rep_max ) {
                 # NOTES:
                 # - not subsetting for true nulls (as done in practice)
                 # - exact inversion to chi-sq stat
-                lambda <- qchisq( 1 - median(pvals), df = df ) / x_m
+                lambda <- qchisq( 1 - median(pvals, na.rm = TRUE), df = df ) / x_m
                 # put everything into a tibble, with all the info we want conveniently in place
                 tib <- tibble(
                     method = method,
