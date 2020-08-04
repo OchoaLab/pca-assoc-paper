@@ -61,76 +61,35 @@ time Rscript real-02-subset-eigenvec.R --bfile $name --std
 time Rscript real-03-popkin.R --bfile $name
 # 4m54.676s ideapad
 
-# draws a random trait
-time Rscript real-04-simtrait.R --bfile $name -r 1
+# draws random traits
 # 0m2.166s ideapad
-
-# loop for work computer
-for rep in {2..50}; do
+for rep in {1..50}; do
     time Rscript real-04-simtrait.R --bfile $name -r $rep
 done
 
-# GCTA runs, eventually do with all PCs
-# runtime is remarkably constant!
-time Rscript real-05-gcta.R --bfile $name -r 1 --n_pcs 0
-# 5m36.827s ideapad
-time Rscript real-05-gcta.R --bfile $name -r 1 --n_pcs 10
-# 5m32.453s ideapad
-time Rscript real-05-gcta.R --bfile $name -r 1 --n_pcs 90
-# 5m37.847s ideapad
-
-# loop that does all PCs in a given rep (local runs)
+# GCTA runs
 for pcs in {0..90}; do
     for rep in {1..50}; do
 	time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs
     done
 done
-# same but with PCs run backwards (GCTA is only using half of processors on labby!, hopefully they meet in the middle)
-for pcs in {90..0}; do
-    for rep in {50..1}; do
-	time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs
-    done
-done
-
-
-# PCA runs
-time Rscript real-06-pca.R --bfile $name -r 1 --n_pcs 0
-# 1m13.805s ideapad
-time Rscript real-06-pca.R --bfile $name -r 1 --n_pcs 10
-# 4m56.686s ideapad
-time Rscript real-06-pca.R --bfile $name -r 1 --n_pcs 90
-# 53m24.639s ideapad
 
 # PCA runs (with plink)
-time Rscript real-06-pca-plink.R --bfile $name -r 1 --n_pcs 0
-# 0m4.355s ideapad
-time Rscript real-06-pca-plink.R --bfile $name -r 1 --n_pcs 10
-# 0m13.500s ideapad
-time Rscript real-06-pca-plink.R --bfile $name -r 1 --n_pcs 90
-# 3m45.629s ideapad
-
-# loop that does all PCs in a given rep (local runs)
-#for pcs in {0..90}; do
-for pcs in {67..90}; do
+for pcs in {0..90}; do
     for rep in {1..50}; do
 	time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs
     done
 done
-# same but with PCs run backwards (to run on another machine, hopefully they meet in the middle)
-for pcs in {90..0}; do
-    for rep in {50..1}; do
-	time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs
-    done
-done
-
 
 # summarizes p-values into AUC and RMSD for each method/rep/pc
 time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90
-# 38+8+5+2+1+3+5+2+1+1+1m ideapad (ran in parts, progressively)
+# 38+8+5+2+1+3+5+2+1+1+1+1+1+1m ideapad (ran in parts, progressively)
+# 61m47.537s + 7m48.435s viiiaX6 (PCA complete, GCTA not yet)
 
 # read all individual summary tables (tiny files), gather into a master table
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
-# 0m32.963s ideapad (partial run)
+# 0m14.780s ideapad (partial run)
+# 0m26.445s viiiaX6 (partial)
 
 # creates final plot for paper!
 time Rscript real-09-figs.R --bfile $name
@@ -173,58 +132,97 @@ time Rscript sim-00-sim-pop.R -g 20 # -n 1000
 
 ### construct genotype matrices
 
-# the large sample size simulation
-time Rscript sim-01-draw-geno.R -r 1 # -n 1000 -g 1
-# 0m19.112s ideapad (concurrent with plink)
+# params shared across reps
+# use right set for each case
 
+## LARGE SAMPLE SIZE
+# sample size (normal n=1000, small n=100)
+n=1000
+# number of causal loci should scale with n
+mc=$(( n / 10 ))
+# to create family structure (g=20) or not (g=1)
+g=1
 # hacks to use "real" data scripts on simulations
-name="sim-n1000-k10-f0.1-s0.5-g1"
+name="sim-n$n-k10-f0.1-s0.5-g$g"
 
-# draws a random trait
-time Rscript sim-02-sim-trait.R --bfile $name -r 1
-# 0m1.914s ideapad (concurrent with plink)
+## FAMILY STRUCTURE
+# sample size (normal n=1000, small n=100)
+n=1000
+# number of causal loci should scale with n
+mc=$(( n / 10 ))
+# to create family structure (g=20) or not (g=1)
+g=20
+# hacks to use "real" data scripts on simulations
+name="sim-n$n-k10-f0.1-s0.5-g$g"
 
-# preprocess with GCTA (makes GRM and max PCs)
-time Rscript real-00-preprocess-gcta.R --bfile $name/rep-1
-# 0m56.426s ideapad (concurrent with plink)
+## SMALL SAMPLE SIZE
+# sample size (normal n=1000, small n=100)
+n=100
+# number of causal loci should scale with n
+mc=$(( n / 10 ))
+# to create family structure (g=20) or not (g=1)
+g=1
+# hacks to use "real" data scripts on simulations
+name="sim-n$n-k10-f0.1-s0.5-g$g"
 
-# get PCs in R, using my formula
-# NOTE: uses ROM version (known bias, does not match popular versions; I think this is best)
-# top 4 PCs match perfectly here, 5 agrees partially, after that it's a mess
-time Rscript real-01-pca-test.R --bfile $name/rep-1
-# 0m17.695s ideapad (concurrent with plink)
+for rep in {1..50}; do
+    # the large sample size simulation
+    time Rscript sim-01-draw-geno.R -r $rep -n $n -g $g
+    # 0m19.112s ideapad (concurrent with plink)
 
-# this creates auxiliary GCTA PCA files (redundant, will delete when done with this analysis)
-time Rscript real-02-subset-eigenvec.R --bfile $name/rep-1
-# 0m3.215s ideapad (concurrent with plink)
-# same but with standard PCA estimates (from my R code, kinship_std ROM version)
-time Rscript real-02-subset-eigenvec.R --bfile $name/rep-1 --std
-# 0m3.422s ideapad (concurrent with plink)
+    # draws a random trait
+    # only place where --m_causal gets specified (not in file paths, etc)
+    time Rscript sim-02-sim-trait.R --bfile $name -r $rep --m_causal $mc
+    # 0m1.914s ideapad (concurrent with plink)
 
-# NOTE: unlike real dataset, here we don't need popkin estimates, we use true p_anc instead (for simulating trait earlier)!
+    # preprocess with GCTA (makes GRM and max PCs)
+    time Rscript real-00-preprocess-gcta.R --bfile $name/rep-$rep
+    # 0m56.426s ideapad (concurrent with plink)
 
-# GCTA runs, eventually do with all PCs
-# runtime is remarkably constant!
-time Rscript real-05-gcta.R --sim --bfile $name -r 1 --n_pcs 0
-# 0m40.506s ideapad (concurrent with plink)
-time Rscript real-05-gcta.R --sim --bfile $name -r 1 --n_pcs 10
-# 0m36.261s ideapad (concurrent with plink)
-time Rscript real-05-gcta.R --sim --bfile $name -r 1 --n_pcs 90
-# 0m37.381s ideapad (concurrent with plink)
+    # get PCs in R, using my formula
+    # NOTE: uses ROM version (known bias, does not match popular versions; I think this is best)
+    # top 4 PCs match perfectly here, 5 agrees partially, after that it's a mess
+    time Rscript real-01-pca-test.R --bfile $name/rep-$rep
+    # 0m17.695s ideapad (concurrent with plink)
 
-# PCA runs (with plink)
-time Rscript real-06-pca-plink.R --sim --bfile $name -r 1 --n_pcs 0
-# 0m3.138s ideapad (concurrent with plink)
-time Rscript real-06-pca-plink.R --sim --bfile $name -r 1 --n_pcs 10
-# 0m3.094s ideapad (concurrent with plink)
-time Rscript real-06-pca-plink.R --sim --bfile $name -r 1 --n_pcs 90
-# 0m13.181s ideapad (concurrent with plink)
+    # this creates auxiliary GCTA PCA files (redundant, will delete when done with this analysis)
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep
+    # 0m3.215s ideapad (concurrent with plink)
+    # same but with standard PCA estimates (from my R code, kinship_std ROM version)
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --std
+    # 0m3.422s ideapad (concurrent with plink)
+
+    # NOTE: unlike real dataset, here we don't need popkin estimates, we use true p_anc instead (for simulating trait earlier)!
+
+    # GCTA runs
+    # do all PCs of this rep
+    for pcs in {0..90}; do
+	time Rscript real-05-gcta.R --sim --bfile $name -r $rep --n_pcs $pcs
+    done
+
+    # # PCA runs (with plink)
+    # do all PCs of this rep
+    for pcs in {0..90}; do
+	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs
+    done
+    
+    # cleanup
+    # remove redundant files only
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --clean
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --clean --std
+done
 
 # summarizes p-values into AUC and RMSD for each method/rep/pc
 time Rscript real-07-auc-rmsd.R --sim --bfile $name -r 50 --n_pcs 90
+# 46m10.111s viiiaX6 (large)
+# 38m9.266s viiiaX6 (family)
+# 33m3.880s viiiaX6 (small)
 
 # read all individual summary tables (tiny files), gather into a master table
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
+# 0m32.340s viiiaX6 (large)
+# 0m32.287s viiiaX6 (family)
+# 0m32.228s viiiaX6 (small)
 
 # creates final plot for paper!
 time Rscript real-09-figs.R --bfile $name
@@ -232,16 +230,11 @@ time Rscript real-09-figs.R --bfile $name
 # tests that p-value vectors have the right lengths of m_loci
 # to make sure nothing was corrupted due to scripts stopping unexpectedly or incomplete file transfers
 # (now test is peformed within real-07-auc-rmsd.R above too, but this can retest everything without recalculating expensive summary statistics).
-time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90
+# --final requires that all files exist!
+time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --final
+# 2m54.797s - 3m43.697s viiiaX6
 
-###############
-### JUNK??? ###
-###############
+###
 
-# currently unused
-# rmsd_auc_read: function to read rmsd or auc for pca or gcta (example attached)
-
-# this series doesn't look fully functional
-# pcs_test_n_100_trait: code to generate random trait and save all data
-# pcs_test_n_100_pca: code to conduct association test for pca for one pc (pc need to be set in advance)
-# pcs_test_n_100_gcta: code to conduct association test for gcta for one pc (pc need to be set in advance & this code still report the error that missing mala in both my desktop and laptop)
+# a comparison of RMSD and lambda across all datasets
+time Rscript real-11-inflation-across-datasets.R

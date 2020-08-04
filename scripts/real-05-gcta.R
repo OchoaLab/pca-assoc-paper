@@ -58,19 +58,19 @@ setwd( dir_out )
 
 method <- 'gcta'
 
-# file to create
-file_out <- paste0( 'pvals_', method, '_', n_pcs, '.txt.gz' )
-
-# do not redo run if output was already present!
-if ( file.exists( file_out ) )
-    stop( 'Output already exists, skipping: ', file_out )
-
 # message so we know where we're at
 message(
     'rep: ', rep,
     ', method: ', method,
     ', pcs: ', n_pcs
 )
+
+# file to create
+file_out <- paste0( 'pvals_', method, '_', n_pcs, '.txt.gz' )
+
+# do not redo run if output was already present!
+if ( file.exists( file_out ) )
+    stop( 'Output already exists, skipping: ', file_out )
 
 # genotypes, PCs:
 # - in real data, are all in lower level (shared across reps)
@@ -93,8 +93,10 @@ obj <- gas_lmm_gcta(
 # all we care to preserve here are the p-values
 pvals <- obj$pvals
 # save into a file, simple human-readable format
+# NOTE: if pvals is NULL (GCTA returns that sometimes, when there's no model convergence/ model is underdetermined) then write_lines writes an empty file, but later read_lines doesn't like this!
+# instead let's write the word NULL, so it's one non-empty line
 write_lines(
-    pvals,
+    if ( is.null( pvals ) ) 'NULL' else pvals,
     file_out
 )
 

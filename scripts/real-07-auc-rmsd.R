@@ -95,26 +95,36 @@ for ( rep in 1 : rep_max ) {
                 )
                 
                 # read the file
-                pvals <- as.numeric(
-                    read_lines(
-                        file_pvals,
-                        na = 'NA' # use this to prevent warnings
-                    )
+                pvals <- read_lines(
+                    file_pvals,
+                    na = 'NA' # use this to prevent warnings
                 )
-                
-                # make sure length is correct!
-                if ( length(pvals) != m_loci )
-                    stop( 'File has ', length(pvals), ' p-values, expected ', m_loci )
-                
-                # calculate RMSD_p
-                rmsdp <- pvals_to_null_rmsd(pvals, causal_indexes)$rmsd
-                # calculate AUC_PR
-                aucpr <- pvals_to_pr_auc(pvals, causal_indexes)
-                # calculate inflation (but on p-values instead of Chi-Sq; this makes sense as not all stats are Chi-Sq anyway)
-                # NOTES:
-                # - not subsetting for true nulls (as done in practice)
-                # - exact inversion to chi-sq stat
-                lambda <- qchisq( 1 - median(pvals, na.rm = TRUE), df = df ) / x_m
+
+                # special case is a single line with the word NULL, which occurs particularly with GCTA outputs when model does not converge/is underdetermined
+                if ( length(pvals) == 1 && pvals == 'NULL' ) {
+                    # when pvals are NULL, they get printed as an empty file
+                    # this is what we get from pvals_to_null_rmsd, pvals_to_pr_auc if we had set pvals==NULL
+                    rmsdp <- NA
+                    aucpr <- NA
+                    # this special case wasn't handled below, I think
+                    lambda <- NA
+                } else {
+                    # make sure length is correct!
+                    if ( length(pvals) != m_loci )
+                        stop( 'File has ', length(pvals), ' p-values, expected ', m_loci )
+
+                    # convert strings to numeric
+                    pvals <- as.numeric( pvals )
+                    # calculate RMSD_p
+                    rmsdp <- pvals_to_null_rmsd(pvals, causal_indexes)$rmsd
+                    # calculate AUC_PR
+                    aucpr <- pvals_to_pr_auc(pvals, causal_indexes)
+                    # calculate inflation (but on p-values instead of Chi-Sq; this makes sense as not all stats are Chi-Sq anyway)
+                    # NOTES:
+                    # - not subsetting for true nulls (as done in practice)
+                    # - exact inversion to chi-sq stat
+                    lambda <- qchisq( 1 - median(pvals, na.rm = TRUE), df = df ) / x_m
+                }
                 # put everything into a tibble, with all the info we want conveniently in place
                 tib <- tibble(
                     method = method,

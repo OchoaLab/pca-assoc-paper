@@ -21,7 +21,9 @@ option_list = list(
     make_option(c("-r", "--rep"), type = "integer", default = 50,
                 help = "Max replicates", metavar = "int"),
     make_option("--sim", action = "store_true", default = FALSE, 
-                help = "Genotypes are simulated (rather than real; alters location only)")
+                help = "Genotypes are simulated (rather than real; alters location only)"),
+    make_option("--final", action = "store_true", default = FALSE, 
+                help = "Dies if files are missing (otherwise they are skipped silently)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -61,8 +63,18 @@ for ( rep in 1 : rep_max ) {
             # file to read
             file_pvals <- paste0( 'pvals_', method, '_', n_pcs, '.txt.gz' )
 
-            if ( !file.exists( file_pvals ) )
-                next
+            if ( !file.exists( file_pvals ) ) {
+                if ( opt$final ) {
+                    # fatal if file is missing and we set `--final` option
+                    stop(
+                        'rep: ', rep,
+                        ', method: ', method,
+                        ', pcs: ', n_pcs,
+                        ', MISSING!'
+                    )
+                } else 
+                    next
+            }
 
             # count lines using linux system terminal (fastest)
             # run wc on terminal
@@ -77,7 +89,8 @@ for ( rep in 1 : rep_max ) {
             # returns string, turn into numeric
             n_lines <- as.numeric( n_lines )
 
-            if ( n_lines != m_loci ) {
+            # data is either complete (m_loci) or result was NULL (1 line), nothing else is acceptable
+            if ( n_lines != m_loci && n_lines != 1 ) {
                 # this is what we wanted to find!
                 stop(
                     'rep: ', rep,

@@ -11,6 +11,13 @@ file_table <- 'sum.txt.gz'
 # for main figure output (goes on papers)
 name_out <- 'sum-rmsd-auc'
 
+method_to_label <- list(
+    'pca-plink' = 'Fixed effects (PCA)',
+    gcta = 'Mixed effects (LMM+PCA)'
+)
+# hardcoded same order as method_to_label
+method_cols <- c('red', 'blue')
+
 ############
 ### ARGV ###
 ############
@@ -42,7 +49,7 @@ tib <- read_tsv(
 )
 
 # extract methods from table itself
-methods <- sort( unique(tib$method) )
+methods <- names( method_to_label ) # not from table, but from hardcoded map, always lists PCA first!
 # and PCs too, numerically
 pcs <- sort( as.numeric( unique( tib$pc ) ) )
 
@@ -86,13 +93,68 @@ barplot(
     beside = TRUE,
     xlab = '# PCs',
     ylab = 'replicates',
-    legend.text = methods
+    legend.text = unlist( method_to_label ),
+    col = method_cols
+)
+fig_end()
+
+################
+### NUM FAIL ###
+################
+
+# counts cases that failed to yield any results (should be exclusively GCTA under small sample sizes, where model did not converge)
+
+# want a table that counts, for every method and PC, the number of replicates so far
+# direct way (old C style)
+# initialize matrix
+counts <- matrix(
+    0,
+    nrow = length(methods),
+    ncol = length(pcs),
+    dimnames = list(
+        methods = methods,
+        pcs = pcs
+    )
+)
+# navigate and fill cases
+for ( i in 1 : nrow( counts ) ) {
+    method <- methods[ i ]
+    # subset big table
+    tib_i <- tib[ tib$method == method, ]
+    for ( j in 1 : ncol( counts ) ) {
+        pc <- pcs[ j ]
+        # this is the count we want
+        counts[ i, j ] <- sum( is.na( tib_i$rmsd[ tib_i$pc == pc ] ) )
+    }
+}
+# simple plot of counts
+fig_start(
+    'sum-num-fail',
+    width = 12
+)
+barplot(
+    counts,
+    beside = TRUE,
+    xlab = '# PCs',
+    ylab = '# Failures',
+    legend.text = unlist( method_to_label ),
+    col = method_cols,
+    args.legend = list(
+        x = 'topleft',
+        bty = 'n'
+    )
 )
 fig_end()
 
 ################
 ### AUC/RMSD ###
 ################
+
+# default legend position
+legend_pos <- 'topright'
+# hack for small sample size simulation only
+if (name == 'sim-n100-k10-f0.1-s0.5-g1')
+    legend_pos <- 'bottomleft'
 
 # gather data into lists, best for boxplots
 data_rmsd <- list()
@@ -212,7 +274,7 @@ boxplots_rmsd_auc <- function(
     # add legend to top panel only
     legend(
         legend_pos,
-        c('Fixed effects (PCA)', 'Mixed effects (LMM+PCA)'),
+        unlist( method_to_label ),
         text.col = c( col_fixed, col_mixed ),
         bty = 'n'
     )
@@ -263,7 +325,8 @@ boxplots_rmsd_auc <- function(
 boxplots_rmsd_auc(
     name_out,
     data_rmsd,
-    data_auc
+    data_auc,
+    legend_pos = legend_pos
 )
 
 ######################

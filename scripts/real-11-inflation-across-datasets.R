@@ -15,17 +15,17 @@ name_out <- 'sum-rmsd-auc'
 datasets <- tibble(
     name_short = c(
         'large',
-        ## 'small',
-        ## 'family',
+        'small',
+        'family',
         'HO'
     ),
     name_long = c(
         'sim-n1000-k10-f0.1-s0.5-g1',
-        ## 'sim-n100-k10-f0.1-s0.5-g1',
-        ## 'sim-n1000-k10-f0.1-s0.5-g20',
+        'sim-n100-k10-f0.1-s0.5-g1',
+        'sim-n1000-k10-f0.1-s0.5-g20',
         'HoPacAll_ld_prune_1000kb_0.3'
     ),
-    col = 1:2
+    col = 1:4
 )
 
 # data we want to collect
@@ -64,12 +64,14 @@ lab_rmsd <- expression( bold( SRMSD[p] ) )
 lab_lambda <- expression( bold( paste("Inflation Factor (", lambda, ")") ) )
 
 # find common data range
-range_rmsd <- range( unlist( rmsds ) )
-range_lambda <- range( unlist( lambdas ) )
+range_rmsd <- range( unlist( rmsds ), na.rm = TRUE )
+range_lambda <- range( unlist( lambdas ), na.rm = TRUE )
 
 # plot in base data dir
 fig_start(
-    'sum-rmsd-vs-lambda'
+    'sum-rmsd-vs-lambda',
+    mar_t = 1,
+    mar_r = 0.3
 )
 # start base plot
 plot(
@@ -80,6 +82,9 @@ plot(
     ylab = lab_lambda,
     log = 'y'
 )
+# guide lines
+abline( v = 0, lty = 2, col = 'gray' )
+abline( h = 1, lty = 2, col = 'gray' )
 # add per-dataset points
 for ( i in 1 : nrow( datasets ) ) {
     points(
@@ -91,7 +96,7 @@ for ( i in 1 : nrow( datasets ) ) {
 }
 # legend
 legend(
-    'topleft',
+    'bottomright',
     datasets$name_short,
     text.col = datasets$col,
     pch = NA,
