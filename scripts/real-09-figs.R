@@ -7,7 +7,7 @@ library(ochoalabtools)
 
 # constants
 # output file name (big table)
-file_table <- 'sum.txt.gz'
+file_table <- 'sum.txt'
 # for main figure output (goes on papers)
 name_out <- 'sum-rmsd-auc'
 

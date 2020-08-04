@@ -7,7 +7,7 @@ library(dplyr)
 # constants
 methods <- c('pca-plink', 'gcta')
 # output file name (big table)
-file_table <- 'sum.txt.gz'
+file_table <- 'sum.txt'
 
 ############
 ### ARGV ###
