@@ -1,0 +1,5 @@
+# extensions to ignore
+*.RData
+*/rep-*/
+sum-num-reps.pdf
+sum-rmsd-vs-lambda.pdf
