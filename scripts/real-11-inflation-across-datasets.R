@@ -5,9 +5,16 @@ library(readr)
 library(tibble)
 library(ochoalabtools)
 
+## # FOR FAILED EXPERIMENT AT END OF SCRIPT
+## # load new functions from external scripts
+## dir_orig <- getwd()
+## setwd("../../scripts") # scripts of main GAS project
+## source('rmsd.R')
+## setwd( dir_orig ) # go back to where we were
+
 # constants
 # output file name (big table)
-file_table <- 'sum.txt.gz'
+file_table <- 'sum.txt'
 # for main figure output (goes on papers)
 name_out <- 'sum-rmsd-auc'
 
@@ -103,3 +110,40 @@ legend(
     bty = 'n'
 )
 fig_end()
+
+## #############
+
+## # test a hypothesis about generating this curve
+## # failed experiment, curves don't track well for high RMSD, lambda, and we couldn't make negative cases either so meh
+
+## # assume the data is coming from a non-central chi-square
+## m <- 1000 # samples (numbers of p-vals)
+## df <- 1 # in GWAS this is always 1 (genotype vector is added in H1, removed in H0, all else the same)
+## ps <- ( 1 : m ) / ( m + 1 ) # percentiles to retrieve, so we barely miss 0 and 1 edges
+## x_m <- qchisq( 0.5, df = df ) # median statistic
+## # NOTE: this inflates only, so there's no negative cases
+
+## # data we want
+## n <- 100 # resolution of curve
+## ncps <- ( 1 : n ) / n * 10
+## lambdas_sim <- vector( 'numeric', n )
+## rmsds_sim <- vector( 'numeric', n )
+## for ( i in 1 : length( ncps ) ) {
+##     message( 'i: ', i )
+##     ncp <- ncps[i]
+##     # this generates the non-central chi-squared quantiles
+##     xs <- qchisq( ps, df = df, ncp = ncp )
+##     # then runs them through the cumulative distribution (central version) to get the (bad) pvalues
+##     pvals <- pchisq( xs, df = df )
+##     # lambdas (directly on raw chi-squared stats, not through p-values)
+##     lambdas_sim[i] <- median( xs ) / x_m
+##     # compute error metric (RMSD)
+##     rmsds_sim[i] <- rmsd( pvals, ps )
+## }
+
+## lines(
+##     rmsds_sim,
+##     lambdas_sim
+## )
+
+## fig_end()
