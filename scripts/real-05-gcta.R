@@ -28,7 +28,9 @@ option_list = list(
     make_option(c("-r", "--rep"), type = "integer", default = 1,
                 help = "Replicate number", metavar = "int"),
     make_option("--sim", action = "store_true", default = FALSE, 
-                help = "Genotypes are simulated (rather than real; alters location only)")
+                help = "Genotypes are simulated (rather than real; alters paths only)"),
+    make_option("--dcc", action = "store_true", default = FALSE, 
+                help = "Duke Compute Cluster runs (alters paths only)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -44,8 +46,13 @@ if ( is.na(name) )
     stop('`--bfile` terminal option is required!')
 
 # move to where the data is
-setwd( '../data/' )
-setwd( name )
+if ( opt$dcc ) {
+    # on DCC we go here, no name for simplicity (data is only temporarily there, so I won't have more than one dataset there at the time)
+    setwd( '/work/ao128/' )
+} else {
+    setwd( '../data/' )
+    setwd( name )
+}
 
 # move higher to the "reps" location
 # this is so GCTA's temporary files don't overwrite files from other parallel runs
