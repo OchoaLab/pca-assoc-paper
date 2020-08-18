@@ -51,8 +51,8 @@ if ( opt$dcc ) {
     setwd( '/work/ao128/' )
 } else {
     setwd( '../data/' )
-    setwd( name )
 }
+setwd( name )
 
 # move higher to the "reps" location
 # this is so GCTA's temporary files don't overwrite files from other parallel runs

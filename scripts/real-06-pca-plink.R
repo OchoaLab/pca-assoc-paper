@@ -28,6 +28,8 @@ option_list = list(
                 help = "Number of PCs to use", metavar = "int"),
     make_option(c("-r", "--rep"), type = "integer", default = 1,
                 help = "Replicate number", metavar = "int"),
+    make_option("--plink", action = "store_true", default = FALSE, 
+                help = "use PCs calculated with plink (default is to use PCs from `kinship_std`)"),
     make_option("--sim", action = "store_true", default = FALSE, 
                 help = "Genotypes are simulated (rather than real; alters paths only)"),
     make_option("--dcc", action = "store_true", default = FALSE, 
@@ -52,8 +54,8 @@ if ( opt$dcc ) {
     setwd( '/work/ao128/' )
 } else {
     setwd( '../data/' )
-    setwd( name )
 }
+setwd( name )
 
 # move higher to the "reps" location
 # this is so GCTA's temporary files don't overwrite files from other parallel runs
@@ -64,7 +66,13 @@ setwd( dir_out )
 ### PCA ###
 ###########
 
-method <- 'pca-plink'
+# identify the PCs used
+# (std are from kinship_std, plink are for pure plink like others would)
+# for input covariates file and for a temporary output path
+name_pcs <- if ( opt$plink ) 'plink' else 'std'
+
+# this is for final outputs
+method <- if ( opt$plink ) 'pca-plink-pure' else 'pca-plink'
 
 # message so we know where we're at
 message(
@@ -86,9 +94,10 @@ if ( file.exists( file_out ) )
 name_in_lower <- if ( opt$sim ) name_in else paste0( '../', name_in )
 
 # output name for plink runs should have number of PCs, so concurrent runs don't overwrite each other
-name_out <- paste0( 'plink_', n_pcs )
+# not used in any final outputs (so only goal is to avoid concurrent run overlaps)
+name_out <- paste0( 'plink_', name_pcs, '_', n_pcs )
 
-file_covar <- paste0( name_in_lower, '-std-n_pcs_', n_pcs, '.eigenvec' )
+file_covar <- paste0( name_in_lower, '-', name_pcs, '-n_pcs_', n_pcs, '.eigenvec' )
 # there's no covariates file to pass if we want zero PCs
 # gas_plink will handle this correctly
 if ( n_pcs == 0 )

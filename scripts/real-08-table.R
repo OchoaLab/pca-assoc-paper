@@ -5,7 +5,7 @@ library(readr)
 library(dplyr)
 
 # constants
-methods <- c('pca-plink', 'gcta')
+methods <- c('pca-plink', 'pca-plink-pure', 'gcta')
 # output file name (big table)
 file_table <- 'sum.txt'
 

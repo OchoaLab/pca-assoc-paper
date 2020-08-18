@@ -79,31 +79,42 @@ for rep in {1..50}; do
     time Rscript real-01-pca-test.R --bfile $name/rep-$rep
     # 0m17.695s ideapad (concurrent with plink)
 
-    # this creates auxiliary GCTA PCA files (redundant, will delete when done with this analysis)
-    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep
-    # 0m3.215s ideapad (concurrent with plink)
-    # same but with standard PCA estimates (from my R code, kinship_std ROM version)
-    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --std
-    # 0m3.422s ideapad (concurrent with plink)
-
+    # get PCs using plink2
+    time Rscript real-01-pcs-plink.R --bfile $name/rep-$rep
+    
     # NOTE: unlike real dataset, here we don't need popkin estimates, we use true p_anc instead (for simulating trait earlier)!
 
     # GCTA runs
+    # this creates auxiliary GCTA PCA files (redundant, will delete when done with this analysis)
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep
+    # 0m3.215s ideapad (concurrent with plink)
     # do all PCs of this rep
     for pcs in {0..90}; do
 	time Rscript real-05-gcta.R --sim --bfile $name -r $rep --n_pcs $pcs
     done
+    # cleanup
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --clean
 
-    # # PCA runs (with plink)
+    # PCA runs (with plink)
+    # same but with standard PCA estimates (from my R code, kinship_std ROM version)
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --std
+    # 0m3.422s ideapad (concurrent with plink)
     # do all PCs of this rep
     for pcs in {0..90}; do
 	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs
     done
-    
     # cleanup
-    # remove redundant files only
-    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --clean
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --clean --std
+    
+    # PCA runs (with *pure* plink)
+    # lastly, same but with PCs from plink2
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink
+    # do all PCs of this rep
+    for pcs in {0..90}; do
+	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs --plink
+    done
+    # cleanup
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink --clean
 done
 
 # summarizes p-values into AUC and RMSD for each method/rep/pc
@@ -111,6 +122,7 @@ time Rscript real-07-auc-rmsd.R --sim --bfile $name -r 50 --n_pcs 90
 # 46m10.111s viiiaX6 (large)
 # 38m9.266s viiiaX6 (family)
 # 33m3.880s viiiaX6 (small)
+# 11m37.970s ideapad (small + plink pure)
 
 # read all individual summary tables (tiny files), gather into a master table
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90

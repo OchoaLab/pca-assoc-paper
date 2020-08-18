@@ -7,7 +7,9 @@ library(ochoalabtools)
 #plink <- FALSE
 script <- 'real-06-pca-plink.R'
 plink <- TRUE
-bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3'
+#bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3'
+bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'
+#bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'
 mem <- '4G' # probably a lot lower for PCA, but meh
 
 # main submission steps
@@ -22,7 +24,9 @@ submit_rep_pcs <- function(
         ' --bfile ', bfile,
         ' -r ', rep,
         ' --n_pcs ', pcs,
-        ' --dcc'
+        ' --dcc',
+        ' --sim',
+        ' --plink'
     )
     
     # load plink module if needed

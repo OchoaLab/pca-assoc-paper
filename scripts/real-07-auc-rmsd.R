@@ -13,7 +13,7 @@ source('pvals_to_pr_auc.R')
 setwd( dir_orig ) # go back to where we were
 
 # constants
-methods <- c('pca-plink', 'gcta')
+methods <- c('pca-plink', 'pca-plink-pure', 'gcta')
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
 # constant factor needed to transform median p-values into inflation factors lambda from chi-square
