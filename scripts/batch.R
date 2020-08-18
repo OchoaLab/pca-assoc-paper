@@ -27,7 +27,7 @@ submit_rep_pcs <- function(
         ' -r ', rep,
         ' --n_pcs ', pcs,
         ' --dcc',
-        ' --sim',
+#        ' --sim',
         ' --plink'
     )
     
