@@ -122,16 +122,22 @@ time Rscript real-07-auc-rmsd.R --sim --bfile $name -r 50 --n_pcs 90
 # 46m10.111s viiiaX6 (large)
 # 38m9.266s viiiaX6 (family)
 # 33m3.880s viiiaX6 (small)
-# 11m37.970s ideapad (small + plink pure)
+# 11m37.970s ideapad (small plink pure)
+# 12m18.912s ideapad (large plink pure)
+# 9m58.027s + 2m49.465s ideapad (family plink pure)
 
 # read all individual summary tables (tiny files), gather into a master table
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
 # 0m32.340s viiiaX6 (large)
 # 0m32.287s viiiaX6 (family)
 # 0m32.228s viiiaX6 (small)
+# 0m38.671s ideapad (large plink pure)
+# 0m36.665s ideapad (family plink pure)
 
 # creates final plot for paper!
 time Rscript real-09-figs.R --bfile $name
+# exploratory version compares pure PCA to PCs from popkinsuppl::kinship_std (practically the same)
+time Rscript real-09-figs.R --bfile $name --pca
 
 # tests that p-value vectors have the right lengths of m_loci
 # to make sure nothing was corrupted due to scripts stopping unexpectedly or incomplete file transfers
@@ -139,7 +145,9 @@ time Rscript real-09-figs.R --bfile $name
 # --final requires that all files exist!
 time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --final
 # 2m54.797s - 3m43.697s viiiaX6
-
+# 4m29.032s ideapad (small plink pure)
+# 2m32.743s ideapad (large plink pure)
+# 4m51.305s ideapad (family plink pure)
 ###
 
 # a comparison of RMSD and lambda across all datasets

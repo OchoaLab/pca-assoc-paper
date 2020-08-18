@@ -54,7 +54,9 @@ time Rscript real-01-pcs-plink.R --bfile $name
 time Rscript real-02-subset-eigenvec.R --bfile $name
 # 0m3.437s ideapad
 # same but with standard PCA estimates (from my R code, kinship_std ROM version)
-time Rscript real-02-subset-eigenvec.R --bfile $name --std
+#time Rscript real-02-subset-eigenvec.R --bfile $name --std
+# lastly, same but with PCs from plink2
+time Rscript real-02-subset-eigenvec.R --bfile $name --plink
 
 # calculates kinship matrix with popkin, to get mean kinship to pass to simtrait
 time Rscript real-03-popkin.R --bfile $name
@@ -63,7 +65,8 @@ time Rscript real-03-popkin.R --bfile $name
 # 255m35.418s ideapad TGP
 
 # draws random traits
-# 0m2.166s ideapad
+# 0m2.166s ideapad HO (each rep)
+# 0m21.066s ideapad TGP (each rep)
 for rep in {1..50}; do
     time Rscript real-04-simtrait.R --bfile $name -r $rep
 done
@@ -75,10 +78,17 @@ for pcs in {0..90}; do
     done
 done
 
-# PCA runs (with plink)
+# # PCA runs (with plink)
+# for pcs in {0..90}; do
+#     for rep in {1..50}; do
+# 	time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs
+#     done
+# done
+
+# PCA runs (with pure plink)
 for pcs in {0..90}; do
     for rep in {1..50}; do
-	time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs
+	time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs --plink
     done
 done
 
@@ -114,5 +124,6 @@ time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90 --final
 # removes redundant, auxiliary GCTA PCA files
 time Rscript real-02-subset-eigenvec.R --bfile $name --clean
 # 0m0.473s ideapad
-time Rscript real-02-subset-eigenvec.R --bfile $name --clean --std
+#time Rscript real-02-subset-eigenvec.R --bfile $name --clean --std
+time Rscript real-02-subset-eigenvec.R --bfile $name --clean --plink
 

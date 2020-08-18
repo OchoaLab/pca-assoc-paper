@@ -4,7 +4,7 @@ library(optparse)
 library(genio)
 
 # constants
-methods <- c('pca-plink', 'gcta')
+methods <- c('pca-plink', 'pca-plink-pure', 'gcta')
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
 

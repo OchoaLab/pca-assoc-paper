@@ -7,13 +7,15 @@ library(ochoalabtools)
 #plink <- FALSE
 script <- 'real-06-pca-plink.R'
 plink <- TRUE
-#bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3'
-bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'
-#bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'
+#bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short <- 'l'
+#bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'; short <- 'f'
+#bfile <- 'HoPacAll_ld_prune_1000kb_0.3'; short <- 'h'
+bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3'; short <- 'd'
+#bfile <- 'all_phase3_filt-minimal_ld_prune_1000kb_0.3'; short <- 'k'
 mem <- '4G' # probably a lot lower for PCA, but meh
 
 # main submission steps
-# global vars: script, bfile, mem, plink
+# global vars: script, bfile, short, mem, plink
 submit_rep_pcs <- function(
                            rep,
                            pcs
@@ -38,7 +40,7 @@ submit_rep_pcs <- function(
         )
     
     # give name clear params too
-    name <- paste0( 'r', rep, 'p', pcs )
+    name <- paste0( short, 'r', rep, 'p', pcs )
     
     # create submission file
     batch_writer(
@@ -77,14 +79,6 @@ submit_rep_pcs( rep = 1, pcs = 90 )
 ##     for ( rep in 1 : reps_max ) {
 ##         submit_rep_pcs( rep, pcs )
 ##     }
-## }
-
-## # IV
-## # still missing a few for pc 56...
-## pcs <- 56
-## reps <- 35 : reps_max
-## for ( rep in reps ) {
-##     submit_rep_pcs( rep, pcs )
 ## }
 
 ########################
