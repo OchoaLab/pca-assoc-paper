@@ -97,6 +97,7 @@ time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90
 # 38+8+5+2+1+3+5+2+1+1+1+1+1+1m ideapad (ran in parts, progressively)
 # 61m47.537s + 7m48.435s + 2 + 4 + 10 + 4 (HO PCA complete, GCTA not yet; all 3 machines)
 # 654m41.628s + 76m10.185s + 147m53.461s ideapad HGDP
+# 33m45.415s ideapad HO + plink pure
 
 # read all individual summary tables (tiny files), gather into a master table
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
@@ -104,10 +105,12 @@ time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
 # 0m26.445s viiiaX6 HO (partial)
 # 0m21.320s labbyduke HO final
 # 0m40.056s ideapad HGDP final
+# 1m8.339s ideapad HO + plink pure final
 
 # creates final plot for paper!
 time Rscript real-09-figs.R --bfile $name
 # 0m1.809s ideapad
+time Rscript real-09-figs.R --bfile $name --pca
 
 # tests that p-value vectors have the right lengths of m_loci
 # to make sure nothing was corrupted due to scripts stopping unexpectedly or incomplete file transfers
@@ -118,6 +121,8 @@ time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90
 time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90 --final
 # 6m21.249s labbyDuke HO
 # 48m44.474s ideapad HGDP
+# 13m24.071s ideapad HO + plink pure
+# 77m6.361s ideapad HGDP + plink pure
 
 ###
 
@@ -127,3 +132,6 @@ time Rscript real-02-subset-eigenvec.R --bfile $name --clean
 #time Rscript real-02-subset-eigenvec.R --bfile $name --clean --std
 time Rscript real-02-subset-eigenvec.R --bfile $name --clean --plink
 
+# archive p-values and individual summary files (move out of space that gets synced between computers; these files take up loads of space and are no longer needed)
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test first!
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90

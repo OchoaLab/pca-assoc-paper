@@ -153,3 +153,6 @@ time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --fin
 # a comparison of RMSD and lambda across all datasets
 time Rscript real-11-inflation-across-datasets.R
 
+# archive p-values and individual summary files (move out of space that gets synced between computers; these files take up loads of space and are no longer needed)
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test first!
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
