@@ -72,11 +72,10 @@ submit_rep_pcs( rep = 1, pcs = 90 )
 ## }
 
 ## # III
-## # loop (PCs on outside, as I was running plink locally)
-## # only do things I was missing too
-## pcs_list <- 57:89
-## for ( pcs in pcs_list ) {
-##     for ( rep in 1 : reps_max ) {
+## # finish rest of PCs
+## pcs_list <- 0:89
+## for ( rep in 1 : reps_max ) {
+##     for ( pcs in pcs_list ) {
 ##         submit_rep_pcs( rep, pcs )
 ##     }
 ## }
