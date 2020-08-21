@@ -12,8 +12,6 @@ setwd( dir_orig ) # go back to where we were
 
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
-# GCTA: here there's no timing, so let's be as fast as possible (use all threads)
-threads <- 0
 
 ############
 ### ARGV ###
@@ -30,7 +28,9 @@ option_list = list(
     make_option("--sim", action = "store_true", default = FALSE, 
                 help = "Genotypes are simulated (rather than real; alters paths only)"),
     make_option("--dcc", action = "store_true", default = FALSE, 
-                help = "Duke Compute Cluster runs (alters paths only)")
+                help = "Duke Compute Cluster runs (alters paths only)"),
+    make_option(c("-t", "--threads"), type = "integer", default = 0, 
+                help = "number of threads (default use all cores if not DCC, 1 core if DCC)", metavar = "int")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -40,6 +40,12 @@ opt <- parse_args(opt_parser)
 name <- opt$bfile
 rep <- opt$rep
 n_pcs <- opt$n_pcs
+threads <- opt$threads
+
+# figure out what threads should be
+# above default should be modified if --dcc and if the threads aren't zero (default, means use all, which we should never do on a cluster!)
+if ( opt$dcc && threads == 0 )
+    threads <- 1
 
 # stop if name is missing
 if ( is.na(name) )
