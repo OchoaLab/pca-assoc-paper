@@ -18,7 +18,9 @@ option_list = list(
     make_option("--bfile", type = "character", default = NA, 
                 help = "Base name for input plink files (.BED/BIM/FAM)", metavar = "character"),
     make_option("--pca", action = "store_true", default = FALSE, 
-                help = "Compare PCA versions (PCs from R popkinsuppl::kinship_std vs pure plink)")
+                help = "Compare PCA versions (PCs from R popkinsuppl::kinship_std vs pure plink)"),
+    make_option("--complete", action = "store_true", default = FALSE, 
+                help = "Plot only complete replicates (useful for partial runs)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -70,6 +72,24 @@ tib <- read_tsv(
 methods <- names( method_to_label ) # not from table, but from hardcoded map, always lists PCA first!
 # and PCs too, numerically
 pcs <- sort( as.numeric( unique( tib$pc ) ) )
+
+# a hack to only plot complete reps
+if ( opt$complete ) {
+    for ( rep in 1:50 ) {
+        # subset for a bit
+        tib2 <- tib[ tib$rep == rep, ]
+        rep_good <- TRUE # boolean that remembers if things were ok for this rep
+        # navigate main methods
+        for ( method in methods ) {
+            # now just count cases, must have 91 to be complete!
+            if ( sum( tib2$method == method ) != 91 )
+                rep_good <- FALSE
+        }
+        # remove rep if it wasn't good!
+        if ( !rep_good )
+            tib <- tib[ tib$rep != rep, ]
+    }
+}
 
 ################
 ### NUM REPS ###

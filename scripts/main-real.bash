@@ -1,8 +1,3 @@
-
-#####################
-### Human Origins ###
-#####################
-
 # make links to data
 # based on: gas-rgls/scripts/data_links.bash
 # use LD pruned only
@@ -78,6 +73,15 @@ for pcs in {0..90}; do
     done
 done
 
+# GCTA runs
+# TGP labbyduke versions
+# run reps backwards
+for rep in {50..20}; do
+    for pcs in {0..90}; do
+	time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs
+    done
+done
+
 # # PCA runs (with plink)
 # for pcs in {0..90}; do
 #     for rep in {1..50}; do
@@ -98,6 +102,11 @@ time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90
 # 61m47.537s + 7m48.435s + 2 + 4 + 10 + 4 (HO PCA complete, GCTA not yet; all 3 machines)
 # 654m41.628s + 76m10.185s + 147m53.461s ideapad HGDP
 # 33m45.415s ideapad HO + plink pure
+# 49m21.674s + 277m34.362s + 56m51.033s ideapad HGDP + plink pure
+# ? + 356m44.225s (done) viiiaX6 TGP? PCA pure plink (first parallel run; total user was ? + 1765m9.124s)
+# + 146m5.550s ideapad TGP GCTA reps 1-6 (single-threaded due to mem limits)
+# + 73m30.572s ideapad TGP GCTA reps 7-9 (single-threaded due to mem limits)
+# + 29m11.051s viiiaX6 TGP GCTA reps 10-12 (6 threads)
 
 # read all individual summary tables (tiny files), gather into a master table
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
@@ -110,6 +119,9 @@ time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
 # creates final plot for paper!
 time Rscript real-09-figs.R --bfile $name
 # 0m1.809s ideapad
+# for partial runs, to plot only complete reps (best for slowest test: TGP)
+time Rscript real-09-figs.R --bfile $name --complete
+# compares PCAs only (for internal purposes only)
 time Rscript real-09-figs.R --bfile $name --pca
 
 # tests that p-value vectors have the right lengths of m_loci
