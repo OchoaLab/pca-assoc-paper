@@ -1,9 +1,8 @@
 ###################
-### SIMS REBOOT ###
+### SIMULATIONS ###
 ###################
 
-# main simulations follow the real dataset analysis more in parallel, so that we take advantage of its embarrasingly parallel structure (for potential cluster runs)
-# old code only ran R PCA anyway, for speed we need plink PCA (which requires plink BED files, etc), so lots of restructuring is needed regardless
+# main simulations follow the real dataset analysis in parallel, so that we take advantage of its embarrasingly parallel structure (for potential cluster runs)
 
 # all have: -k 10 -f 0.1
 # this is like my older FST work
@@ -60,7 +59,7 @@ g=1
 name="sim-n$n-k10-f0.1-s0.5-g$g"
 
 for rep in {1..50}; do
-    # the large sample size simulation
+    # draw random genotypes
     time Rscript sim-01-draw-geno.R -r $rep -n $n -g $g
     # 0m19.112s ideapad (concurrent with plink)
 
@@ -138,6 +137,36 @@ time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
 time Rscript real-09-figs.R --bfile $name
 # exploratory version compares pure PCA to PCs from popkinsuppl::kinship_std (practically the same)
 time Rscript real-09-figs.R --bfile $name --pca
+
+# a summary of "best PCs" in a simple analysis
+Rscript real-13-stats.R --bfile $name
+# LARGE
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      45     3
+# 2 pca-plink-pure auc        3     3
+# 3 gcta           rmsd       0     0
+# 4 gcta           auc        1     0
+# best rmsd: pca-plink-pure (significant)
+# best auc: gcta (significant)
+#
+# FAMILY
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      90    84
+# 2 pca-plink-pure auc       10     4
+# 3 gcta           rmsd       0     0
+# 4 gcta           auc        0     0
+# best rmsd: gcta (significant)
+# best auc: gcta (significant)
+#
+# SMALL
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      88     3
+# 2 pca-plink-pure auc        2     1
+# 3 gcta           rmsd       0     0
+# 4 gcta           auc        0     0
+# best rmsd: pca-plink-pure (tie)
+# best auc: gcta (tie)
+
 
 # tests that p-value vectors have the right lengths of m_loci
 # to make sure nothing was corrupted due to scripts stopping unexpectedly or incomplete file transfers
