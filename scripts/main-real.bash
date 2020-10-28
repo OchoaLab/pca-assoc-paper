@@ -97,7 +97,7 @@ time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90
 # ? + 356m44.225s (done) viiiaX6 TGP? PCA pure plink (first parallel run; total user was ? + 1765m9.124s)
 # + 146m5.550s + 73m30.572s + 141m29.723s ideapad TGP GCTA reps 1-6, 7-9, 15-20 (single-threaded due to mem limits)
 # + 29m11.051s + 18m22.124s viiiaX6 TGP GCTA reps 10-14 (6 threads)
-# + 172m1.762s + 97m24.298s labbyDuke TGP GCTA reps 23-34, 35-42 (12 threads)
+# + 172m1.762s + 97m24.298s + 52m33.071s + 20m29.856s + 27m22.079s + 16m1.279s labbyDuke TGP GCTA reps 23-34, 35-42, 45-48, 49-50, 21-22 (12 threads), 43-44 (6 threads)
 
 # read all individual summary tables (tiny files), gather into a master table
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
@@ -106,6 +106,7 @@ time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
 # 0m21.320s labbyduke HO final
 # 0m40.056s ideapad HGDP final
 # 1m8.339s ideapad HO + plink pure final
+# 0m28.833s labbyduke TGP final
 
 # creates final plot for paper!
 time Rscript real-09-figs.R --bfile $name
@@ -135,11 +136,11 @@ Rscript real-13-stats.R --bfile $name
 # best rmsd: gcta (significant)
 # best auc: gcta (significant)
 #
-# TGP (prelim, with --complete flag)
+# TGP
 #   method         metric  best   min
 # 1 pca-plink-pure rmsd      35    16
-# 2 pca-plink-pure auc       11     3
-# 3 gcta           rmsd       4     0
+# 2 pca-plink-pure auc       11     4
+# 3 gcta           rmsd       4     1
 # 4 gcta           auc        0     0
 # best rmsd: pca-plink-pure (significant)
 # best auc: gcta (tie)
@@ -155,8 +156,7 @@ time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90 --final
 # 48m44.474s ideapad HGDP
 # 13m24.071s ideapad HO + plink pure
 # 77m6.361s ideapad HGDP + plink pure
-
-###
+# 93m20.586s labbyDuke TGP (plink pure only [no old plink with popkinsuppl::kinship_std PCs])
 
 # removes redundant, auxiliary GCTA PCA files
 time Rscript real-02-subset-eigenvec.R --bfile $name --clean

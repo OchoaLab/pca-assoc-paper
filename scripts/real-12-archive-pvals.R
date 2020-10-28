@@ -5,7 +5,7 @@ library(optparse)
 library(genio)
 
 # constants
-methods <- c('pca-plink', 'pca-plink-pure', 'gcta')
+methods <- c('pca-plink-pure', 'gcta') # 'pca-plink', 
 # move p-values (biggest) and individual summaries (should already be condensed into the master summary table)
 bases <- c('pvals', 'sum') 
 # destination dir, created manually on viiiaX6 only
