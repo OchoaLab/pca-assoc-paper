@@ -67,7 +67,7 @@ for ( rep in 1 : rep_max ) {
 
                 if ( !file.exists( file_in ) )
                     # missing files are always fatal for this step
-                    stop( 'MISSING: ', file_in )
+                    stop( 'MISSING: ', 'rep-', rep, '/', file_in )
                 # else move to destination
                 file_out <- paste0( dir_out, '/', file_in )
                 if ( !opt$test ) 

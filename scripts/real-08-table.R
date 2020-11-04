@@ -8,6 +8,8 @@ library(dplyr)
 methods <- c('pca-plink', 'pca-plink-pure', 'gcta')
 # output file name (big table)
 file_table <- 'sum.txt'
+# dir for archived data, created manually on viiiaX6 only
+dir_archive <- '~/dbs2/PCA/'
 
 ############
 ### ARGV ###
@@ -20,7 +22,9 @@ option_list = list(
     make_option("--n_pcs", type = "integer", default = 90,
                 help = "Max number of PCs", metavar = "int"),
     make_option(c("-r", "--rep"), type = "integer", default = 50,
-                help = "Max replicates", metavar = "int")
+                help = "Max replicates", metavar = "int"),
+    make_option(c("-a", "--archived"), action = "store_true", default = FALSE, 
+                help = "Data is archived (changes search paths)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -30,6 +34,7 @@ opt <- parse_args(opt_parser)
 name <- opt$bfile
 rep_max <- opt$rep
 n_pcs_max <- opt$n_pcs
+archived <- opt$archived
 
 # stop if name is missing
 if ( is.na(name) )
@@ -37,6 +42,11 @@ if ( is.na(name) )
 
 # move to where the data is
 setwd( '../data/' )
+
+if ( archived ) {
+    dir_orig <- getwd()
+    setwd( dir_archive )
+}
 setwd( name )
 
 # big table of interest
@@ -73,6 +83,12 @@ for ( rep in 1 : rep_max ) {
     
     # move back down when done with this rep
     setwd( '..' )
+}
+
+if ( archived ) {
+    # just switch back to ordinary data location
+    setwd( dir_orig )
+    setwd( name )
 }
 
 # write the big table to file!

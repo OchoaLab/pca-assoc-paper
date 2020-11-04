@@ -167,3 +167,18 @@ time Rscript real-02-subset-eigenvec.R --bfile $name --clean --plink
 # archive p-values and individual summary files (move out of space that gets synced between computers; these files take up loads of space and are no longer needed)
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
+
+# a comparison of RMSD and lambda across all datasets
+time Rscript real-11-inflation-across-datasets.R
+
+# reports on actual m_causal values used in all sims (used for paper, and to catch an unexpected error from an early run!)
+time Rscript real-14-report-m-causal.R
+# sim-n1000-k10-f0.1-s0.5-g1: 100
+# sim-n100-k10-f0.1-s0.5-g1: 10
+# sim-n1000-k10-f0.1-s0.5-g20: 100
+# HoPacAll_ld_prune_1000kb_0.3: 1000
+# hgdp_wgs_autosomes_ld_prune_1000kb_0.3: 1000
+# all_phase3_filt-minimal_ld_prune_1000kb_0.3: 1000
+#
+# OLD: sim-n1000-k10-f0.1-s0.5-g1: 1000, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100
+

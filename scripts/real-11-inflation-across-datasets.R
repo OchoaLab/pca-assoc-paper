@@ -5,12 +5,12 @@ library(readr)
 library(tibble)
 library(ochoalabtools)
 
-# FOR FAILED EXPERIMENT AT END OF SCRIPT
-# load new functions from external scripts
-dir_orig <- getwd()
-setwd("../../scripts") # scripts of main GAS project
-source('rmsd.R')
-setwd( dir_orig ) # go back to where we were
+## # FOR FAILED EXPERIMENT AT END OF SCRIPT
+## # load new functions from external scripts
+## dir_orig <- getwd()
+## setwd("../../scripts") # scripts of main GAS project
+## source('rmsd.R')
+## setwd( dir_orig ) # go back to where we were
 
 # constants
 # output file name (big table)
@@ -24,15 +24,19 @@ datasets <- tibble(
         'large',
         'small',
         'family',
-        'HO'
+        'HO',
+        'HGDP',
+        'TGP'
     ),
     name_long = c(
         'sim-n1000-k10-f0.1-s0.5-g1',
         'sim-n100-k10-f0.1-s0.5-g1',
         'sim-n1000-k10-f0.1-s0.5-g20',
-        'HoPacAll_ld_prune_1000kb_0.3'
+        'HoPacAll_ld_prune_1000kb_0.3',
+        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3',
+        'all_phase3_filt-minimal_ld_prune_1000kb_0.3'
     ),
-    col = 1:4
+    col = 1:6
 )
 
 # data we want to collect
@@ -109,47 +113,47 @@ legend(
     pch = NA,
     bty = 'n'
 )
-#fig_end()
-
-#############
-
-# test a hypothesis about generating this curve
-# failed experiment, curves don't track well for high RMSD, lambda, so meh
-
-# assume the data is coming from a chi-square with different degrees of freedom
-m <- 1000 # samples (numbers of p-vals)
-df <- 1 # in GWAS this is always 1 (genotype vector is added in H1, removed in H0, all else the same)
-ps <- ( 1 : m ) / ( m + 1 ) # percentiles to retrieve, so we barely miss 0 and 1 edges
-x_m <- qchisq( 0.5, df = df ) # median statistic
-
-# data we want
-n <- 100 # resolution of curve
-# deltas in a log scale
-deltas <- ( -n : n ) / n * 0.8
-# in real scale
-deltas <- 10^( deltas )
-l <- length( deltas )
-lambdas_sim <- vector( 'numeric', l )
-rmsds_sim <- vector( 'numeric', l )
-for ( i in 1 : l ) {
-    message( 'i: ', i )
-    delta <- deltas[i]
-    # this generates the alternate chi-squared quantiles
-    xs <- qchisq( ps, df = delta )
-    # then runs them through the cumulative distribution (standard version) to get the (bad) pvalues
-    pvals <- pchisq( xs, df = df )
-    # lambdas (directly on raw chi-squared stats, not through p-values)
-    lambdas_sim[i] <- median( xs ) / x_m
-    # compute error metric (RMSD)
-    rmsds_sim[i] <- rmsd( pvals, ps )
-    # add sign depending on delta
-    if ( delta < 1 )
-        rmsds_sim[i] <- - rmsds_sim[i]
-}
-
-lines(
-    rmsds_sim,
-    lambdas_sim
-)
-
 fig_end()
+
+## #############
+
+## # test a hypothesis about generating this curve
+## # failed experiment, curves don't track well for high RMSD, lambda, so meh
+
+## # assume the data is coming from a chi-square with different degrees of freedom
+## m <- 1000 # samples (numbers of p-vals)
+## df <- 1 # in GWAS this is always 1 (genotype vector is added in H1, removed in H0, all else the same)
+## ps <- ( 1 : m ) / ( m + 1 ) # percentiles to retrieve, so we barely miss 0 and 1 edges
+## x_m <- qchisq( 0.5, df = df ) # median statistic
+
+## # data we want
+## n <- 100 # resolution of curve
+## # deltas in a log scale
+## deltas <- ( -n : n ) / n * 0.8
+## # in real scale
+## deltas <- 10^( deltas )
+## l <- length( deltas )
+## lambdas_sim <- vector( 'numeric', l )
+## rmsds_sim <- vector( 'numeric', l )
+## for ( i in 1 : l ) {
+##     message( 'i: ', i )
+##     delta <- deltas[i]
+##     # this generates the alternate chi-squared quantiles
+##     xs <- qchisq( ps, df = delta )
+##     # then runs them through the cumulative distribution (standard version) to get the (bad) pvalues
+##     pvals <- pchisq( xs, df = df )
+##     # lambdas (directly on raw chi-squared stats, not through p-values)
+##     lambdas_sim[i] <- median( xs ) / x_m
+##     # compute error metric (RMSD)
+##     rmsds_sim[i] <- rmsd( pvals, ps )
+##     # add sign depending on delta
+##     if ( delta < 1 )
+##         rmsds_sim[i] <- - rmsds_sim[i]
+## }
+
+## lines(
+##     rmsds_sim,
+##     lambdas_sim
+## )
+
+## fig_end()

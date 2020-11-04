@@ -94,16 +94,16 @@ for rep in {1..50}; do
     # cleanup
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --clean
 
-    # PCA runs (with plink)
-    # same but with standard PCA estimates (from my R code, kinship_std ROM version)
-    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --std
-    # 0m3.422s ideapad (concurrent with plink)
-    # do all PCs of this rep
-    for pcs in {0..90}; do
-	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs
-    done
-    # cleanup
-    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --clean --std
+    # # PCA runs (with plink)
+    # # same but with standard PCA estimates (from my R code, kinship_std ROM version)
+    # time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --std
+    # # 0m3.422s ideapad (concurrent with plink)
+    # # do all PCs of this rep
+    # for pcs in {0..90}; do
+    # 	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs
+    # done
+    # # cleanup
+    # time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --clean --std
     
     # PCA runs (with *pure* plink)
     # lastly, same but with PCs from plink2
@@ -132,6 +132,7 @@ time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
 # 0m32.228s viiiaX6 (small)
 # 0m38.671s ideapad (large plink pure)
 # 0m36.665s ideapad (family plink pure)
+time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 -a # to run on fully-archived data
 
 # creates final plot for paper!
 time Rscript real-09-figs.R --bfile $name
@@ -178,9 +179,6 @@ time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --fin
 # 2m32.743s ideapad (large plink pure)
 # 4m51.305s ideapad (family plink pure)
 ###
-
-# a comparison of RMSD and lambda across all datasets
-time Rscript real-11-inflation-across-datasets.R
 
 # archive p-values and individual summary files (move out of space that gets synced between computers; these files take up loads of space and are no longer needed)
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test first!
