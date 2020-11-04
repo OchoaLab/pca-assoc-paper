@@ -3,16 +3,17 @@ library(ochoalabtools)
 # slurm job submission script for DCC
 
 # shared items for all HGDP runs
-script <- 'real-05-gcta.R'
 plink <- FALSE
-## script <- 'real-06-pca-plink.R'
 ## plink <- TRUE
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short <- 'l'
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'; short <- 'f'
 bfile <- 'HoPacAll_ld_prune_1000kb_0.3'; short <- 'h'
 #bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3'; short <- 'd'
-#bfile <- 'all_phase3_filt-minimal_ld_prune_1000kb_0.3'; short <- 'k'
+#bfile <- 'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'; short <- 'k'
 mem <- '4G' # probably a lot lower for PCA, but meh
+
+# select script automatically from boolean
+script <- if ( plink ) 'real-06-pca-plink.R' else 'real-05-gcta.R'
 
 # so names don't overlap between plink and gcta runs
 short <- paste0( short, if (plink) 'p' else 'g' )
@@ -73,6 +74,7 @@ submit_rep_pcs( rep, pcs )
 
 # II
 # finish rest of rep
+rep <- 1
 for ( pcs in 0 : ( pcs_max - 1 ) ) {
     submit_rep_pcs( rep, pcs )
 }

@@ -11,7 +11,7 @@ name='hgdp_wgs_autosomes_ld_prune_1000kb_0.3'
 DATA_DIR='/home/viiia/dbs/hgdp_wgs'
 
 # version for TGP
-name='all_phase3_filt-minimal_ld_prune_1000kb_0.3'
+name='all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'
 DATA_DIR='/home/viiia/dbs/tgp/plink2'
 
 # shared steps (for each in turn)
@@ -30,11 +30,12 @@ time Rscript real-00-preprocess-gcta.R --bfile $name
 # 1m25.639s viiiaX6 HO
 # 1m26.897s ideapad HGDP
 # 19m50.614s ideapad TGP
+# 2m27.177s ideapad TGP thinned
 
 # get PCs in R, using my formula
 # hope for similar average performance, although these PCs are very different than GCTA (except for top 2)
 # NOTE: uses ROM version (known bias, does not match popular versions; I think this is best)
-time Rscript real-01-pca-test.R --bfile $name
+# time Rscript real-01-pca-test.R --bfile $name # Not repeated on TGP after m_causal bugs were fixed and thinning performed
 # 6m57.502s viiiaX6 HO
 # 5m21.411s ideapad HGDP
 # 30m45.184s labbyDuke TGP # ideapad and viiiaX6 ran out of mem (~16G RAM)
@@ -44,6 +45,7 @@ time Rscript real-01-pcs-plink.R --bfile $name
 # 0m39.102s ideapad HO
 # 0m25.582s ideapad HGDP
 # 2m48.309s ideapad TGP
+# 0m5.659s ideapad TGP thinned, removed kinship_std comparison
 
 # this creates auxiliary GCTA PCA files (redundant, will delete when done with this analysis)
 time Rscript real-02-subset-eigenvec.R --bfile $name
@@ -58,10 +60,12 @@ time Rscript real-03-popkin.R --bfile $name
 # 4m54.676s ideapad HO
 # 8m37.050s ideapad HGDP
 # 255m35.418s ideapad TGP
+# 20m25.597s ideapad TGP thinned
 
 # draws random traits
 # 0m2.166s ideapad HO (each rep)
 # 0m21.066s ideapad TGP (each rep)
+# 0m2.014s ideapad TGP thinned (each rep)
 for rep in {1..50}; do
     time Rscript real-04-simtrait.R --bfile $name -r $rep
 done
@@ -72,13 +76,6 @@ for pcs in {0..90}; do
 	time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs
     done
 done
-
-# # PCA runs (with plink)
-# for pcs in {0..90}; do
-#     for rep in {1..50}; do
-# 	time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs
-#     done
-# done
 
 # PCA runs (with pure plink)
 for pcs in {0..90}; do
@@ -113,8 +110,8 @@ time Rscript real-09-figs.R --bfile $name
 # 0m1.809s ideapad
 # for partial runs, to plot only complete reps (best for slowest test: TGP)
 time Rscript real-09-figs.R --bfile $name --complete
-# compares PCAs only (for internal purposes only)
-time Rscript real-09-figs.R --bfile $name --pca
+# # OBSOLETE compares PCAs only (for internal purposes only); Not redone after m_causal bug was found
+# time Rscript real-09-figs.R --bfile $name --pca
 
 # a summary of "best PCs" in a simple analysis
 Rscript real-13-stats.R --bfile $name
@@ -176,9 +173,6 @@ time Rscript real-14-report-m-causal.R
 # sim-n1000-k10-f0.1-s0.5-g1: 100
 # sim-n100-k10-f0.1-s0.5-g1: 10
 # sim-n1000-k10-f0.1-s0.5-g20: 100
-# HoPacAll_ld_prune_1000kb_0.3: 1000
-# hgdp_wgs_autosomes_ld_prune_1000kb_0.3: 1000
-# all_phase3_filt-minimal_ld_prune_1000kb_0.3: 1000
-#
-# OLD: sim-n1000-k10-f0.1-s0.5-g1: 1000, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100
-
+# HoPacAll_ld_prune_1000kb_0.3: 292
+# hgdp_wgs_autosomes_ld_prune_1000kb_0.3: 93
+# all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1: 250
