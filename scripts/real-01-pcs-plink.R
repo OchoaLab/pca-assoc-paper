@@ -83,15 +83,15 @@ out <- read_eigenvec(
 )
 eigenvec_gcta <- out$eigenvec
 
-###################
-### LOAD MY PCA ###
-###################
+## ###################
+## ### LOAD MY PCA ###
+## ###################
 
-# also load my custom precomputed PCs (from kinship_std), for comparison
-out <- read_eigenvec(
-    file = paste0( name_in, '-std-n_pcs_', n_pcs_max )
-)
-eigenvec_std <- out$eigenvec
+## # also load my custom precomputed PCs (from kinship_std), for comparison
+## out <- read_eigenvec(
+##     file = paste0( name_in, '-std-n_pcs_', n_pcs_max )
+## )
+## eigenvec_std <- out$eigenvec
 
 ###################
 ### COMPARISONS ###
@@ -100,29 +100,29 @@ eigenvec_std <- out$eigenvec
 # the key comparison is this inner product of vectors, which in a perfect agreement leads to the identity matrix (as these are orthonormal)
 # results in a dim-`n_pcs_max` square matrix (i.e. 90 x 90)
 # in this version we do 3 times!
-comparison_gcta_std <- crossprod( eigenvec_gcta, eigenvec_std )
+#comparison_gcta_std <- crossprod( eigenvec_gcta, eigenvec_std )
 comparison_gcta_plink <- crossprod( eigenvec_gcta, eigenvec_plink )
-comparison_std_plink <- crossprod( eigenvec_std, eigenvec_plink )
+#comparison_std_plink <- crossprod( eigenvec_std, eigenvec_plink )
 
 # a crude comparison shows that only the top eigenvectors sort of agree
 # this is ok as r becomes very large, they don't fit well regardless, but some of the reranking is surprising
 fig_start(
     'pca-comparison2',
-    width = 10,
+    width = 4, # 10,
     mar_t = 2,
     mar_b = 0,
     mar_l = 0
 )
 plot_popkin(
     list(
-        abs( comparison_gcta_std ),
-        abs( comparison_gcta_plink ),
-        abs( comparison_std_plink )
+#        abs( comparison_gcta_std ),
+        abs( comparison_gcta_plink )
+#        abs( comparison_std_plink )
     ),
     titles = c(
-        'GCTA-STD',
-        'GCTA-plink',
-        'STD-plink'
+#        'GCTA-STD',
+        'GCTA-plink'
+#        'STD-plink'
     ),
     ylab = 'Eigenvector',
     leg_title = 'Abs. Correlation'
