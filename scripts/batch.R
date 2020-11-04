@@ -3,16 +3,19 @@ library(ochoalabtools)
 # slurm job submission script for DCC
 
 # shared items for all HGDP runs
-#script <- 'real-05-gcta.R'
-#plink <- FALSE
-script <- 'real-06-pca-plink.R'
-plink <- TRUE
+script <- 'real-05-gcta.R'
+plink <- FALSE
+## script <- 'real-06-pca-plink.R'
+## plink <- TRUE
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short <- 'l'
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'; short <- 'f'
-#bfile <- 'HoPacAll_ld_prune_1000kb_0.3'; short <- 'h'
-bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3'; short <- 'd'
+bfile <- 'HoPacAll_ld_prune_1000kb_0.3'; short <- 'h'
+#bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3'; short <- 'd'
 #bfile <- 'all_phase3_filt-minimal_ld_prune_1000kb_0.3'; short <- 'k'
 mem <- '4G' # probably a lot lower for PCA, but meh
+
+# so names don't overlap between plink and gcta runs
+short <- paste0( short, if (plink) 'p' else 'g' )
 
 # main submission steps
 # global vars: script, bfile, short, mem, plink
@@ -26,13 +29,15 @@ submit_rep_pcs <- function(
         ' --bfile ', bfile,
         ' -r ', rep,
         ' --n_pcs ', pcs,
-        ' --dcc',
-#        ' --sim',
-        ' --plink'
+        ' --dcc'
+#        ' --sim'
     )
     
     # load plink module if needed
     if ( plink )
+        # first add --plink flag (same line)
+        commands <- paste0( commands, ' --plink' )
+        # then load plink module (separate lines)
         commands <- c(
             'module load Plink/2.00a2LM',
             commands,
@@ -62,23 +67,23 @@ pcs_max <- 90
 
 # I
 # test one
-submit_rep_pcs( rep = 1, pcs = 90 )
+rep <- 1
+pcs <- pcs_max
+submit_rep_pcs( rep, pcs )
 
-## # II
-## # finish rest of run for these PCs
-## pcs <- 90
-## for ( rep in 2 : reps_max ) {
-##     submit_rep_pcs( rep, pcs )
-## }
+# II
+# finish rest of rep
+for ( pcs in 0 : ( pcs_max - 1 ) ) {
+    submit_rep_pcs( rep, pcs )
+}
 
-## # III
-## # finish rest of PCs
-## pcs_list <- 0:89
-## for ( rep in 1 : reps_max ) {
-##     for ( pcs in pcs_list ) {
-##         submit_rep_pcs( rep, pcs )
-##     }
-## }
+# III
+# finish rest of reps
+for ( rep in 2 : reps_max ) {
+    for ( pcs in 0 : pcs_max ) {
+        submit_rep_pcs( rep, pcs )
+    }
+}
 
 ########################
 
