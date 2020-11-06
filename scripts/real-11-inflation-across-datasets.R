@@ -6,11 +6,7 @@ library(tibble)
 library(ochoalabtools)
 
 ## # FOR FAILED EXPERIMENT AT END OF SCRIPT
-## # load new functions from external scripts
-## dir_orig <- getwd()
-## setwd("../../scripts") # scripts of main GAS project
-## source('rmsd.R')
-## setwd( dir_orig ) # go back to where we were
+## library(simtrait) # for rmsd
 
 # constants
 # output file name (big table)

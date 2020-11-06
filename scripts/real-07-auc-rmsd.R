@@ -5,13 +5,7 @@ library(readr)
 library(tibble)
 library(genio)
 library(parallel)
-
-# load new functions from external scripts
-dir_orig <- getwd()
-setwd("../../scripts") # scripts of main GAS project
-source('pvals_to_null_rmsd.R')
-source('pvals_to_pr_auc.R')
-setwd( dir_orig ) # go back to where we were
+library(simtrait) # pval_srmsd, pval_aucpr
 
 # constants
 methods <- c('pca-plink', 'pca-plink-pure', 'gcta')
@@ -93,7 +87,7 @@ auc_rmsd_one_pcs <- function(n_pcs) {
     # special case is a single line with the word NULL, which occurs particularly with GCTA outputs when model does not converge/is underdetermined
     if ( length(pvals) == 1 && pvals == 'NULL' ) {
         # when pvals are NULL, they get printed as an empty file
-        # this is what we get from pvals_to_null_rmsd, pvals_to_pr_auc if we had set pvals==NULL
+        # this is what we get from pval_srmsd, pval_aucpr if we had set pvals==NULL
         rmsdp <- NA
         aucpr <- NA
         # this special case wasn't handled below, I think
@@ -106,9 +100,9 @@ auc_rmsd_one_pcs <- function(n_pcs) {
         # convert strings to numeric
         pvals <- as.numeric( pvals )
         # calculate RMSD_p
-        rmsdp <- pvals_to_null_rmsd(pvals, causal_indexes)$rmsd
+        rmsdp <- pval_srmsd(pvals, causal_indexes)
         # calculate AUC_PR
-        aucpr <- pvals_to_pr_auc(pvals, causal_indexes)
+        aucpr <- pval_aucpr(pvals, causal_indexes)
         # calculate inflation (but on p-values instead of Chi-Sq; this makes sense as not all stats are Chi-Sq anyway)
         # NOTES:
         # - not subsetting for true nulls (as done in practice)
