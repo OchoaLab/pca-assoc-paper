@@ -10,7 +10,9 @@ plink <- FALSE
 bfile <- 'HoPacAll_ld_prune_1000kb_0.3'; short <- 'h'
 #bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3'; short <- 'd'
 #bfile <- 'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'; short <- 'k'
-mem <- '4G' # probably a lot lower for PCA, but meh
+
+# GCTA uses more memory, this works for the largest cases
+mem <- if ( plink ) '4G' else '16G'
 
 # select script automatically from boolean
 script <- if ( plink ) 'real-06-pca-plink.R' else 'real-05-gcta.R'

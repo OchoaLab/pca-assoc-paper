@@ -12,8 +12,8 @@ plink <- FALSE
 #bfile <- 'HoPacAll_ld_prune_1000kb_0.3'; short <- 'h'
 #bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3'; short <- 'd'
 bfile <- 'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'; short <- 'k'
-mem <- '16G' # needed to increase for TGP GCTA
-threads <- 3 # needed to make sure each process gets enough memory if all my jobs saturate the machines
+mem <- '32G' # needed to increase for TGP GCTA
+threads <- 4 # needed to make sure each process gets enough memory if all my jobs saturate the machines
 
 # main submission steps
 # global vars: script, bfile, short, mem, plink
