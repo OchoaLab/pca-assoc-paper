@@ -5,15 +5,12 @@ library(readr)
 library(tibble)
 library(genio)
 library(parallel)
-library(simtrait) # pval_srmsd, pval_aucpr
+library(simtrait) # pval_srmsd, pval_aucpr, pval_infl
 
 # constants
-methods <- c('pca-plink', 'pca-plink-pure', 'gcta')
+methods <- c('pca-plink-pure', 'gcta') # 'pca-plink', 
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
-# constant factor needed to transform median p-values into inflation factors lambda from chi-square
-df <- 1
-x_m <- qchisq( 0.5, df = df )
 
 ############
 ### ARGV ###
@@ -103,11 +100,8 @@ auc_rmsd_one_pcs <- function(n_pcs) {
         rmsdp <- pval_srmsd(pvals, causal_indexes)
         # calculate AUC_PR
         aucpr <- pval_aucpr(pvals, causal_indexes)
-        # calculate inflation (but on p-values instead of Chi-Sq; this makes sense as not all stats are Chi-Sq anyway)
-        # NOTES:
-        # - not subsetting for true nulls (as done in practice)
-        # - exact inversion to chi-sq stat
-        lambda <- qchisq( 1 - median(pvals, na.rm = TRUE), df = df ) / x_m
+        # calculate inflation factor from p-values (map back to Chi-Sq)
+        lambda <- pval_infl( pvals )
     }
     # put everything into a tibble, with all the info we want conveniently in place
     tib <- tibble(
