@@ -183,3 +183,9 @@ time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --fin
 # archive p-values and individual summary files (move out of space that gets synced between computers; these files take up loads of space and are no longer needed)
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
+
+# a simple figure that illustrates the methods
+Rscript sim-10-measures-fig.R 13
+# Inflation factor: gcta: 0.977811992816224
+# Inflation factor: pca-plink-pure: 2.55503828726139
+# Inflation factor: gcta: 0.861113356022774
