@@ -2,6 +2,7 @@
 # is the curve the same across datasets with different sample sizes, etc?
 
 library(readr)
+library(dplyr) # for bind_rows
 library(tibble)
 library(ochoalabtools)
 
@@ -13,16 +14,18 @@ library(ochoalabtools)
 file_table <- 'sum.txt'
 # for main figure output (goes on papers)
 name_out <- 'sum-rmsd-auc'
+# methods to keep in analysis
+methods <- c('pca-plink-pure', 'gcta')
 
 # names of datasets (paired list)
 datasets <- tibble(
     name_short = c(
-        'large',
-        'small',
-        'family',
-        'HO',
+        'Large sample size sim.',
+        'Small sample size sim.',
+        'Family structure sim.',
+        'Human Origins',
         'HGDP',
-        'TGP'
+        '1000 Genomes'
     ),
     name_long = c(
         'sim-n1000-k10-f0.1-s0.5-g1',
@@ -35,13 +38,12 @@ datasets <- tibble(
     col = 1:6
 )
 
-# data we want to collect
-# separate both so axis ranges are easier to extract
-rmsds <- list()
-lambdas <- list()
-
 # move to where the data is
 setwd( '../data/' )
+
+# big table of interest
+# initialize this way, it'll grow correctly
+tib_main <- NULL
 
 # load each dataset
 for ( i in 1 : nrow( datasets ) ) {
@@ -53,10 +55,24 @@ for ( i in 1 : nrow( datasets ) ) {
         file_table,
         col_types = 'ciiddd'
     )
+
+    # subset to use only the two methods we talk about in the paper
+    tib <- tib[ tib$method %in% methods, ]
+
+    # recall the dataset of origin
+    tib$dataset <- datasets$name_short[ i ]
+
+    # boring idea, obviously GCTA was always negative and PCA was always positive SRMSD
+##     # color by method
+##     tib$col <- 'blue' # default
+## #    tib$col[ tib$method == methods[1] ] <- 'blue'
+##     tib$col[ tib$method == methods[2] ] <- 'red' # GCTA is red
+
+    # color by dataset
+    tib$col <- datasets$col[ i ]
     
-    # save only the two columns of interest
-    rmsds[[ i ]] <- tib$rmsd
-    lambdas[[ i ]] <- tib$lambda
+    # concatenate into bigger table
+    tib_main <- bind_rows( tib_main, tib )
     
     # go back down
     setwd( '..' )
@@ -71,8 +87,8 @@ lab_rmsd <- expression( bold( SRMSD[p] ) )
 lab_lambda <- expression( bold( paste("Inflation Factor (", lambda, ")") ) )
 
 # find common data range
-range_rmsd <- range( unlist( rmsds ), na.rm = TRUE )
-range_lambda <- range( unlist( lambdas ), na.rm = TRUE )
+range_rmsd <- range( tib_main$rmsd, na.rm = TRUE )
+range_lambda <- range( tib_main$lambda, na.rm = TRUE )
 
 # plot in base data dir
 fig_start(
@@ -92,22 +108,24 @@ plot(
 # guide lines
 abline( v = 0, lty = 2, col = 'gray' )
 abline( h = 1, lty = 2, col = 'gray' )
-# add per-dataset points
-for ( i in 1 : nrow( datasets ) ) {
-    points(
-        rmsds[[ i ]],
-        lambdas[[ i ]],
-        pch = '.',
-        col = datasets$col[ i ]
-    )
-}
+# randomize rows so last dataset doesn't just overlap previous datasets
+tib_main <- tib_main[ sample( nrow(tib_main) ), ]
+# add data on top
+points(
+    tib_main$rmsd,
+    tib_main$lambda,
+    col = tib_main$col,
+    pch = '.'
+)
 # legend
 legend(
     'bottomright',
     datasets$name_short,
+    title = 'Dataset',
     text.col = datasets$col,
     pch = NA,
-    bty = 'n'
+    bty = 'n',
+    cex = 0.5
 )
 fig_end()
 
