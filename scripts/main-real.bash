@@ -86,30 +86,22 @@ done
 
 # summarizes p-values into AUC and RMSD for each method/rep/pc
 time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90
-# 38+8+5+2+1+3+5+2+1+1+1+1+1+1m ideapad (ran in parts, progressively)
-# 61m47.537s + 7m48.435s + 2 + 4 + 10 + 4 (HO PCA complete, GCTA not yet; all 3 machines)
-# 654m41.628s + 76m10.185s + 147m53.461s ideapad HGDP
-# 33m45.415s ideapad HO + plink pure
-# 49m21.674s + 277m34.362s + 56m51.033s ideapad HGDP + plink pure
-# ? + 356m44.225s (done) viiiaX6 TGP? PCA pure plink (first parallel run; total user was ? + 1765m9.124s)
-# + 146m5.550s + 73m30.572s + 141m29.723s ideapad TGP GCTA reps 1-6, 7-9, 15-20 (single-threaded due to mem limits)
-# + 29m11.051s + 18m22.124s viiiaX6 TGP GCTA reps 10-14 (6 threads)
-# + 172m1.762s + 97m24.298s + 52m33.071s + 20m29.856s + 27m22.079s + 16m1.279s labbyDuke TGP GCTA reps 23-34, 35-42, 45-48, 49-50, 21-22 (12 threads), 43-44 (6 threads)
+# all are plink + GCTA, labbyDuke 12 threads
+# 19m16.850s HO
+# 174m22.306s HGDP
+# 71m22.370s TGP
 
 # read all individual summary tables (tiny files), gather into a master table
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
-# 0m25.560s ideapad HO (partial)
-# 0m26.445s viiiaX6 HO (partial)
-# 0m21.320s labbyduke HO final
-# 0m40.056s ideapad HGDP final
-# 1m8.339s ideapad HO + plink pure final
-# 0m28.833s labbyduke TGP final
+# 0m20.941s labbyDuke HO
+# 0m27.567s labbyDuke HGDP
+# 0m24.078s labbyDuke TGP
 
 # creates final plot for paper!
 time Rscript real-09-figs.R --bfile $name
 # 0m1.809s ideapad
-# for partial runs, to plot only complete reps (best for slowest test: TGP)
-time Rscript real-09-figs.R --bfile $name --complete
+# # OBSOLETE for partial runs, to plot only complete reps (best for slowest test: TGP)
+# time Rscript real-09-figs.R --bfile $name --complete
 # # OBSOLETE compares PCAs only (for internal purposes only); Not redone after m_causal bug was found
 # time Rscript real-09-figs.R --bfile $name --pca
 
@@ -117,28 +109,29 @@ time Rscript real-09-figs.R --bfile $name --complete
 Rscript real-13-stats.R --bfile $name
 # Human Origins
 #   method         metric  best   min
-# 1 pca-plink-pure rmsd      90    71
-# 2 pca-plink-pure auc       51    20
+# 1 pca-plink-pure rmsd      90    80
+# 2 pca-plink-pure auc       34    31
 # 3 gcta           rmsd       5     0
-# 4 gcta           auc        5     0
+# 4 gcta           auc       12     0
 # best rmsd: gcta (significant)
 # best auc: gcta (significant)
 #
 # HGDP
 #   method         metric  best   min
-# 1 pca-plink-pure rmsd      31    24
-# 2 pca-plink-pure auc       17     6
+# 1 pca-plink-pure rmsd      72    17
+# 2 pca-plink-pure auc       11     4
 # 3 gcta           rmsd       0     0
 # 4 gcta           auc        0     0
-# best rmsd: gcta (significant)
-# best auc: gcta (significant)
+# best rmsd: pca-plink-pure (significant)
+# best auc: gcta (tie)
 #
 # TGP
 #   method         metric  best   min
-# 1 pca-plink-pure rmsd      35    16
-# 2 pca-plink-pure auc       11     4
-# 3 gcta           rmsd       4     1
-# 4 gcta           auc        0     0
+#   <chr>          <chr>  <dbl> <dbl>
+# 1 pca-plink-pure rmsd       4     4
+# 2 pca-plink-pure auc        7     4
+# 3 gcta           rmsd       4     0
+# 4 gcta           auc        5     0
 # best rmsd: pca-plink-pure (significant)
 # best auc: gcta (tie)
 
@@ -147,13 +140,10 @@ Rscript real-13-stats.R --bfile $name
 # (now test is peformed within real-07-auc-rmsd.R above too, but this can retest everything without recalculating expensive summary statistics).
 # --final requires that all files exist!
 time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90
-# 3m12.595s ideapad HO (partial)
 time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90 --final
-# 6m21.249s labbyDuke HO
-# 48m44.474s ideapad HGDP
-# 13m24.071s ideapad HO + plink pure
-# 77m6.361s ideapad HGDP + plink pure
-# 93m20.586s labbyDuke TGP (plink pure only [no old plink with popkinsuppl::kinship_std PCs])
+# 5m12.610s labbyDuke HO
+# 35m17.690s labbyDuke HGDP
+# 13m33.181s labbyDuke TGP
 
 # removes redundant, auxiliary GCTA PCA files
 time Rscript real-02-subset-eigenvec.R --bfile $name --clean
