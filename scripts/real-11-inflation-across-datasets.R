@@ -37,6 +37,12 @@ datasets <- tibble(
     ),
     col = 1:6
 )
+# color for fit curve
+col_fit <- 'gray'
+lty_fit <- 5
+# and guide lines
+col_guides <- 'gray95'
+lty_guides <- 1
 
 # move to where the data is
 setwd( '../data/' )
@@ -86,9 +92,81 @@ for ( i in 1 : nrow( datasets ) ) {
 lab_rmsd <- expression( bold( SRMSD[p] ) )
 lab_lambda <- expression( bold( paste("Inflation Factor (", lambda, ")") ) )
 
+# sigmoid fit
+# remove NAs for simplicity
+# test on one of these, it should be the same for all other metrics
+indexes_missing <- is.na( tib_main$rmsd )
+stopifnot( all( is.na( tib_main$lambda[ indexes_missing ] ) ) )
+stopifnot( all( is.na( tib_main$auc[ indexes_missing ] ) ) )
+# subset now
+tib_main <- tib_main[ !indexes_missing, ]
+
+# NOTE: x and y are reversed from actual plot
+y <- tib_main$rmsd
+#x <- log(tib_main$lambda)
+x <- tib_main$lambda
+x2 <- sort(x)
+
+# fit full data (lambda < 1 seems to mess things up though)
+## obj <- nls( y ~ a * (x^b - 1) / (x^b + 1), start = list(a = 1/2, b = 1) )
+## Nonlinear regression model
+##   model: y ~ a * (x^b - 1)/(x^b + 1)
+##    data: parent.frame()
+##      a      b 
+## 0.5392 0.6046 
+##  residual sum-of-squares: 0.3812
+## Number of iterations to convergence: 5 
+## Achieved convergence tolerance: 2.558e-06
+
+# fit on top data only
+indexes <- x > 1
+xp <- x[ indexes ]
+yp <- y[ indexes ]
+objp <- nls( yp ~ a * (xp^b - 1) / (xp^b + 1), start = list(a = 1/2, b = 1) )
+#print( objp )
+print( coef( objp ) )
+## Nonlinear regression model
+##   model: yp ~ a * (xp^b - 1)/(xp^b + 1)
+##    data: parent.frame()
+##      a      b 
+## 0.5481 0.6382 
+##  residual sum-of-squares: 0.01682
+## Number of iterations to convergence: 4 
+## Achieved convergence tolerance: 3.601e-07
+
+# invert relationship, failed :(
+# y ~ a * (x^b - 1) / (x^b + 1)
+# y * (x^b + 1) ~ a * (x^b - 1)
+# y * x^b + y ~ a * x^b - a
+# (y-a) * x^b ~ - (y + a)
+# x^b ~ (a + y) / (a - y)
+# x ~ ( (a + y) / (a - y) )^{1/b}
+# x ~ ( (a + y) / (a - y) )^c, c = 1/b
+## obj2 <- nls( x ~ ( (a + y) / (a - y) )^c, start = list(a = 1/2, c = 1.6) )
+## Error in numericDeriv(form[[3L]], names(ind), env) : 
+##   Missing value or an infinity produced when evaluating the model
+## obj2 <- nls( x ~ ( (a + y) / (a - y) )^c, start = list(a = 0.6, c = 1) )
+
+# test plot
+## plot( x, y, pch = '.', log = 'x' )
+## #plot( x, y, pch = '.' )
+## lines( x2, predict(obj, list(x = x2) ), col = 2 )
+## #lines( x2, fl(x2, 1, 1), col = 2 )
+## lines( x2, predict(objp, list(xp = x2) ), col = 3 ) # best fit!
+
 # find common data range
 range_rmsd <- range( tib_main$rmsd, na.rm = TRUE )
 range_lambda <- range( tib_main$lambda, na.rm = TRUE )
+
+# symetrize lambda range (in log scale)
+log_max_lambda <- max( abs( log( range_lambda ) ) )
+range_lambda <- exp( c( -log_max_lambda, log_max_lambda ) )
+# same with SRMSD, though no log needed here
+max_srmsd <- max( abs( range_rmsd ) )
+range_rmsd <- c( -max_srmsd, max_srmsd )
+
+# uniformly spaced points for curve
+xp <- exp( log_max_lambda * (-100 : 100) / 100 )
 
 # plot in base data dir
 fig_start(
@@ -96,6 +174,8 @@ fig_start(
     mar_t = 1,
     mar_r = 0.3
 )
+# try to change default y labeling
+par( lab = c(3, 5, 7) )
 # start base plot
 plot(
     NA,
@@ -106,8 +186,11 @@ plot(
     log = 'y'
 )
 # guide lines
-abline( v = 0, lty = 2, col = 'gray' )
-abline( h = 1, lty = 2, col = 'gray' )
+abline( v = 0, lty = lty_guides, col = col_guides )
+abline( h = 1, lty = lty_guides, col = col_guides )
+# plot reversed to match actual plot (regression had x and y flipped)
+lines( predict(objp, list(xp = xp) ), xp, lty = lty_fit, col = col_fit ) # using uniformly spaced points
+#lines( predict(objp, list(xp = x2) ), x2, lty = lty_fit, col = col_fit ) # using actual data
 # randomize rows so last dataset doesn't just overlap previous datasets
 tib_main <- tib_main[ sample( nrow(tib_main) ), ]
 # add data on top
@@ -124,6 +207,16 @@ legend(
     title = 'Dataset',
     text.col = datasets$col,
     pch = NA,
+    bty = 'n',
+    cex = 0.5
+)
+# second legend just for fit
+legend(
+    'topleft',
+    c('Data', 'Model fit'),
+    col = c('black', col_fit),
+    lty = c(NA, lty_fit),
+    pch = c('.', NA),
     bty = 'n',
     cex = 0.5
 )
