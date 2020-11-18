@@ -157,6 +157,12 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
 
 # a comparison of RMSD and lambda across all datasets
 time Rscript real-11-inflation-across-datasets.R
+# model fit:
+# rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
+#         a         b 
+# 0.5481480 0.6381526
+# log-linear approx: log(lambda) = RMSD * 5.72
+
 
 # reports on actual m_causal values used in all sims (used for paper, and to catch an unexpected error from an early run!)
 time Rscript real-14-report-m-causal.R

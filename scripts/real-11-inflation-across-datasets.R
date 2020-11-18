@@ -38,8 +38,10 @@ datasets <- tibble(
     col = 1:6
 )
 # color for fit curve
-col_fit <- 'gray'
-lty_fit <- 5
+col_fit_sigmoid <- 'gray40'
+lty_fit_sigmoid <- 5
+col_fit_loglin <- 'gray'
+lty_fit_loglin <- 2
 # and guide lines
 col_guides <- 'gray95'
 lty_guides <- 1
@@ -189,8 +191,29 @@ plot(
 abline( v = 0, lty = lty_guides, col = col_guides )
 abline( h = 1, lty = lty_guides, col = col_guides )
 # plot reversed to match actual plot (regression had x and y flipped)
-lines( predict(objp, list(xp = xp) ), xp, lty = lty_fit, col = col_fit ) # using uniformly spaced points
-#lines( predict(objp, list(xp = x2) ), x2, lty = lty_fit, col = col_fit ) # using actual data
+lines( predict(objp, list(xp = xp) ), xp, lty = lty_fit_sigmoid, col = col_fit_sigmoid ) # using uniformly spaced points
+#lines( predict(objp, list(xp = x2) ), x2, lty = lty_fit_sigmoid, col = col_fit_sigmoid ) # using actual data
+
+# slope prediction at lambda = 1
+# (linear approx)
+lm_m <- 1 / ( coef( objp )[1] * coef( objp )[2] / 2)
+## message( 'linear approx: lambda = RMSD * ', signif( lm_m, 3)  )
+message( 'log-linear approx: log(lambda) = RMSD * ', signif( lm_m, 3)  )
+## abline(
+##     1,
+##     lm_m,
+##     lty = lty_fit_loglin,
+##     col = col_fit_loglin,
+##     untf = TRUE # untransform because it's a log plot
+## )
+# log-linear approx
+lines(
+    log( xp ) / lm_m,
+    xp,
+    lty = lty_fit_loglin,
+    col = col_fit_loglin
+)
+
 # randomize rows so last dataset doesn't just overlap previous datasets
 tib_main <- tib_main[ sample( nrow(tib_main) ), ]
 # add data on top
@@ -213,9 +236,13 @@ legend(
 # second legend just for fit
 legend(
     'topleft',
-    c('Data', 'Model fit'),
-    col = c('black', col_fit),
-    lty = c(NA, lty_fit),
+    c(
+        expression( bold( 'Data' ) ),
+        expression( bold( 'Sigmoid fit' ) ),
+        expression( bold( paste( 'Log-linear approx at ', lambda == 1 ) ) )
+    ),
+    col = c('black', col_fit_sigmoid, col_fit_loglin),
+    lty = c(NA, lty_fit_sigmoid, lty_fit_loglin),
     pch = c('.', NA),
     bty = 'n',
     cex = 0.5
