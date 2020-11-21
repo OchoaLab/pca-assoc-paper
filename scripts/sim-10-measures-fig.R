@@ -127,15 +127,16 @@ legend(
 )
 
 srmsd <- vector( 'numeric', length(methods) )
-for ( i in 1 : length(methods) ) {
+# plot backwards so green is on top
+for ( i in rev( 1 : length(methods) ) ) {
     # calculate SRMSD_p
     obj <- pval_srmsd(pvals[[i]], causal_indexes, detailed = TRUE)
     # record value for second panel
     srmsd[i] <- obj$srmsd
     # plot curve
     lines(
-        obj$pvals_null,
         obj$pvals_unif,
+        obj$pvals_null,
         col = colors[i]
     )
     
@@ -159,21 +160,24 @@ panel_letter('B')
 # third panel: AUC plot
 # in this case we don't start it until inside the loop (for first element only)
 aucpr <- vector( 'numeric', length(methods) )
-for ( i in 1 : length(methods) ) {
+# plot backwards so green is on top
+for ( i in rev( 1 : length(methods) ) ) {
     # calculate AUC_PR
     obj <- pval_aucpr(pvals[[i]], causal_indexes, curve = TRUE)
     # record value for next panel
     aucpr[i] <- obj$auc.integral
+    # add for all but last method (first in reverse order)
+    add <- i < length( methods )
     # plot curve
     plot(
         obj,
         color = colors[i],
         auc.main = FALSE,
         main = '',
-        add = (i > 1)
+        add = add
     )
-    # add panel letter first time only
-    if ( i == 1 )
+    # add panel letter first time only (converse of `add`)
+    if ( !add )
         panel_letter('C')
 }
 
