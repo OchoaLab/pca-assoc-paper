@@ -162,7 +162,8 @@ time Rscript real-11-inflation-across-datasets.R
 #         a         b 
 # 0.5481480 0.6381526
 # log-linear approx: log(lambda) = RMSD * 5.72
-
+# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00853
+# threshold map (log-linear): lambda = 1.05, RMSD = 0.00853
 
 # reports on actual m_causal values used in all sims (used for paper, and to catch an unexpected error from an early run!)
 time Rscript real-14-report-m-causal.R

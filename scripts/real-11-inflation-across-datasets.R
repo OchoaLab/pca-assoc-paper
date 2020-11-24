@@ -16,6 +16,8 @@ file_table <- 'sum.txt'
 name_out <- 'sum-rmsd-auc'
 # methods to keep in analysis
 methods <- c('pca-plink-pure', 'gcta')
+# report on the RMSD predicted for lambda = 1.05
+lambda_cut <- 1.05
 
 # names of datasets (paired list)
 datasets <- tibble(
@@ -136,6 +138,15 @@ print( coef( objp ) )
 ## Number of iterations to convergence: 4 
 ## Achieved convergence tolerance: 3.601e-07
 
+# report on the RMSD predicted for lambda = 1.05
+# lambda is in linear scale here
+rmsd_cut_sigmoid <- predict(objp, list(xp = lambda_cut) )
+message(
+    'threshold map (sigmoidal): ',
+    'lambda = ', lambda_cut, ', ',
+    'RMSD = ', signif( rmsd_cut_sigmoid, 3 )
+)
+
 # invert relationship, failed :(
 # y ~ a * (x^b - 1) / (x^b + 1)
 # y * (x^b + 1) ~ a * (x^b - 1)
@@ -213,6 +224,15 @@ lines(
     lty = lty_fit_loglin,
     col = col_fit_loglin
 )
+# report on the RMSD predicted for lambda = 1.05
+# lambda is in linear scale here too
+rmsd_cut_loglin <- log( lambda_cut ) / lm_m
+message(
+    'threshold map (log-linear): ',
+    'lambda = ', lambda_cut, ', ',
+    'RMSD = ', signif( rmsd_cut_loglin, 3 )
+)
+
 
 # randomize rows so last dataset doesn't just overlap previous datasets
 tib_main <- tib_main[ sample( nrow(tib_main) ), ]
