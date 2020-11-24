@@ -1,8 +1,13 @@
 # extensions to ignore
 *.RData
+*.eigenval
+*.eigenvec
+*.grm.*
 */rep-*/
+bad/
 sum-num-reps.pdf
 sum-rmsd-vs-lambda.pdf
 sum-pca-num-reps.pdf
 sum-pca-rmsd-vs-lambda.pdf
 sum-pca-rmsd-auc.pdf
+pca-comparison2.pdf
