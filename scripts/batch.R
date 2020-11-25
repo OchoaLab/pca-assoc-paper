@@ -20,6 +20,10 @@ script <- if ( plink ) 'real-06-pca-plink.R' else 'real-05-gcta.R'
 # so names don't overlap between plink and gcta runs
 short <- paste0( short, if (plink) 'p' else 'g' )
 
+# needed to make sure each process gets enough memory if all my jobs saturate the machines
+# (didn't have to change last time, but before TGP was thinned I needed 4 threads for GCTA runs)
+threads <- 1
+
 # main submission steps
 # global vars: script, bfile, short, mem, plink
 submit_rep_pcs <- function(
@@ -32,6 +36,7 @@ submit_rep_pcs <- function(
         ' --bfile ', bfile,
         ' -r ', rep,
         ' --n_pcs ', pcs,
+        ' -t ', threads,
         ' --dcc'
 #        ' --sim'
     )
@@ -54,7 +59,8 @@ submit_rep_pcs <- function(
     batch_writer(
         commands,
         name,
-        mem = mem
+        mem = mem,
+   	threads = threads
     )
 
     # submit job!
