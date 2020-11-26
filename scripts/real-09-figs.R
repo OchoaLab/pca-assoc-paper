@@ -47,7 +47,7 @@ if (pca_test) {
     # pure plink version is only PCA version, add LMM too
     method_to_label <- list(
         'pca-plink-pure' = 'Fixed effects (PCA)',
-        gcta = 'Mixed effects (LMM+PCA)'
+        gcta = 'Mixed effects (LMM)'
     )
     name_base <- 'sum-'
 }
@@ -234,7 +234,8 @@ boxplots_rmsd_auc <- function(
                               data_auc,
                               r_max,
                               legend_pos = 'topright',
-                              alpha = 0.5
+                              alpha = 0.5,
+                              shift_unit = 0.3
                               ) {
     # get common range of data plotted
     # always include zero in range for both
@@ -243,10 +244,12 @@ boxplots_rmsd_auc <- function(
     
     # make labels
     # blank all non-multiples of 10, for plot
-    rs <- 0 : r_max
+    at <- 0 : r_max # locations of boxed more generally
+    rs <- at
     rs[ rs %% 10 != 0 ] <- NA
-    # overlaid panels have all blanks (R doesn't handle this correctly otherwise)
-    rs_blank <- rep.int( NA, r_max+1)
+    # set a tighter xlim (default leaves lots of space on the sides)
+    # note that length( at ) = ( r_max + 1 ), so limits are (min+2, max-2)
+    xlim <- range( at[ 3 : ( r_max - 1 ) ] )
     
     # add transarency to colors!!!
     method_cols_alpha <- alpha(method_cols, alpha)
@@ -258,7 +261,7 @@ boxplots_rmsd_auc <- function(
     whisklty <- 1 # whisker line type (default 2?)
     
     # start PDF
-    fig_start(name_out, width = 7, height = 5, mar_b = 1.5)
+    fig_start(name_out, width = 7, height = 4, mar_b = 1.5)
     # add lower margin, so inner margins can be even smaller
     par( oma = c(1.5, 0, 0, 0) )
     # two panels
@@ -270,22 +273,31 @@ boxplots_rmsd_auc <- function(
     for ( method in methods ) {
         # get index to match colors up
         i <- which( methods == method )
+        # method index controls shift
+        # recall boxes are in units of 1, so `shift_unit` is the shift unit as a fraction of that
+        shift <- ( i - 1 ) * shift_unit
         # first method has some special cases
         is_first <- i == 1
         # plot data!
         boxplot(
             data_rmsd[[ method ]],
             add = !is_first, # add all but first time
-            names = if ( is_first ) rs else rs_blank,
+            # don't redraw axes after first time
+            xaxt = if ( is_first ) 's' else 'n',
+            yaxt = if ( is_first ) 's' else 'n',
+            xlim = xlim,
+            names = rs, # only used first time because of `xaxt`
             xlab = "",
-            ylab = if ( is_first ) lab_rmsd else '',
+            ylab = lab_rmsd, # only used first time because of `add`
             ylim = range_rmsd,
             border = method_cols_alpha[ i ],
             col = NA,
             outline = outline,
             range = range,
             whisklty = whisklty,
-            medlwd = medlwd
+            medlwd = medlwd,
+            # to stagger boxes a bit
+            at = at + shift
         )
         # do this for first method of panel only
         if ( is_first ) {
@@ -308,22 +320,31 @@ boxplots_rmsd_auc <- function(
     for ( method in methods ) {
         # get index to match colors up
         i <- which( methods == method )
+        # method index controls shift
+        # recall boxes are in units of 1, so `shift_unit` is the shift unit as a fraction of that
+        shift <- ( i - 1 ) * shift_unit
         # first method has some special cases
         is_first <- i == 1
         # plot data!
         boxplot(
             data_auc[[ method ]],
             add = !is_first, # add all but first time
-            names = if ( is_first ) rs else rs_blank,
+            # don't redraw axes after first time
+            xaxt = if ( is_first ) 's' else 'n',
+            yaxt = if ( is_first ) 's' else 'n',
+            xlim = xlim,
+            names = rs, # only used first time because of `xaxt`
             xlab = '',
-            ylab = if ( is_first ) lab_auc else '',
+            ylab = lab_auc, # only used first time because of `add`
             ylim = range_auc,
             border = method_cols_alpha[ i ],
             col = NA,
             outline = outline,
             range = range,
             whisklty = whisklty,
-            medlwd = medlwd
+            medlwd = medlwd,
+            # to stagger boxes a bit
+            at = at + shift
         )
         # do this for first method of panel only
         if ( is_first ) {
