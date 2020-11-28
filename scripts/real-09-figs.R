@@ -4,10 +4,13 @@ library(optparse)
 library(scales) # for transparency
 library(readr)
 library(ochoalabtools)
+# shared code with another plotting function that spans several datasets
+source('plot-auc-rmsd.R')
 
 # constants
 # output file name (big table)
 file_table <- 'sum.txt'
+rep_max <- 50
 
 ############
 ### ARGV ###
@@ -75,7 +78,7 @@ pcs <- sort( as.numeric( unique( tib$pc ) ) )
 
 # a hack to only plot complete reps
 if ( opt$complete ) {
-    for ( rep in 1:50 ) {
+    for ( rep in 1 : rep_max ) {
         # subset for a bit
         tib2 <- tib[ tib$rep == rep, ]
         rep_good <- TRUE # boolean that remembers if things were ok for this rep
@@ -121,20 +124,23 @@ for ( i in 1 : nrow( counts ) ) {
         counts[ i, j ] <- sum( tib_i$pc == pc )
     }
 }
-# simple plot of progress (shows partial run status, not all replicates complete)
-fig_start(
-    paste0( name_base, 'num-reps' ),
-    width = 12
-)
-barplot(
-    counts,
-    beside = TRUE,
-    xlab = '# PCs',
-    ylab = 'replicates',
-    legend.text = unlist( method_to_label ),
-    col = method_cols
-)
-fig_end()
+# don't plot anything if this is trivial
+if ( any( counts < rep_max ) ) {
+    # simple plot of progress (shows partial run status, not all replicates complete)
+    fig_start(
+        paste0( name_base, 'num-reps' ),
+        width = 12
+    )
+    barplot(
+        counts,
+        beside = TRUE,
+        xlab = '# PCs',
+        ylab = 'replicates',
+        legend.text = unlist( method_to_label ),
+        col = method_cols
+    )
+    fig_end()
+}
 
 ################
 ### NUM FAIL ###
@@ -187,9 +193,9 @@ if ( any( counts > 0 ) ) {
     fig_end()
 }
 
-################
-### AUC/RMSD ###
-################
+#########################
+### AUC/RMSD BOXPLOTS ###
+#########################
 
 # default legend position
 legend_pos <- 'topright'
@@ -198,202 +204,14 @@ if (name == 'sim-n100-k10-f0.1-s0.5-g1' && !pca_test)
     legend_pos <- 'bottomleft'
 
 # gather data into lists, best for boxplots
-data_rmsd <- list()
-data_auc <- list()
-for ( method in methods ) {
-    # sublists we want
-    data_rmsd_i <- list()
-    data_auc_i <- list()
-    # subset big table
-    tib_i <- tib[ tib$method == method, ]
-    for ( pc in pcs ) {
-        # subset table more
-        tib_ij <- tib_i[ tib_i$pc == pc, ]
-        # transfer vectors to lists
-        # (shift index, since R doesn't like zero index)
-        data_rmsd_i[[ pc+1 ]] <- tib_ij$rmsd
-        data_auc_i[[ pc+1 ]] <- tib_ij$auc
-    }
-    # copy sublists to big lists
-    data_rmsd[[ method ]] <- data_rmsd_i
-    data_auc[[ method ]] <- data_auc_i
-}
-
-# plotting labels
-lab_rmsd <- expression( bold( SRMSD[p] ) )
-lab_auc <- expression( bold( AUC[PR] ) )
-lab_lambda <- expression( bold( paste("Inflation Factor (", lambda, ")") ) )
-
-# global vars:
-# - methods
-# - method_to_label
-# - method_cols
-boxplots_rmsd_auc <- function(
-                              name_out,
-                              data_rmsd,
-                              data_auc,
-                              r_max,
-                              legend_pos = 'topright',
-                              alpha = 0.5,
-                              shift_unit = 0.3
-                              ) {
-    # get common range of data plotted
-    # always include zero in range for both
-    range_rmsd <- range( 0, unlist(data_rmsd), na.rm = TRUE)
-    range_auc <- range( 0, unlist(data_auc), na.rm = TRUE)
-    
-    # make labels
-    # blank all non-multiples of 10, for plot
-    at <- 0 : r_max # locations of boxed more generally
-    rs <- at
-    rs[ rs %% 10 != 0 ] <- NA
-    # set a tighter xlim (default leaves lots of space on the sides)
-    # note that length( at ) = ( r_max + 1 ), so limits are (min+2, max-2)
-    xlim <- range( at[ 3 : ( r_max - 1 ) ] )
-    
-    # add transarency to colors!!!
-    method_cols_alpha <- alpha(method_cols, alpha)
-    
-    # other shared params (same as standard boxplot)
-    outline <- FALSE # no outliers plotted separately (so busy as it is)
-    #  range <- 0 # make whiskers extend to full range
-    range <- 1.5 # default whiskers range
-    whisklty <- 1 # whisker line type (default 2?)
-    
-    # start PDF
-    fig_start(name_out, width = 7, height = 4, mar_b = 1.5)
-    # add lower margin, so inner margins can be even smaller
-    par( oma = c(1.5, 0, 0, 0) )
-    # two panels
-    par( mfrow = c(2, 1) )
-    # get this param after fig_start (which modifies lwd)
-    medlwd <- par('lwd') # median line width (default is 3 times this)
-    # boxplots!
-    # top panel
-    for ( method in methods ) {
-        # get index to match colors up
-        i <- which( methods == method )
-        # method index controls shift
-        # recall boxes are in units of 1, so `shift_unit` is the shift unit as a fraction of that
-        shift <- ( i - 1 ) * shift_unit
-        # first method has some special cases
-        is_first <- i == 1
-        # plot data!
-        boxplot(
-            data_rmsd[[ method ]],
-            add = !is_first, # add all but first time
-            # don't redraw axes after first time
-            xaxt = if ( is_first ) 's' else 'n',
-            yaxt = if ( is_first ) 's' else 'n',
-            xlim = xlim,
-            names = rs, # only used first time because of `xaxt`
-            xlab = "",
-            ylab = lab_rmsd, # only used first time because of `add`
-            ylim = range_rmsd,
-            border = method_cols_alpha[ i ],
-            col = NA,
-            outline = outline,
-            range = range,
-            whisklty = whisklty,
-            medlwd = medlwd,
-            # to stagger boxes a bit
-            at = at + shift
-        )
-        # do this for first method of panel only
-        if ( is_first ) {
-            # mark zero line, significant in both metrics
-            abline(
-                h = 0,
-                lty = 2,
-                col = 'gray'
-            )
-            # add legend to top panel only
-            legend(
-                legend_pos,
-                unlist( method_to_label ),
-                text.col = method_cols,
-                bty = 'n'
-            )
-        }
-    }
-    # bottom panel
-    for ( method in methods ) {
-        # get index to match colors up
-        i <- which( methods == method )
-        # method index controls shift
-        # recall boxes are in units of 1, so `shift_unit` is the shift unit as a fraction of that
-        shift <- ( i - 1 ) * shift_unit
-        # first method has some special cases
-        is_first <- i == 1
-        # plot data!
-        boxplot(
-            data_auc[[ method ]],
-            add = !is_first, # add all but first time
-            # don't redraw axes after first time
-            xaxt = if ( is_first ) 's' else 'n',
-            yaxt = if ( is_first ) 's' else 'n',
-            xlim = xlim,
-            names = rs, # only used first time because of `xaxt`
-            xlab = '',
-            ylab = lab_auc, # only used first time because of `add`
-            ylim = range_auc,
-            border = method_cols_alpha[ i ],
-            col = NA,
-            outline = outline,
-            range = range,
-            whisklty = whisklty,
-            medlwd = medlwd,
-            # to stagger boxes a bit
-            at = at + shift
-        )
-        # do this for first method of panel only
-        if ( is_first ) {
-            # mark zero line, significant in both metrics
-            abline(
-                h = 0,
-                lty = 2,
-                col = 'gray'
-            )
-        }
-    }
-    # add outer margin
-    mtext(
-        "Number of PCs (r)",
-        side = 1,
-        line = 0.5,
-        adj = 0.55,
-        outer = TRUE
-    )
-    fig_end()
-}
+data <- tibble_to_lists_rmsd_auc( tib )
 
 # actually make plot
-# for main figure output (goes on papers)
-boxplots_rmsd_auc(
+# for main figure output (goes on papers, presentations)
+lineplots_rmsd_auc(
     name_out = paste0( name_base, 'rmsd-auc' ),
-    data_rmsd = data_rmsd,
-    data_auc = data_auc,
+    data_rmsd = data$rmsd,
+    data_auc = data$auc,
     r_max = max( pcs ),
     legend_pos = legend_pos
 )
-
-######################
-### LAMBDA vs RMSD ###
-######################
-
-# kinda boring in this case, only make in main output
-if ( !pca_test ) {
-    # this was surprisingly cleaner than expected
-    fig_start(
-        paste0( name_base, 'rmsd-vs-lambda' )
-    )
-    plot(
-        tib$rmsd,
-        tib$lambda,
-        xlab = lab_rmsd,
-        ylab = lab_lambda,
-        log = 'y',
-        pch = '.'
-    )
-    fig_end()
-}
