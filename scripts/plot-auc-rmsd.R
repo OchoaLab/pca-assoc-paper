@@ -122,7 +122,7 @@ leg_mean_quarts <- function( alpha_q, alpha_e, x = '', col = 'black', cex = 0.7 
 # - methods
 # - method_cols
 # - alpha_q, alpha_e
-lineplots_rmsd_auc_one_panel <- function( data, lab, r_max, guide_max = FALSE ) {
+lineplots_rmsd_auc_one_panel <- function( data, lab, r_max, guide_max = FALSE, main = '' ) {
     # assumes PDF or whatever device has been created, and panels laid out
     # does not plot legends (that's external, for more control)
     
@@ -141,7 +141,8 @@ lineplots_rmsd_auc_one_panel <- function( data, lab, r_max, guide_max = FALSE ) 
         xlim = xlim,
         ylim = ylim,
         xlab = "", # will use outer labels here
-        ylab = lab
+        ylab = lab,
+        main = main
     )
     
     # background stuff

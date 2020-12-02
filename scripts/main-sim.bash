@@ -189,3 +189,6 @@ Rscript sim-10-measures-fig.R 13
 # Inflation factor: gcta: 0.977811992816224
 # Inflation factor: pca-plink-pure: 2.55503828726139
 # Inflation factor: gcta: 0.861113356022774
+
+# final plot gathers all three simulations into a single multipanel figure
+time Rscript real-15-plots-big.R

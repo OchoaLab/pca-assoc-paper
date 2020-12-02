@@ -173,3 +173,6 @@ time Rscript real-14-report-m-causal.R
 # HoPacAll_ld_prune_1000kb_0.3: 292
 # hgdp_wgs_autosomes_ld_prune_1000kb_0.3: 93
 # all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1: 250
+
+# final plot gathers all three datasets into a single multipanel figure
+time Rscript real-15-plots-big.R --real
