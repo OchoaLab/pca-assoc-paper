@@ -176,3 +176,11 @@ time Rscript real-14-report-m-causal.R
 
 # final plot gathers all three datasets into a single multipanel figure
 time Rscript real-15-plots-big.R --real
+
+### MAF code
+## first gather MAF vectors from raw data
+time Rscript real-16-mafs.R
+# 1m57.285s ideapad
+## then make plot
+time Rscript real-17-mafs-plot.R
+# 0m13.937s ideapad
