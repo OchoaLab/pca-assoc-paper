@@ -21,7 +21,9 @@ option_list = list(
     make_option("--complete", action = "store_true", default = FALSE, 
                 help = "Plot only complete replicates (useful for partial runs)"),
     make_option("--cut", type = "double", default = 0.01, 
-                help = "P-value threshold for Wilcoxon 2-sample comparisons", metavar = 'double')
+                help = "P-value threshold for Wilcoxon 2-sample comparisons", metavar = 'double'),
+    make_option("--const_herit_loci", action = "store_true", default = FALSE, 
+                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -30,6 +32,7 @@ opt <- parse_args(opt_parser)
 # get values
 name <- opt$bfile
 cut <- opt$cut
+const_herit_loci <- opt$const_herit_loci
 
 # stop if name is missing
 if ( is.na(name) )
@@ -46,6 +49,10 @@ name_base <- 'sum-'
 # move to where the data is
 setwd( '../data/' )
 setwd( name )
+
+# if const_herit_loci is true, move to directory containing input and outputs
+if ( const_herit_loci )
+    setwd( 'const_herit_loci' )
 
 # read the big table!
 tib <- read_tsv(

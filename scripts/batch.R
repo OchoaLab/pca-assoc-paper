@@ -2,9 +2,9 @@ library(ochoalabtools)
 
 # slurm job submission script for DCC
 
-# shared items for all HGDP runs
-plink <- FALSE
-## plink <- TRUE
+# shared items for all runs
+plink <- TRUE
+## plink <- FALSE
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short <- 'l'
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'; short <- 'f'
 bfile <- 'HoPacAll_ld_prune_1000kb_0.3'; short <- 'h'
@@ -37,6 +37,7 @@ submit_rep_pcs <- function(
         ' -r ', rep,
         ' --n_pcs ', pcs,
         ' -t ', threads,
+        '--const_herit_loci', # NEW!
         ' --dcc'
 #        ' --sim'
     )

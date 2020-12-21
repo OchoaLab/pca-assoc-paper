@@ -24,7 +24,9 @@ option_list = list(
     make_option(c("-r", "--rep"), type = "integer", default = 50,
                 help = "Max replicates", metavar = "int"),
     make_option(c("-t", "--test"), action = "store_true", default = FALSE, 
-                help = "Test run (makes sure no files are missing, but doesn't actually move anything.  However, output directories are created.)")
+                help = "Test run (makes sure no files are missing, but doesn't actually move anything.  However, output directories are created.)"),
+    make_option("--const_herit_loci", action = "store_true", default = FALSE, 
+                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -34,6 +36,7 @@ opt <- parse_args(opt_parser)
 name <- opt$bfile
 rep_max <- opt$rep
 n_pcs_max <- opt$n_pcs
+const_herit_loci <- opt$const_herit_loci
 
 # stop if name is missing
 if ( is.na(name) )
@@ -48,12 +51,16 @@ dir_dest <- paste0( dir_dest, name )
 if ( !dir.exists( dir_dest ) )
     dir.create( dir_dest )
 
+dir_phen <- if ( const_herit_loci ) '/const_herit_loci' else ''
+
 for ( rep in 1 : rep_max ) {
     # move higher to the "reps" location
-    dir_rep <- paste0( 'rep-', rep )
+    # this `dir_rep` includes `const_herit_loci` bit
+    dir_rep <- paste0( 'rep-', rep, dir_phen )
     setwd( dir_rep )
-
+    
     # create the same dir in the destination, if needed
+    # NOTE: inherits `const_herit_loci` bit from `dir_rep`
     dir_out <- paste0( dir_dest, '/', dir_rep )
     if ( !dir.exists( dir_out ) )
         dir.create( dir_out )
@@ -78,4 +85,9 @@ for ( rep in 1 : rep_max ) {
     
     # move back down when done with this rep
     setwd( '..' )
+    # move back one more level in this case
+    if ( const_herit_loci )
+        setwd( '..' )
 }
+
+print( warnings() )

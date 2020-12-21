@@ -33,7 +33,9 @@ option_list = list(
     make_option("--dcc", action = "store_true", default = FALSE, 
                 help = "Duke Compute Cluster runs (alters paths only)"),
     make_option(c("-t", "--threads"), type = "integer", default = 0, 
-                help = "number of threads (default use all cores if not DCC, 1 core if DCC)", metavar = "int")
+                help = "number of threads (default use all cores if not DCC, 1 core if DCC)", metavar = "int"),
+    make_option("--const_herit_loci", action = "store_true", default = FALSE, 
+                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -44,6 +46,7 @@ name <- opt$bfile
 rep <- opt$rep
 n_pcs <- opt$n_pcs
 threads <- opt$threads
+const_herit_loci <- opt$const_herit_loci
 
 # figure out what threads should be
 # above default should be modified if --dcc and if the threads aren't zero (default, means use all, which we should never do on a cluster!)
@@ -87,21 +90,10 @@ message(
     ', pcs: ', n_pcs
 )
 
-# file to create
-file_out <- paste0( 'pvals_', method, '_', n_pcs, '.txt.gz' )
-
-# do not redo run if output was already present!
-if ( file.exists( file_out ) )
-    stop( 'Output already exists, skipping: ', file_out )
-
 # genotypes, PCs:
 # - in real data, are all in lower level (shared across reps)
 # - in simulated data, are all in current level (not shared across reps)
 name_in_lower <- if ( opt$sim ) name_in else paste0( '../', name_in )
-
-# output name for plink runs should have number of PCs, so concurrent runs don't overwrite each other
-# not used in any final outputs (so only goal is to avoid concurrent run overlaps)
-name_out <- paste0( 'plink_', name_pcs, '_', n_pcs )
 
 file_covar <- paste0( name_in_lower, '-', name_pcs, '-n_pcs_', n_pcs, '.eigenvec' )
 # there's no covariates file to pass if we want zero PCs
@@ -109,11 +101,29 @@ file_covar <- paste0( name_in_lower, '-', name_pcs, '-n_pcs_', n_pcs, '.eigenvec
 if ( n_pcs == 0 )
     file_covar <- NULL
 
+# adjust paths if using const_herit_loci model
+dir_phen <- '' # current dir
+# use subdir instead in this case
+if ( const_herit_loci )
+    dir_phen <- 'const_herit_loci/'
+
+# only these are in dir_phen
+name_phen <- paste0( dir_phen, name_in )
+# output name for plink runs should have number of PCs, so concurrent runs don't overwrite each other
+# not used in any final outputs (so only goal is to avoid concurrent run overlaps)
+name_out <- paste0( dir_phen, 'plink_', name_pcs, '_', n_pcs )
+# file to create
+file_out <- paste0( dir_phen, 'pvals_', method, '_', n_pcs, '.txt.gz' )
+
+# do not redo run if output was already present!
+if ( file.exists( file_out ) )
+    stop( 'Output already exists, skipping: ', file_out )
+
 # actual run
 obj <- gas_plink(
     plink2_bin,
     name = name_in_lower,
-    name_phen = name_in,
+    name_phen = name_phen,
     name_out = name_out, # write outputs into current level, add number of PCs
     file_covar = file_covar,
     threads = threads,

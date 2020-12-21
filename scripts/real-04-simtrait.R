@@ -22,7 +22,9 @@ option_list = list(
     ## make_option("--m_causal", type = "integer", default = 1000,
     ##             help = "num causal loci", metavar = "int"),
     make_option(c("-r", "--rep"), type = "integer", default = 1,
-                help = "Replicate number", metavar = "int")
+                help = "Replicate number", metavar = "int"),
+    make_option("--const_herit_loci", action = "store_true", default = FALSE, 
+                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -33,6 +35,7 @@ name <- opt$bfile
 herit <- opt$herit
 ## m_causal <- opt$m_causal
 rep <- opt$rep
+const_herit_loci <- opt$const_herit_loci
 
 # stop if name is missing
 if ( is.na(name) )
@@ -64,7 +67,8 @@ obj_trait <- sim_trait(
     X = X,
     m_causal = m_causal,
     herit = herit,
-    kinship = kinship
+    kinship = kinship,
+    const_herit_loci = const_herit_loci
 )
 # extract data of interest
 # trait vector
@@ -84,6 +88,20 @@ if( !dir.exists( dir_out ) )
     dir.create( dir_out )
 # now move in there
 setwd( dir_out )
+
+# if const_herit_loci is true, create a new directory and move there, where the new data will go (so nothing gets overwritten, have both versions together)
+if ( const_herit_loci ) {
+    dir_out <- 'const_herit_loci'
+    # let's not overwrite things, under the assumption that the simulations are very expensive to redo
+    # if the output directory exists, assume all the files we want are there too.  Only a non-existent output directory will work
+    if ( dir.exists( dir_out ) ) {
+        stop('Output exists, will not overwrite: ', dir_out)
+    } else {
+        # create directory and move into there
+        dir.create( dir_out )
+        setwd( dir_out )
+    }
+}
 
 # now save, as R data
 save(

@@ -24,7 +24,9 @@ option_list = list(
     make_option(c("-r", "--rep"), type = "integer", default = 50,
                 help = "Max replicates", metavar = "int"),
     make_option(c("-a", "--archived"), action = "store_true", default = FALSE, 
-                help = "Data is archived (changes search paths)")
+                help = "Data is archived (changes search paths)"),
+    make_option("--const_herit_loci", action = "store_true", default = FALSE, 
+                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -35,6 +37,7 @@ name <- opt$bfile
 rep_max <- opt$rep
 n_pcs_max <- opt$n_pcs
 archived <- opt$archived
+const_herit_loci <- opt$const_herit_loci
 
 # stop if name is missing
 if ( is.na(name) )
@@ -62,6 +65,20 @@ for ( rep in 1 : rep_max ) {
         next
     setwd( dir_out )
     
+    # move in an additional level in this case
+    if ( const_herit_loci ) {
+        dir_phen <- 'const_herit_loci/'
+        # directory can be missing, skip in that case
+        if ( !dir.exists( dir_phen ) ) {
+            # just move down from rep-* case
+            setwd( '..' )
+            # skip rest
+            next
+        }
+        # else move in
+        setwd( dir_phen )
+    }
+    
     # start a big loop
     for ( method in methods ) {
         for ( n_pcs in 0 : n_pcs_max ) {
@@ -83,12 +100,25 @@ for ( rep in 1 : rep_max ) {
     
     # move back down when done with this rep
     setwd( '..' )
+    # move back an additional level in this case
+    if ( const_herit_loci )
+        setwd( '..' )
 }
 
 if ( archived ) {
     # just switch back to ordinary data location
     setwd( dir_orig )
     setwd( name )
+}
+
+# if const_herit_loci is true, create a new directory (if it doesn't already exist) and move there
+if ( const_herit_loci ) {
+    dir_out <- 'const_herit_loci'
+    # create first time, if needed
+    if ( !dir.exists( dir_out ) )
+        dir.create( dir_out )
+    # move there
+    setwd( dir_out )
 }
 
 # write the big table to file!

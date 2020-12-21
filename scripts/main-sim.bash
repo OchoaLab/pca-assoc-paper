@@ -8,23 +8,6 @@
 # this is like my older FST work
 # but unlike my main gas-rgls sim (instead has: -k 3 -f 0.3)
 
-### construct admixture proportions, ancestral inbreeding, and family structure if needed
-# done once, shared across replicates
-
-# the large sample size simulation
-time Rscript sim-00-sim-pop.R # -n 1000 -g 1
-# 0m1.047s ideapad
-
-# the small sample size simulation
-time Rscript sim-00-sim-pop.R -n 100 # -g 1
-# 0m0.783s ideapad
-
-# the family structure simulation
-time Rscript sim-00-sim-pop.R -g 20 # -n 1000
-# 0m13.656s ideapad (concurrent with plink, so probably would have been faster)
-
-### construct genotype matrices
-
 # params shared across reps
 # use right set for each case
 
@@ -57,6 +40,15 @@ mc=$(( n / 10 ))
 g=1
 # hacks to use "real" data scripts on simulations
 name="sim-n$n-k10-f0.1-s0.5-g$g"
+
+# construct admixture proportions, ancestral inbreeding, and family structure if needed
+# done once, shared across replicates
+time Rscript sim-00-sim-pop.R -n $n -g $g
+# large: 0m1.047s ideapad
+# small: 0m0.783s ideapad
+# family: 0m13.656s ideapad (concurrent with plink, so probably would have been faster)
+
+### construct genotype matrices, traits, etc
 
 for rep in {1..50}; do
     # draw random genotypes
@@ -192,3 +184,65 @@ Rscript sim-10-measures-fig.R 13
 
 # final plot gathers all three simulations into a single multipanel figure
 time Rscript real-15-plots-big.R
+
+########################
+### const_herit_loci ###
+########################
+
+# addition to complement existing analysis with alternative trait from const_herit_loci model
+# not sure if it will make a meaningful difference
+# NOTE: many steps that depend on genotypes only aren't redone (are shared from prev run)
+
+for rep in {1..50}; do
+    time Rscript sim-02-sim-trait.R --bfile $name -r $rep --m_causal $mc --const_herit_loci
+
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink
+    for pcs in {0..90}; do
+	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs --plink --const_herit_loci
+    done
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink --clean
+
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep
+    for pcs in {0..90}; do
+	time Rscript real-05-gcta.R --sim --bfile $name -r $rep --n_pcs $pcs --const_herit_loci
+    done
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --clean
+done
+
+time Rscript real-07-auc-rmsd.R --sim --bfile $name -r 50 --n_pcs 90 --const_herit_loci
+time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
+
+time Rscript real-09-figs.R --bfile $name --const_herit_loci
+time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --final --const_herit_loci
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci -t # test first!
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
+
+Rscript real-13-stats.R --bfile $name --const_herit_loci
+# LARGE
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      90     4
+# 2 pca-plink-pure auc        4     3
+# 3 gcta           rmsd       0     0
+# 4 gcta           auc        1     0
+# best rmsd: pca-plink-pure (significant)
+# best auc: gcta (significant)
+#
+# SMALL
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      84     2
+# 2 pca-plink-pure auc        1     1
+# 3 gcta           rmsd       0     0
+# 4 gcta           auc        0     0
+# best rmsd: gcta (tie)
+# best auc: gcta (significant)
+#
+# FAMILY
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      90    85
+# 2 pca-plink-pure auc       24     5
+# 3 gcta           rmsd       0     0
+# 4 gcta           auc        0     0
+# best rmsd: gcta (significant)
+# best auc: gcta (significant)
+
+time Rscript real-15-plots-big.R --const_herit_loci

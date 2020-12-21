@@ -30,7 +30,9 @@ option_list = list(
     make_option("--dcc", action = "store_true", default = FALSE, 
                 help = "Duke Compute Cluster runs (alters paths only)"),
     make_option(c("-t", "--threads"), type = "integer", default = 0, 
-                help = "number of threads (default use all cores if not DCC, 1 core if DCC)", metavar = "int")
+                help = "number of threads (default use all cores if not DCC, 1 core if DCC)", metavar = "int"),
+    make_option("--const_herit_loci", action = "store_true", default = FALSE, 
+                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -41,6 +43,7 @@ name <- opt$bfile
 rep <- opt$rep
 n_pcs <- opt$n_pcs
 threads <- opt$threads
+const_herit_loci <- opt$const_herit_loci
 
 # figure out what threads should be
 # above default should be modified if --dcc and if the threads aren't zero (default, means use all, which we should never do on a cluster!)
@@ -78,26 +81,33 @@ message(
     ', pcs: ', n_pcs
 )
 
-# file to create
-file_out <- paste0( 'pvals_', method, '_', n_pcs, '.txt.gz' )
-
-# do not redo run if output was already present!
-if ( file.exists( file_out ) )
-    stop( 'Output already exists, skipping: ', file_out )
-
 # genotypes, PCs:
 # - in real data, are all in lower level (shared across reps)
 # - in simulated data, are all in current level (not shared across reps)
 name_in_lower <- if ( opt$sim ) name_in else paste0( '../', name_in )
 
+# adjust paths if using const_herit_loci model
+dir_phen <- '' # current dir
+# use subdir instead in this case
+if ( const_herit_loci )
+    dir_phen <- 'const_herit_loci/'
+
+# only these are in dir_phen
+name_phen <- paste0( dir_phen, name_in )
 # output name for GCTA runs should have number of PCs, so concurrent runs don't overwrite each other
-name_out <- paste0( 'gcta_', n_pcs )
+name_out <- paste0( dir_phen, 'gcta_', n_pcs )
+# file to create
+file_out <- paste0( dir_phen, 'pvals_', method, '_', n_pcs, '.txt.gz' )
+
+# do not redo run if output was already present!
+if ( file.exists( file_out ) )
+    stop( 'Output already exists, skipping: ', file_out )
 
 # actual GWAS
 obj <- gas_lmm_gcta(
     gcta_bin = gcta_bin,
     name = name_in_lower, # genotypes, GRM, PCA are all in lower level (shared across reps)
-    name_phen = name_in, # phenotype is in current level
+    name_phen = name_phen,
     name_out = name_out, # write outputs into current level, add number of PCs
     threads = threads,
     n_pcs = n_pcs

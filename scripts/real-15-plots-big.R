@@ -86,7 +86,9 @@ legend_pos <- 'topright'
 # define options
 option_list = list(
     make_option("--real", action = "store_true", default = FALSE, 
-                help = "Process real datasets (default: simulated datasets)")
+                help = "Process real datasets (default: simulated datasets)"),
+    make_option("--const_herit_loci", action = "store_true", default = FALSE, 
+                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -97,6 +99,9 @@ if ( opt$real ) {
     datasets <- datasets_real
     name_out <- name_out_real
 }
+# get values
+const_herit_loci <- opt$const_herit_loci
+
 
 ################
 ### DATA/FIG ###
@@ -104,6 +109,16 @@ if ( opt$real ) {
 
 # move to where the data is
 setwd( '../data/' )
+
+# move in an additional level in this case
+dir_phen <- 'const_herit_loci'
+if ( const_herit_loci ) {
+    # create directory if it didn't already exist
+    if ( !dir.exists( dir_phen ) )
+        dir.create( dir_phen )
+    # now move in
+    setwd( dir_phen )
+}
 
 # start PDF
 fig_start(name_out, width = width_max, height = height_max)
@@ -119,9 +134,15 @@ layout(
 par( lab = c(10, 3, 7) )
 
 # load each of our datasets
+# move back one more level in this case
+if ( const_herit_loci )
+    setwd( '..' )
 for ( index_dataset in 1 : nrow( datasets ) ) {
     name <- datasets$name_long[ index_dataset ]
     setwd( name )
+    # move in one more level in this case
+    if ( const_herit_loci )
+        setwd( dir_phen )
 
     # read the big table!
     tib <- read_tsv(
@@ -163,6 +184,9 @@ for ( index_dataset in 1 : nrow( datasets ) ) {
 
     # go back down, for next dataset
     setwd( '..' )
+    # move back one more level in this case
+    if ( const_herit_loci )
+        setwd( '..' )
 }
 
 # add outer margin label
