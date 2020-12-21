@@ -37,7 +37,7 @@ submit_rep_pcs <- function(
         ' -r ', rep,
         ' --n_pcs ', pcs,
         ' -t ', threads,
-        '--const_herit_loci', # NEW!
+        ' --const_herit_loci', # NEW!
         ' --dcc'
 #        ' --sim'
     )
