@@ -21,16 +21,6 @@ g=1
 # hacks to use "real" data scripts on simulations
 name="sim-n$n-k10-f0.1-s0.5-g$g"
 
-## FAMILY STRUCTURE
-# sample size (normal n=1000, small n=100)
-n=1000
-# number of causal loci should scale with n
-mc=$(( n / 10 ))
-# to create family structure (g=20) or not (g=1)
-g=20
-# hacks to use "real" data scripts on simulations
-name="sim-n$n-k10-f0.1-s0.5-g$g"
-
 ## SMALL SAMPLE SIZE
 # sample size (normal n=1000, small n=100)
 n=100
@@ -38,6 +28,16 @@ n=100
 mc=$(( n / 10 ))
 # to create family structure (g=20) or not (g=1)
 g=1
+# hacks to use "real" data scripts on simulations
+name="sim-n$n-k10-f0.1-s0.5-g$g"
+
+## FAMILY STRUCTURE
+# sample size (normal n=1000, small n=100)
+n=1000
+# number of causal loci should scale with n
+mc=$(( n / 10 ))
+# to create family structure (g=20) or not (g=1)
+g=20
 # hacks to use "real" data scripts on simulations
 name="sim-n$n-k10-f0.1-s0.5-g$g"
 
@@ -135,12 +135,21 @@ time Rscript real-09-figs.R --bfile $name --pca
 Rscript real-13-stats.R --bfile $name
 # LARGE
 #   method         metric  best   min
-# 1 pca-plink-pure rmsd      45     3
+# 1 pca-plink-pure rmsd      21     3 # OLD 45,3
 # 2 pca-plink-pure auc        3     3
 # 3 gcta           rmsd       0     0
 # 4 gcta           auc        1     0
-# best rmsd: pca-plink-pure (significant)
+# best rmsd: pca-plink-pure (tie) # OLD significant
 # best auc: gcta (significant)
+#
+# SMALL
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd       5     2 # OLD 88,3
+# 2 pca-plink-pure auc        2     1
+# 3 gcta           rmsd       0     0
+# 4 gcta           auc        0     0
+# best rmsd: gcta (significant) # OLD: pca-plink-pure (tie)
+# best auc: gcta (tie)
 #
 # FAMILY
 #   method         metric  best   min
@@ -150,16 +159,6 @@ Rscript real-13-stats.R --bfile $name
 # 4 gcta           auc        0     0
 # best rmsd: gcta (significant)
 # best auc: gcta (significant)
-#
-# SMALL
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      88     3
-# 2 pca-plink-pure auc        2     1
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        0     0
-# best rmsd: pca-plink-pure (tie)
-# best auc: gcta (tie)
-
 
 # tests that p-value vectors have the right lengths of m_loci
 # to make sure nothing was corrupted due to scripts stopping unexpectedly or incomplete file transfers
@@ -220,26 +219,26 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_heri
 Rscript real-13-stats.R --bfile $name --const_herit_loci
 # LARGE
 #   method         metric  best   min
-# 1 pca-plink-pure rmsd      90     4
+# 1 pca-plink-pure rmsd      90     8 # OLD: 90,4
 # 2 pca-plink-pure auc        4     3
 # 3 gcta           rmsd       0     0
 # 4 gcta           auc        1     0
-# best rmsd: pca-plink-pure (significant)
+# best rmsd: gcta (tie) # OLD: pca-plink-pure (significant)
 # best auc: gcta (significant)
 #
 # SMALL
 #   method         metric  best   min
-# 1 pca-plink-pure rmsd      84     2
+# 1 pca-plink-pure rmsd       3     2 # OLD 84,2
 # 2 pca-plink-pure auc        1     1
 # 3 gcta           rmsd       0     0
 # 4 gcta           auc        0     0
-# best rmsd: gcta (tie)
+# best rmsd: gcta (significant) # OLD: tie
 # best auc: gcta (significant)
 #
 # FAMILY
 #   method         metric  best   min
 # 1 pca-plink-pure rmsd      90    85
-# 2 pca-plink-pure auc       24     5
+# 2 pca-plink-pure auc       24     6 # OLD: 24,5
 # 3 gcta           rmsd       0     0
 # 4 gcta           auc        0     0
 # best rmsd: gcta (significant)

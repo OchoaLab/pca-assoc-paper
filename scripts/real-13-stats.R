@@ -60,9 +60,11 @@ tib <- read_tsv(
     col_types = 'ciiddd'
 )
 
-# extract methods from table itself
-#methods <- names( method_to_label ) # not from table, but from hardcoded map, always lists PCA first!
-# and PCs too, numerically
+# RMSD data is signed, but in the comparisons of this entire script we don't care about the sign/direction
+# for simplicity, take absolute value now for all data (all PCs and all methods)!
+tib$rmsd <- abs( tib$rmsd )
+
+# extract PCs from table, numerically
 pcs <- sort( as.numeric( unique( tib$pc ) ) )
 
 # a hack to only plot complete reps
@@ -90,17 +92,19 @@ if ( opt$complete ) {
 
 get_best_pcs <- function(tib, metric, method) {
     # NOTE: input tibble should already be subset to be for a single method, but for several PCs and replicates
-    
+
     # get summary mean performance per PC
     means <- aggregate( tib[[ metric ]], list(tib$pc), mean)$x
 
     # this PC was closest to perfection
     if ( metric == 'rmsd' ) {
         # best RMSDs are near zero in absolute value
-        pc_best <- which.min( abs( means ) ) - 1
+        pc_best <- which.min( means ) - 1
+        alternative <- 'g' # alternative is greater than min
     } else if ( metric == 'auc' ) {
         # best AUCs are largest
         pc_best <- which.max( means ) - 1
+        alternative <- 'l' # alternative is lesser than max
     }
     # extract data corresponding to that PC only
     vals_best <- tib[[ metric ]][ tib$pc == pc_best ]
@@ -118,12 +122,14 @@ get_best_pcs <- function(tib, metric, method) {
             vals <- tib[[ metric ]][ tib$pc == pc ]
             # test if they are significantly different than the best or not
             # use paired version
-            pvals[ pc + 1 ] <- wilcox.test( vals, vals_best, paired = TRUE )$p.value
+            pvals[ pc + 1 ] <- wilcox.test( vals, vals_best, paired = TRUE, alternative = alternative )$p.value
         }
     }
 
     # this is the smallest PC that performed as well as the best, in the sense that it is not significantly different
     pc_best_min <- min( which( pvals > cut ), na.rm = TRUE ) - 1
+    # extract data corresponding to that PC only
+    vals_best_min <- tib[[ metric ]][ tib$pc == pc_best_min ]
 
     # create output tibble row
     data <- tibble(
@@ -136,7 +142,7 @@ get_best_pcs <- function(tib, metric, method) {
     return(
         list(
             data = data,
-            vals = vals_best
+            vals = vals_best_min # in paper it makes more sense to talk about these
         )
     )
 }
@@ -174,15 +180,20 @@ report_cross_method <- function( method_to_vals, metric ) {
     method_to_mean <- sapply( method_to_vals, mean )
     if ( metric == 'auc' ) {
         method_best <- methods[ which.max( method_to_mean ) ]
+        alternative <- 'l' # alternative is lesser than max
     } else if ( metric == 'rmsd' ) {
-        method_best <- methods[ which.min( abs(method_to_mean ) ) ]
+        method_best <- methods[ which.min( method_to_mean ) ]
+        alternative <- 'g' # alternative is greater than min
     }
-
+    # to get direction right, need to identify worst method too
+    method_worst <- setdiff( methods, method_best )
+    
     # and decide if they're statistically significantly different or not
     sig <- wilcox.test(
-        method_to_vals[[ methods[1] ]],
-        method_to_vals[[ methods[2] ]],
-        paired = TRUE
+        method_to_vals[[ method_worst ]],
+        method_to_vals[[ method_best ]],
+        paired = TRUE,
+        alternative = alternative
     )$p.value < cut
 
     message( 'best ', metric, ': ', method_best, ' ', if (sig) '(significant)' else '(tie)' )

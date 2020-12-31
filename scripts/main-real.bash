@@ -109,8 +109,8 @@ time Rscript real-09-figs.R --bfile $name
 Rscript real-13-stats.R --bfile $name
 # Human Origins
 #   method         metric  best   min
-# 1 pca-plink-pure rmsd      90    80
-# 2 pca-plink-pure auc       34    31
+# 1 pca-plink-pure rmsd      90    81 # OLD: 90,80
+# 2 pca-plink-pure auc       34    33 # OLD: 34,31
 # 3 gcta           rmsd       5     0
 # 4 gcta           auc       12     0
 # best rmsd: gcta (significant)
@@ -118,17 +118,16 @@ Rscript real-13-stats.R --bfile $name
 #
 # HGDP
 #   method         metric  best   min
-# 1 pca-plink-pure rmsd      72    17
+# 1 pca-plink-pure rmsd      35    17 # OLD: 72,17
 # 2 pca-plink-pure auc       11     4
 # 3 gcta           rmsd       0     0
 # 4 gcta           auc        0     0
-# best rmsd: pca-plink-pure (significant)
-# best auc: gcta (tie)
+# best rmsd: pca-plink-pure (tie) # OLD: significant
+# best auc: gcta (significant) # OLD tie
 #
 # TGP
 #   method         metric  best   min
-#   <chr>          <chr>  <dbl> <dbl>
-# 1 pca-plink-pure rmsd       4     4
+# 1 pca-plink-pure rmsd      90     6 # OLD: 4,4
 # 2 pca-plink-pure auc        7     4
 # 3 gcta           rmsd       4     0
 # 4 gcta           auc        5     0
@@ -184,3 +183,94 @@ time Rscript real-16-mafs.R
 ## then make plot
 time Rscript real-17-mafs-plot.R
 # 0m13.937s ideapad
+
+########################
+### const_herit_loci ###
+########################
+
+# addition to complement existing analysis with alternative trait from const_herit_loci model
+# not sure if it will make a meaningful difference
+# NOTE: many steps that depend on genotypes only aren't redone (are shared from prev run)
+
+for rep in {1..50}; do
+    time Rscript real-04-simtrait.R --bfile $name -r $rep --const_herit_loci
+done
+# redo if needed
+time Rscript real-02-subset-eigenvec.R --bfile $name --dcc
+time Rscript real-02-subset-eigenvec.R --bfile $name --dcc --plink
+
+# NOTE: these actually run on DCC through batch.R (requires manual edits)
+# GCTA runs
+for pcs in {0..90}; do
+    for rep in {1..50}; do
+	time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs --const_herit_loci
+    done
+done
+
+# PCA runs (with pure plink)
+for pcs in {0..90}; do
+    for rep in {1..50}; do
+	time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs --plink --const_herit_loci
+    done
+done
+time Rscript real-02-subset-eigenvec.R --bfile $name --dcc --clean
+time Rscript real-02-subset-eigenvec.R --bfile $name --dcc --clean --plink
+
+time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
+time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
+time Rscript real-09-figs.R --bfile $name --const_herit_loci
+Rscript real-13-stats.R --bfile $name --const_herit_loci
+# Human Origins
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      90    71 # OLD: 90,65
+# 2 pca-plink-pure auc       34    16 # OLD: 34,9
+# 3 gcta           rmsd       0     0
+# 4 gcta           auc        1     0
+# best rmsd: gcta (significant)
+# best auc: gcta (significant)
+# 
+# HGDP
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      90    87 # OLD 2,2
+# 2 pca-plink-pure auc        4     1
+# 3 gcta           rmsd       0     0
+# 4 gcta           auc        1     0
+# best rmsd: pca-plink-pure (significant)
+# best auc: gcta (significant) # OLD: tie
+#
+# TGP
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd       1     0 # OLD 0,0
+# 2 pca-plink-pure auc        2     2
+# 3 gcta           rmsd       0     0
+# 4 gcta           auc        0     0
+# best rmsd: pca-plink-pure (significant)
+# best auc: gcta (significant)
+
+time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90 --final --const_herit_loci
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci -t # test first!
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
+
+time Rscript real-15-plots-big.R --real --const_herit_loci
+
+# NOT YET UPDATED
+# repeating old data for now
+
+# a comparison of RMSD and lambda across all datasets
+time Rscript real-11-inflation-across-datasets.R
+# model fit:
+# rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
+#         a         b 
+# 0.5481480 0.6381526
+# log-linear approx: log(lambda) = RMSD * 5.72
+# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00853
+# threshold map (log-linear): lambda = 1.05, RMSD = 0.00853
+
+# reports on actual m_causal values used in all sims (used for paper, and to catch an unexpected error from an early run!)
+time Rscript real-14-report-m-causal.R
+# sim-n1000-k10-f0.1-s0.5-g1: 100
+# sim-n100-k10-f0.1-s0.5-g1: 10
+# sim-n1000-k10-f0.1-s0.5-g20: 100
+# HoPacAll_ld_prune_1000kb_0.3: 292
+# hgdp_wgs_autosomes_ld_prune_1000kb_0.3: 93
+# all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1: 250
