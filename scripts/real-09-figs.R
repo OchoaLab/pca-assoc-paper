@@ -25,7 +25,9 @@ option_list = list(
     make_option("--complete", action = "store_true", default = FALSE, 
                 help = "Plot only complete replicates (useful for partial runs)"),
     make_option("--const_herit_loci", action = "store_true", default = FALSE, 
-                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)")
+                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)"),
+    make_option("--m_causal_fac", type = "double", default = 10,
+                help = "Proportion of individuals to causal loci", metavar = "double")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -35,6 +37,7 @@ opt <- parse_args(opt_parser)
 name <- opt$bfile
 pca_test <- opt$pca
 const_herit_loci <- opt$const_herit_loci
+m_causal_fac <- opt$m_causal_fac
 
 # stop if name is missing
 if ( is.na(name) )
@@ -67,6 +70,13 @@ method_cols <- c(
 # move to where the data is
 setwd( '../data/' )
 setwd( name )
+
+# new level to this hierarchy
+if ( m_causal_fac != 10 ) {
+    dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
+    # now move in there
+    setwd( dir_out )
+}
 
 # if const_herit_loci is true, move to directory containing input and outputs
 if ( const_herit_loci )

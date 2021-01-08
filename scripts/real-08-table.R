@@ -26,7 +26,9 @@ option_list = list(
     make_option(c("-a", "--archived"), action = "store_true", default = FALSE, 
                 help = "Data is archived (changes search paths)"),
     make_option("--const_herit_loci", action = "store_true", default = FALSE, 
-                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)")
+                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)"),
+    make_option("--m_causal_fac", type = "double", default = 10,
+                help = "Proportion of individuals to causal loci", metavar = "double")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -38,6 +40,7 @@ rep_max <- opt$rep
 n_pcs_max <- opt$n_pcs
 archived <- opt$archived
 const_herit_loci <- opt$const_herit_loci
+m_causal_fac <- opt$m_causal_fac
 
 # stop if name is missing
 if ( is.na(name) )
@@ -51,6 +54,13 @@ if ( archived ) {
     setwd( dir_archive )
 }
 setwd( name )
+
+# new level to this hierarchy
+if ( m_causal_fac != 10 ) {
+    dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
+    # now move in there
+    setwd( dir_out )
+}
 
 # big table of interest
 # initialize this way, it'll grow correctly
@@ -109,6 +119,12 @@ if ( archived ) {
     # just switch back to ordinary data location
     setwd( dir_orig )
     setwd( name )
+    # new level to this hierarchy
+    if ( m_causal_fac != 10 ) {
+        dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
+        # now move in there
+        setwd( dir_out )
+    }
 }
 
 # if const_herit_loci is true, create a new directory (if it doesn't already exist) and move there

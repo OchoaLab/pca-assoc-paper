@@ -32,7 +32,9 @@ option_list = list(
     make_option(c("-t", "--threads"), type = "integer", default = 0, 
                 help = "number of threads (default use all cores if not DCC, 1 core if DCC)", metavar = "int"),
     make_option("--const_herit_loci", action = "store_true", default = FALSE, 
-                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)")
+                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)"),
+    make_option("--m_causal_fac", type = "double", default = 10,
+                help = "Proportion of individuals to causal loci", metavar = "double")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -44,6 +46,7 @@ rep <- opt$rep
 n_pcs <- opt$n_pcs
 threads <- opt$threads
 const_herit_loci <- opt$const_herit_loci
+m_causal_fac <- opt$m_causal_fac
 
 # figure out what threads should be
 # above default should be modified if --dcc and if the threads aren't zero (default, means use all, which we should never do on a cluster!)
@@ -62,6 +65,13 @@ if ( opt$dcc ) {
     setwd( '../data/' )
 }
 setwd( name )
+
+# new level to this hierarchy
+if ( m_causal_fac != 10 ) {
+    dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
+    # now move in there
+    setwd( dir_out )
+}
 
 # move higher to the "reps" location
 # this is so GCTA's temporary files don't overwrite files from other parallel runs
@@ -85,6 +95,9 @@ message(
 # - in real data, are all in lower level (shared across reps)
 # - in simulated data, are all in current level (not shared across reps)
 name_in_lower <- if ( opt$sim ) name_in else paste0( '../', name_in )
+# data is even lower still in this mode
+if ( !opt$sim && m_causal_fac != 10 )
+    name_in_lower <- paste0( '../', name_in_lower )
 
 # adjust paths if using const_herit_loci model
 dir_phen <- '' # current dir
