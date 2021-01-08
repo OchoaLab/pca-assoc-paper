@@ -63,8 +63,17 @@ get_mean_quants_from_list <- function( data ) {
 
 # assumes plot has been started, adds lines
 plot_mean_quarts_lines <- function( stats, x, col, alpha_q, alpha_e ) {
+    
     # plot median as simple line
     l <- 3 # median is 3rd stat row
+    # there can be NAs when a PC/method is completely missing
+    # this doesn't work with lines and polygons
+    # identify by missing means only
+    indexes_keep <- !is.na( stats[ l, ] )
+    # subset entire data now, for simplicity
+    x <- x[ indexes_keep ]
+    stats <- stats[ , indexes_keep, drop = FALSE ]
+    # actually plot lines now
     lines(
         x,
         stats[ l, ],
