@@ -139,8 +139,7 @@ obj <- gas_plink(
     name_phen = name_phen,
     name_out = name_out, # write outputs into current level, add number of PCs
     file_covar = file_covar,
-    threads = threads,
-    ver_older = opt$dcc # prevents an error when there are no covariates
+    threads = threads
 )
 
 # all we care to preserve here are the p-values
