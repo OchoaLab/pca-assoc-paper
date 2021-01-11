@@ -104,9 +104,12 @@ auc_rmsd_one_pcs <- function(n_pcs) {
         lambda <- NA
     } else {
         # make sure length is correct!
-        if ( length(pvals) != m_loci )
-            stop( 'File has ', length(pvals), ' p-values, expected ', m_loci )
-
+        # since we're in parallelized code, skip instead of dying (return early without generating output)
+        if ( length(pvals) != m_loci ) {
+            message( 'File has ', length(pvals), ' p-values, expected ', m_loci, '.  SKIPPING!' )
+            return()
+        }
+        
         # convert strings to numeric
         pvals <- as.numeric( pvals )
         # calculate RMSD_p
