@@ -3,13 +3,13 @@ library(ochoalabtools)
 # slurm job submission script for DCC
 
 # shared items for all runs
-plink <- TRUE
-## plink <- FALSE
+#plink <- TRUE
+plink <- FALSE
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short <- 'l'
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'; short <- 'f'
-bfile <- 'HoPacAll_ld_prune_1000kb_0.3'; short <- 'h'
-#bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3'; short <- 'd'
-#bfile <- 'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'; short <- 'k'
+#bfile <- 'HoPacAll_ld_prune_1000kb_0.3'; short <- 'h'
+#bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01'; short <- 'd'
+bfile <- 'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'; short <- 'k'
 
 # GCTA uses more memory, this works for the largest cases
 mem <- if ( plink ) '4G' else '16G'
@@ -48,9 +48,9 @@ submit_rep_pcs <- function(
         commands <- paste0( commands, ' --plink' )
         # then load plink module (separate lines)
         commands <- c(
-            'module load Plink/2.00a2LM',
+            'module load Plink/2.00a3LM',
             commands,
-            'module unload Plink/2.00a2LM'
+            'module unload Plink/2.00a3LM'
         )
     
     # give name clear params too
@@ -81,20 +81,20 @@ rep <- 1
 pcs <- pcs_max
 submit_rep_pcs( rep, pcs )
 
-# II
-# finish rest of rep
-rep <- 1
-for ( pcs in 0 : ( pcs_max - 1 ) ) {
-    submit_rep_pcs( rep, pcs )
-}
+## # II
+## # finish rest of rep
+## rep <- 1
+## for ( pcs in 0 : ( pcs_max - 1 ) ) {
+##     submit_rep_pcs( rep, pcs )
+## }
 
-# III
-# finish rest of reps
-for ( rep in 2 : reps_max ) {
-    for ( pcs in 0 : pcs_max ) {
-        submit_rep_pcs( rep, pcs )
-    }
-}
+## # III
+## # finish rest of reps
+## for ( rep in 2 : reps_max ) {
+##     for ( pcs in 0 : pcs_max ) {
+##         submit_rep_pcs( rep, pcs )
+##     }
+## }
 
 ########################
 
