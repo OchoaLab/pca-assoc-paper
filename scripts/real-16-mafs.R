@@ -11,8 +11,10 @@ datasets <- c(
     'sim-n100-k10-f0.1-s0.5-g1',
     'sim-n1000-k10-f0.1-s0.5-g20',
     'HoPacAll_ld_prune_1000kb_0.3',
-    'hgdp_wgs_autosomes_ld_prune_1000kb_0.3',
-    'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'
+    #'hgdp_wgs_autosomes_ld_prune_1000kb_0.3',
+    'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
+    #'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'
+    'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'
 )
 
 # move to where the data is

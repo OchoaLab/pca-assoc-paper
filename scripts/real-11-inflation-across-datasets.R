@@ -5,15 +5,21 @@ library(readr)
 library(dplyr) # for bind_rows
 library(tibble)
 library(ochoalabtools)
+library(optparse)
 
 ## # FOR FAILED EXPERIMENT AT END OF SCRIPT
 ## library(simtrait) # for rmsd
 
-# constants
+#################
+### CONSTANTS ###
+#################
+
 # output file name (big table)
 file_table <- 'sum.txt'
-# for main figure output (goes on papers)
-name_out <- 'sum-rmsd-auc'
+# directory name, needed in one mode (weird var name just stuck)
+dir_phen <- 'const_herit_loci'
+# output name
+name_out <- 'sum-rmsd-vs-lambda'
 # methods to keep in analysis
 methods <- c('pca-plink-pure', 'gcta')
 # report on the RMSD predicted for lambda = 1.05
@@ -34,8 +40,10 @@ datasets <- tibble(
         'sim-n100-k10-f0.1-s0.5-g1',
         'sim-n1000-k10-f0.1-s0.5-g20',
         'HoPacAll_ld_prune_1000kb_0.3',
-        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3',
-        'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'
+        #'hgdp_wgs_autosomes_ld_prune_1000kb_0.3',
+        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
+        #'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'
+        'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'
     ),
     col = 1:6
 )
@@ -48,6 +56,27 @@ lty_fit_loglin <- 2
 col_guides <- 'gray95'
 lty_guides <- 1
 
+############
+### ARGV ###
+############
+
+# define options
+option_list = list(
+    make_option("--const_herit_loci", action = "store_true", default = FALSE, 
+                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)")
+)
+
+opt_parser <- OptionParser(option_list = option_list)
+opt <- parse_args(opt_parser)
+
+# get values
+const_herit_loci <- opt$const_herit_loci
+
+
+################
+### DATA/FIG ###
+################
+
 # move to where the data is
 setwd( '../data/' )
 
@@ -59,6 +88,9 @@ tib_main <- NULL
 for ( i in 1 : nrow( datasets ) ) {
     # enter dir
     setwd( datasets$name_long[ i ] )
+    # move in one more level in this case
+    if ( const_herit_loci )
+        setwd( dir_phen )
     
     # read the big table!
     tib <- read_tsv(
@@ -86,6 +118,9 @@ for ( i in 1 : nrow( datasets ) ) {
     
     # go back down
     setwd( '..' )
+    # move back one more level in this case
+    if ( const_herit_loci )
+        setwd( '..' )
 }
 
 ######################
@@ -181,9 +216,13 @@ range_rmsd <- c( -max_srmsd, max_srmsd )
 # uniformly spaced points for curve
 xp <- exp( log_max_lambda * (-100 : 100) / 100 )
 
+# place fig output here!
+if ( const_herit_loci )
+    setwd( dir_phen )
+
 # plot in base data dir
 fig_start(
-    'sum-rmsd-vs-lambda',
+    name_out,
     mar_t = 1,
     mar_r = 0.3
 )

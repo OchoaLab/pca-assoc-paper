@@ -64,8 +64,10 @@ datasets_real <- tibble(
     ),
     name_long = c(
         'HoPacAll_ld_prune_1000kb_0.3',
-        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3',
-        'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'
+        #'hgdp_wgs_autosomes_ld_prune_1000kb_0.3',
+        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
+        #'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'
+        'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'
     )
 )
 # output names
