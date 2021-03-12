@@ -378,3 +378,19 @@ time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90 --m_causal_fac $f
 
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 --m_causal_fac $fac --const_herit_loci
 time Rscript real-09-figs.R --bfile $name --m_causal_fac $fac --const_herit_loci
+
+###################
+### FIT FOR SIM ###
+###################
+
+# we already had popkin estimate because we needed params for simtrait (all real datasets)
+
+# what follows has been run for TGP only!
+
+# manually copied annotations file from Storey Lab project
+cp ~/docs/ochoalab/storey/fst/simulations/all_phase3_filt-minimal/pops-annot.txt ../data/$name/
+
+# this script calculates subpopulations kinship matrix, which we'll fit tree to
+# also produces a nice plot that validates the estimate
+time Rscript fit-01-popkin-subpops.R --bfile $name
+# 4s ideapad
