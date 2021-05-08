@@ -388,9 +388,64 @@ time Rscript real-09-figs.R --bfile $name --m_causal_fac $fac --const_herit_loci
 # what follows has been run for TGP only!
 
 # manually copied annotations file from Storey Lab project
+# for TGP
 cp ~/docs/ochoalab/storey/fst/simulations/all_phase3_filt-minimal/pops-annot.txt ../data/$name/
+# for HGDP
+cp ~/docs/ochoalab/storey/fst/simulations/hgdp_wgs_autosomes/pops-annot.txt ../data/$name/
+# for HO
+cp ~/docs/ochoalab/storey/fst/simulations/ho16ep/pops-annot.txt ../data/$name/
 
 # this script calculates subpopulations kinship matrix, which we'll fit tree to
 # also produces a nice plot that validates the estimate
 time Rscript fit-01-popkin-subpops.R --bfile $name
 # 4s ideapad
+# NOTE: label/margin sizes tuned for TGP, terrible for HGDP and HO
+
+# fit tree to real data, visualize success
+time Rscript fit-02-tree.R --bfile $name
+
+# set up simulation params Q and Psi tree
+time Rscript fit-03-sim-pop.R --bfile $name
+
+# from here on, the real data name needs a '_sim' suffix
+# the rest of the pipeline is the same as for the regular simulations
+name=$name"_sim"
+for rep in {1..50}; do
+    time Rscript fit-04-draw-geno.R --bfile $name -r $rep
+
+    time Rscript sim-02-sim-trait.R --bfile $name -r $rep
+
+    time Rscript real-00-preprocess-gcta.R --bfile $name/rep-$rep
+
+    time Rscript real-01-pcs-plink.R --bfile $name/rep-$rep
+
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep
+    for pcs in {0..90}; do
+	time Rscript real-05-gcta.R --sim --bfile $name -r $rep --n_pcs $pcs
+    done
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --clean
+
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink
+    for pcs in {0..90}; do
+	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs --plink
+    done
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink --clean
+done
+
+time Rscript real-07-auc-rmsd.R --sim --bfile $name -r 50 --n_pcs 90
+# 14m22.146s # ideapad 4 threads
+time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
+time Rscript real-09-figs.R --bfile $name
+time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --final
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test first!
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
+Rscript real-13-stats.R --bfile $name
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      81    18
+# 2 pca-plink-pure auc       15    14
+# 3 gcta           rmsd       0     0
+# 4 gcta           auc        1     0
+# best rmsd: gcta (significant)
+# best auc: gcta (significant)
+
+# NOTE: this is not beta-p-inv!!!

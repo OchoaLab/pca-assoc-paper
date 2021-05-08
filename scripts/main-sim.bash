@@ -14,8 +14,6 @@
 ## LARGE SAMPLE SIZE
 # sample size (normal n=1000, small n=100)
 n=1000
-# number of causal loci should scale with n
-mc=$(( n / 10 ))
 # to create family structure (g=20) or not (g=1)
 g=1
 # hacks to use "real" data scripts on simulations
@@ -24,8 +22,6 @@ name="sim-n$n-k10-f0.1-s0.5-g$g"
 ## SMALL SAMPLE SIZE
 # sample size (normal n=1000, small n=100)
 n=100
-# number of causal loci should scale with n
-mc=$(( n / 10 ))
 # to create family structure (g=20) or not (g=1)
 g=1
 # hacks to use "real" data scripts on simulations
@@ -34,8 +30,6 @@ name="sim-n$n-k10-f0.1-s0.5-g$g"
 ## FAMILY STRUCTURE
 # sample size (normal n=1000, small n=100)
 n=1000
-# number of causal loci should scale with n
-mc=$(( n / 10 ))
 # to create family structure (g=20) or not (g=1)
 g=20
 # hacks to use "real" data scripts on simulations
@@ -56,8 +50,7 @@ for rep in {1..50}; do
     # 0m19.112s ideapad (concurrent with plink)
 
     # draws a random trait
-    # only place where --m_causal gets specified (not in file paths, etc)
-    time Rscript sim-02-sim-trait.R --bfile $name -r $rep --m_causal $mc
+    time Rscript sim-02-sim-trait.R --bfile $name -r $rep
     # 0m1.914s ideapad (concurrent with plink)
 
     # preprocess with GCTA (makes GRM and max PCs)
@@ -193,7 +186,7 @@ time Rscript real-15-plots-big.R
 # NOTE: many steps that depend on genotypes only aren't redone (are shared from prev run)
 
 for rep in {1..50}; do
-    time Rscript sim-02-sim-trait.R --bfile $name -r $rep --m_causal $mc --const_herit_loci
+    time Rscript sim-02-sim-trait.R --bfile $name -r $rep --const_herit_loci
 
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink
     for pcs in {0..90}; do

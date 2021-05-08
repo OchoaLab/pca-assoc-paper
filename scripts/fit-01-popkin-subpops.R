@@ -5,13 +5,6 @@ library(readr)
 library(ochoalabtools)
 library(tibble)
 
-## # load new functions from external scripts
-## dir_orig <- getwd()
-## setwd("../../scripts") # scripts of main GAS project
-## source('gas_lmm_gcta.R')
-## source('paths.R')
-## setwd( dir_orig ) # go back to where we were
-
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
 
@@ -105,7 +98,16 @@ kinship_pop <- avgSubpopsKinship( kinship, fam$fam, subpop_info$pop )
 write_grm( 'popkin_subpops', kinship_pop )
 
 # means we can use subpop_info to annotate plot without changes (sorting or subsetting)
-stopifnot( colnames( kinship_pop ) == subpop_info$pop )
+# extra work is only necessary for Human Origins
+names_pop <- colnames( kinship_pop )
+if ( length( names_pop ) != nrow( subpop_info ) || all( names_pop != subpop_info$pop ) ) {
+    # in Human Origins the problem is there are extra rows in info table, so filter that file
+    indexes <- match( names_pop, subpop_info$pop )
+    # subset now
+    subpop_info <- subpop_info[ indexes, ]
+    # check again for agreement
+    stopifnot( subpop_info$pop == names_pop )
+}
 
 ############
 ### PLOT ###

@@ -18,8 +18,8 @@ option_list = list(
                 help = "Base name for input plink files (.BED/BIM/FAM)", metavar = "character"),
     make_option("--herit", type = "double", default = 0.8, 
                 help = "heritability", metavar = "double"),
-    make_option("--m_causal", type = "integer", default = 1000,
-                help = "num causal loci", metavar = "int"),
+    make_option("--m_causal_fac", type = "double", default = 10,
+                help = "Proportion of individuals to causal loci", metavar = "double"),
     make_option(c("-r", "--rep"), type = "integer", default = 1,
                 help = "Replicate number", metavar = "int"),
     make_option("--const_herit_loci", action = "store_true", default = FALSE, 
@@ -32,7 +32,7 @@ opt <- parse_args(opt_parser)
 # get values
 name <- opt$bfile
 herit <- opt$herit
-m_causal <- opt$m_causal
+m_causal_fac <- opt$m_causal_fac
 rep <- opt$rep
 const_herit_loci <- opt$const_herit_loci
 
@@ -54,6 +54,10 @@ load( 'p_anc.RData' )
 
 # load FAM table, for phen output
 fam <- read_fam( name_in )
+
+# now that we have number of individuals, use a tenth of that for m_causal, rounding
+m_causal <- round( nrow( fam ) / m_causal_fac )
+message( 'm_causal: ', m_causal )
 
 # load genotype data with BEDMatrix
 X <- BEDMatrix( name_in, simple_names = TRUE )
