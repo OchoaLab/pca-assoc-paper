@@ -12,6 +12,7 @@ datasets <- tibble(
         'Family structure sim.',
         'Human Origins',
         'HGDP',
+        'HGDP sim.',
         '1000 Genomes'
     ),
     name_long = c(
@@ -21,17 +22,24 @@ datasets <- tibble(
         'HoPacAll_ld_prune_1000kb_0.3',
         #'hgdp_wgs_autosomes_ld_prune_1000kb_0.3',
         'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
+        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim',
         #'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'
         'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'
     ),
-    col = 1:6
+    col = 1:7
 )
 
 # move to where the data is
 setwd( '../data/' )
 
-# loads `mafs`, named list of MAF vectors
-load( 'mafs.RData' )
+# loads individual `maf` vectors into named list for all datasets
+mafs <- list()
+for ( name in datasets$name_long ) {
+    setwd( name )
+    load( 'maf.RData' )
+    mafs[[ name ]] <- maf
+    setwd( '..' )
+}
 
 # start plot
 fig_start( 'mafs' )

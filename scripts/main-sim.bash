@@ -101,6 +101,10 @@ for rep in {1..50}; do
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink --clean
 done
 
+# for MAF comparisons plot (only needs rep-1)
+time Rscript real-16-mafs.R --bfile $name --sim
+
+
 # summarizes p-values into AUC and RMSD for each method/rep/pc
 time Rscript real-07-auc-rmsd.R --sim --bfile $name -r 50 --n_pcs 90
 # 46m10.111s viiiaX6 (large)
@@ -238,3 +242,4 @@ Rscript real-13-stats.R --bfile $name --const_herit_loci
 # best auc: gcta (significant)
 
 time Rscript real-15-plots-big.R --const_herit_loci
+

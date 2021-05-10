@@ -182,6 +182,10 @@ time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90 --final
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
 
+# calculate and store MAF distributions, useful not just for a plot but also for simulating data from real datasets
+time Rscript real-16-mafs.R --bfile $name
+
+
 # a comparison of RMSD and lambda across all datasets
 time Rscript real-11-inflation-across-datasets.R
 # model fit:
@@ -211,12 +215,7 @@ time Rscript real-14-report-m-causal.R
 # final plot gathers all three datasets into a single multipanel figure
 time Rscript real-15-plots-big.R --real
 
-### MAF code
-## first gather MAF vectors from raw data
-time Rscript real-16-mafs.R
-# 1m57.285s ideapad
-# 2m18.001s viiiaX6 MAF
-## then make plot
+# MAF plot code
 time Rscript real-17-mafs-plot.R
 # 0m13.937s ideapad
 
@@ -412,34 +411,37 @@ time Rscript fit-03-sim-pop.R --bfile $name
 name=$name"_sim"
 for rep in {1..50}; do
     time Rscript fit-04-draw-geno.R --bfile $name -r $rep
-
     time Rscript sim-02-sim-trait.R --bfile $name -r $rep
-
     time Rscript real-00-preprocess-gcta.R --bfile $name/rep-$rep
-
     time Rscript real-01-pcs-plink.R --bfile $name/rep-$rep
-
-    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep
-    for pcs in {0..90}; do
-	time Rscript real-05-gcta.R --sim --bfile $name -r $rep --n_pcs $pcs
-    done
-    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --clean
-
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink
     for pcs in {0..90}; do
 	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs --plink
     done
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink --clean
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep
+    for pcs in {0..90}; do
+	time Rscript real-05-gcta.R --sim --bfile $name -r $rep --n_pcs $pcs
+    done
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --clean
 done
+# new steps to make sure simulation is as expected (validates not just tree but also Q matrix and their respective alignment)
+# estimates from rep-1 only!
+time Rscript real-03-popkin.R --bfile $name --sim
+# 0m23.905s # ideapad HGDP-sim
+# TODO
+# get MAFs for comparison plot too (only needs rep-1)
+time Rscript real-16-mafs.R --bfile $name --sim
 
 time Rscript real-07-auc-rmsd.R --sim --bfile $name -r 50 --n_pcs 90
-# 14m22.146s # ideapad 4 threads
+# 14m22.146s # ideapad 4 threads HGDP-sim-rand
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
 time Rscript real-09-figs.R --bfile $name
 time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --final
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
 Rscript real-13-stats.R --bfile $name
+# HGDP-sim-rand
 #   method         metric  best   min
 # 1 pca-plink-pure rmsd      81    18
 # 2 pca-plink-pure auc       15    14
@@ -448,4 +450,32 @@ Rscript real-13-stats.R --bfile $name
 # best rmsd: gcta (significant)
 # best auc: gcta (significant)
 
-# NOTE: this is not beta-p-inv!!!
+### const_herit_loci ###
+for rep in {1..50}; do
+    time Rscript sim-02-sim-trait.R --bfile $name -r $rep --const_herit_loci
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink
+    for pcs in {0..90}; do
+	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs --plink --const_herit_loci
+    done
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink --clean
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep
+    for pcs in {0..90}; do
+	time Rscript real-05-gcta.R --sim --bfile $name -r $rep --n_pcs $pcs --const_herit_loci
+    done
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --clean
+done
+time Rscript real-07-auc-rmsd.R --sim --bfile $name -r 50 --n_pcs 90 --const_herit_loci
+time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
+time Rscript real-09-figs.R --bfile $name --const_herit_loci
+time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --final --const_herit_loci
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci -t # test first!
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
+Rscript real-13-stats.R --bfile $name --const_herit_loci
+# HGDP-sim
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      25    14
+# 2 pca-plink-pure auc       15    14
+# 3 gcta           rmsd       0     0
+# 4 gcta           auc        0     0
+# best rmsd: gcta (tie)
+# best auc: gcta (significant)

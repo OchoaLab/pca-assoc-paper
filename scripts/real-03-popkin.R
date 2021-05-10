@@ -16,7 +16,9 @@ name_in <- 'data'
 # define options
 option_list = list(
     make_option("--bfile", type = "character", default = NA, 
-                help = "Base name for input plink files (.BED/BIM/FAM)", metavar = "character")
+                help = "Base name for input plink files (.BED/BIM/FAM)", metavar = "character"),
+    make_option("--sim", action = "store_true", default = FALSE, 
+                help = "Genotypes are simulated (rather than real; alters paths only, reads and writes data in 'rep-1/' subdir)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -32,6 +34,11 @@ if ( is.na(name) )
 # move to where the data is
 setwd( '../data/' )
 setwd( name )
+
+# if data is simulated, genotypes are not in base dir but in rep-*/ subdirs (one for every rep)
+# all reps ought to be similar, just use rep-1 (no need to ever have to repeat this)
+if ( opt$sim )
+    setwd( 'rep-1' )
 
 ##############
 ### popkin ###

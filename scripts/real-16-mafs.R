@@ -2,53 +2,51 @@
 
 library(BEDMatrix)
 library(simtrait) # for allele_freqs
+library(optparse)
 
-# constants
-file_bed <- 'data'
-# names of datasets
-datasets <- c(
-    'sim-n1000-k10-f0.1-s0.5-g1',
-    'sim-n100-k10-f0.1-s0.5-g1',
-    'sim-n1000-k10-f0.1-s0.5-g20',
-    'HoPacAll_ld_prune_1000kb_0.3',
-    #'hgdp_wgs_autosomes_ld_prune_1000kb_0.3',
-    'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
-    #'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'
-    'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'
+# the name is for dir only, actual file is just "data"
+name_in <- 'data'
+
+############
+### ARGV ###
+############
+
+# define options
+option_list = list(
+    make_option("--bfile", type = "character", default = NA, 
+                help = "Base name for input plink files (.BED/BIM/FAM)", metavar = "character"),
+    make_option("--sim", action = "store_true", default = FALSE, 
+                help = "Genotypes are simulated (rather than real; alters paths only, reads and writes data in 'rep-1/' subdir)")
 )
+
+opt_parser <- OptionParser(option_list = option_list)
+opt <- parse_args(opt_parser)
+
+# get values
+name <- opt$bfile
+
+# stop if name is missing
+if ( is.na(name) )
+    stop('`--bfile` terminal option is required!')
 
 # move to where the data is
 setwd( '../data/' )
+setwd( name )
 
-# get all the MAF vectors together in a list
-mafs <- list()
+# if data is simulated, genotypes are not in base dir but in rep-*/ subdirs (one for every rep)
+# all reps ought to be similar, just use rep-1 (no need to ever have to repeat this)
+if ( opt$sim )
+    setwd( 'rep-1' )
 
-# load each dataset
-for ( dataset in datasets ) {
-    # enter dir
-    setwd( dataset )
+# load genotypes BEDMatrix object
+X <- BEDMatrix( name_in )
 
-    # slightly different processing for simulated data...
-    is_sim <- grepl( 'sim-', dataset )
-    
-    # simulated datasets don't have a single genotype file, but one per rep
-    # in that case enter rep-1
-    if ( is_sim )
-        setwd( 'rep-1' )
-    
-    # load genotypes BEDMatrix object
-    X <- BEDMatrix( file_bed )
-
-    # and get back down when done
-    if ( is_sim )
-        setwd( '..' )
-
-    # calculate desired allele frequencies
-    mafs[[ dataset ]] <- allele_freqs( X, fold = TRUE )
-
-    # go back down for next dataset
+# and get back down when done
+if ( opt$sim )
     setwd( '..' )
-}
+
+# calculate desired allele frequencies
+maf <- allele_freqs( X, fold = TRUE )
 
 # save all data on `data` base directory
-save( mafs, file = 'mafs.RData' )
+save( maf, file = 'maf.RData' )

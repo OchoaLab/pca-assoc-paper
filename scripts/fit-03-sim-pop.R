@@ -46,6 +46,8 @@ load( 'tree.RData' ) # load `tree` and other things we don't use here
 # labels come from fam file
 # subpops are desired order, match tree order
 admix_proportions <- admix_prop_indep_subpops( fam$fam, subpops = tree$tip.label )
+# copy names of individuals, to have correspondence to real data (though these are completely simulated)
+rownames( admix_proportions ) <- fam$id
 
 ## # try things with this info
 ## # coanc_est is ancestral coancestry according to tree (came from 'tree.RData')
@@ -85,4 +87,5 @@ tree_subpops <- tree
 tree_subpops$root.edge <- NULL
 
 # save bnpsd data to an RData file
-save( admix_proportions, tree_subpops, file = 'bnpsd.RData' )
+# here add copy of real `fam` table, for checks
+save( admix_proportions, tree_subpops, fam, file = 'bnpsd.RData' )

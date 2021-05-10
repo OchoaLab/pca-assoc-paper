@@ -52,7 +52,7 @@ setwd( name )
 
 # load precalculated bnpsd data from RData file
 load( 'bnpsd.RData' )
-# loads: admix_proportions, tree_subpops
+# loads: admix_proportions, tree_subpops, fam
 
 #####################
 ### SIM GENOTYPES ###
@@ -79,15 +79,18 @@ out <- draw_all_admix(
     admix_proportions = admix_proportions,
     tree_subpops = tree_subpops,
     m_loci = m_loci,
-    verbose = TRUE
+    verbose = verbose
 )
 X <- out$X
 p_anc <- out$p_anc
 
-# write to plink BED/BIM/FAM 
+# write to plink BED/BIM/FAM
+# use real FAM here, also ensures that X and fam agree in individual order
 write_plink(
     name_out,
-    X
+    X,
+    fam = fam,
+    verbose = verbose
 )
 
 # write final p_anc
