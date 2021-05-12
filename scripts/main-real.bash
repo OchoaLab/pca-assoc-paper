@@ -410,7 +410,7 @@ time Rscript fit-03-sim-pop.R --bfile $name
 # the rest of the pipeline is the same as for the regular simulations
 name=$name"_sim"
 for rep in {1..50}; do
-    time Rscript fit-04-draw-geno.R --bfile $name -r $rep
+    time Rscript fit-04-draw-geno.R --bfile $name -r $rep --maf_real
     time Rscript sim-02-sim-trait.R --bfile $name -r $rep
     time Rscript real-00-preprocess-gcta.R --bfile $name/rep-$rep
     time Rscript real-01-pcs-plink.R --bfile $name/rep-$rep
@@ -428,8 +428,8 @@ done
 # new steps to make sure simulation is as expected (validates not just tree but also Q matrix and their respective alignment)
 # estimates from rep-1 only!
 time Rscript real-03-popkin.R --bfile $name --sim
-# 0m23.905s # ideapad HGDP-sim
-# TODO
+# make plot based on those estimates
+time Rscript fit-10-plot-real-vs-sim.R --bfile $name
 # get MAFs for comparison plot too (only needs rep-1)
 time Rscript real-16-mafs.R --bfile $name --sim
 
@@ -442,6 +442,15 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test fi
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
 Rscript real-13-stats.R --bfile $name
 # HGDP-sim-rand
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      88    16
+# 2 pca-plink-pure auc       17    13
+# 3 gcta           rmsd       2     0
+# 4 gcta           auc       10     0
+# best rmsd: pca-plink-pure (tie)
+# best auc: gcta (tie)
+#
+# HGDP-sim-rand-UNIF
 #   method         metric  best   min
 # 1 pca-plink-pure rmsd      81    18
 # 2 pca-plink-pure auc       15    14
@@ -471,7 +480,16 @@ time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --fin
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
 Rscript real-13-stats.R --bfile $name --const_herit_loci
-# HGDP-sim
+# HGDP-sim-inv
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      88    14
+# 2 pca-plink-pure auc       20     7
+# 3 gcta           rmsd       2     0
+# 4 gcta           auc        8     2
+# best rmsd: gcta (tie)
+# best auc: gcta (significant)
+#
+# HGDP-sim-inv-UNIF
 #   method         metric  best   min
 # 1 pca-plink-pure rmsd      25    14
 # 2 pca-plink-pure auc       15    14
@@ -479,3 +497,5 @@ Rscript real-13-stats.R --bfile $name --const_herit_loci
 # 4 gcta           auc        0     0
 # best rmsd: gcta (tie)
 # best auc: gcta (significant)
+
+############# HERE on LABBYDUKE

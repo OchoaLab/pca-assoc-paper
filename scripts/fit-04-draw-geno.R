@@ -27,7 +27,11 @@ option_list = list(
     make_option(c("-m", "--m_loci"), type = "integer", default = 100000, 
                 help = "number of loci", metavar = "int"),
     make_option(c("-r", "--rep"), type = "integer", default = 1,
-                help = "Replicate number", metavar = "int")
+                help = "Replicate number", metavar = "int"),
+    make_option("--maf_real", action = "store_true", default = FALSE, 
+                help = "Draw ancestral allele frequencies from real distribution"),
+    make_option("--maf_min", type = "double", default = 0, # 0.01, 
+                help = "Minimum MAF, to simulate MAF-based ascertainment bias", metavar = "double")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -37,18 +41,38 @@ opt <- parse_args(opt_parser)
 name <- opt$bfile
 m_loci <- opt$m_loci
 rep <- opt$rep
+maf_real <- opt$maf_real
+maf_min <- opt$maf_min
 
 # stop if name is missing
 if ( is.na(name) )
     stop('`--bfile` terminal option is required!')
 
-# directory above must already exist
-setwd( '../data/' )
-setwd( name )
-
 ##############################
 ### LOAD PRECALCUATED DATA ###
 ##############################
+
+# directory above must already exist
+setwd( '../data/' )
+
+p_anc <- NULL
+if ( maf_real ) {
+    # deduce original file path
+    name_real <- sub( '_sim$', '', name )
+    setwd( name_real )
+    
+    # load MAF
+    load( 'maf.RData' )
+    # loads: maf
+
+    # select random allele frequencies
+    p_anc <- sample( maf, m_loci )
+    
+    # go back down so we can find the simulated path
+    setwd( '..' )
+}
+
+setwd( name )
 
 # load precalculated bnpsd data from RData file
 load( 'bnpsd.RData' )
@@ -79,6 +103,8 @@ out <- draw_all_admix(
     admix_proportions = admix_proportions,
     tree_subpops = tree_subpops,
     m_loci = m_loci,
+    p_anc = p_anc,
+    maf_min = maf_min,
     verbose = verbose
 )
 X <- out$X
