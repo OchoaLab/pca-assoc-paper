@@ -70,9 +70,22 @@ datasets_real <- tibble(
         'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'
     )
 )
+datasets_real_sim <- tibble(
+    name_short = c(
+        'Human Origins sim.',
+        'HGDP sim.',
+        '1000 Genomes sim.'
+    ),
+    name_long = c(
+        'HoPacAll_ld_prune_1000kb_0.3_sim',
+        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim',
+        'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim'
+    )
+)
 # output names
 name_out <- 'rmsd-auc-sim'
 name_out_real <- 'rmsd-auc-real'
+name_out_real_sim <- 'rmsd-auc-real-sim'
 
 # default legend position
 legend_pos <- 'topright'
@@ -89,6 +102,8 @@ legend_pos <- 'topright'
 option_list = list(
     make_option("--real", action = "store_true", default = FALSE, 
                 help = "Process real datasets (default: simulated datasets)"),
+    make_option("--real_sim", action = "store_true", default = FALSE, 
+                help = "Process real-sim datasets (default: simulated datasets)"),
     make_option("--const_herit_loci", action = "store_true", default = FALSE, 
                 help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)")
 )
@@ -98,8 +113,15 @@ opt <- parse_args(opt_parser)
 
 # switch to process real datasets if requested
 if ( opt$real ) {
+    # can't have both of these be on at the same time
+    if ( opt$real_sim )
+        stop( 'Cannot use "--real" and "--real_sim" at the same time!' )
+    # proceed now
     datasets <- datasets_real
     name_out <- name_out_real
+} else if ( opt$real_sim ) {
+    datasets <- datasets_real_sim
+    name_out <- name_out_real_sim
 }
 # get values
 const_herit_loci <- opt$const_herit_loci

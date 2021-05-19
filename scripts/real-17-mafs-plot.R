@@ -10,23 +10,28 @@ datasets <- tibble(
         'Large sample size sim.',
         'Small sample size sim.',
         'Family structure sim.',
+        'Human Origins sim',
         'Human Origins',
-        'HGDP',
         'HGDP sim.',
+        'HGDP',
+        '1000 Genomes sim.',
         '1000 Genomes'
     ),
     name_long = c(
         'sim-n1000-k10-f0.1-s0.5-g1',
         'sim-n100-k10-f0.1-s0.5-g1',
         'sim-n1000-k10-f0.1-s0.5-g20',
+        'HoPacAll_ld_prune_1000kb_0.3_sim',
         'HoPacAll_ld_prune_1000kb_0.3',
         #'hgdp_wgs_autosomes_ld_prune_1000kb_0.3',
-        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
         'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim',
+        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
         #'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'
+        'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim',
         'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'
     ),
-    col = 1:7
+    col = c(1, 2, 3, 4, 4, 5, 5, 6, 6),
+    lty = c(2, 2, 2, 2, 1, 2, 1, 2, 1)
 )
 
 # move to where the data is
@@ -44,38 +49,37 @@ for ( name in datasets$name_long ) {
 # start plot
 fig_start( 'mafs' )
 
+# set up plot area
+plot(
+    NA,
+    # axis labels for first time
+    xlab = 'Minor Allele Frequency',
+    ylab = 'Cumulative Probability',
+    main = '',
+    xlim = c(0, 0.5),
+    ylim = c(0, 1)
+)
+
 # navigate datasets
 for ( i in 1 : nrow( datasets ) ) {
     # get name used in key
     name_long <- datasets$name_long[ i ]
-    # extract MAF from list, convert immediately to CDF
-    x <- ecdf( mafs[[ name_long ]] )
+    
+    # a nicer alternative to `ecdf`, more flexibility for me
+    # https://stat.ethz.ch/pipermail/r-help/2016-June/439416.html
+    x <- sort( mafs[[ name_long ]] )
+    y <- ppoints( x )
+    
     # plot, with add as needed
-    plot(
+    lines(
         x,
+        y,
         col = datasets$col[ i ],
-        add = i > 1,
-        # axis labels for first time
-        xlab = 'Minor Allele Frequency',
-        ylab = 'Cumulative Probability',
-        main = '',
-        # get rid of ugly limit lines
-        col.01line = NA,
-        # get rid of points at knots
-        do.points = FALSE,
-        # connect lines in stepwise function (otherwise they're all horizontal)
-        verticals = TRUE,
-        # reduce large end gaps in x direction
-        xaxs = 'i',
-        # don't like default axis marks/locations, will do manually at end
-        xaxt = 'n'
+        lty = datasets$lty[ i ]
     )
 }
 
-# add x axis marks, where they make the most sense for this data
-axis( 1, at = c(0, 0.25, 0.5) )
-
-# legend, same as RMSD-vs-lambda fig
+# legend, (almost the) same as RMSD-vs-lambda fig
 # reverse order because it matches curve appearance better
 legend(
     'bottomright',
@@ -85,8 +89,11 @@ legend(
     title = 'Dataset',
     title.col = 'black',
     pch = NA,
+    col = rev( datasets$col ),
+    lty = rev( datasets$lty ),
     bty = 'n',
-    cex = 0.5
+    cex = 0.5,
+    seg.len = 3
 )
 
 fig_end()

@@ -185,39 +185,8 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
 # calculate and store MAF distributions, useful not just for a plot but also for simulating data from real datasets
 time Rscript real-16-mafs.R --bfile $name
 
-
-# a comparison of RMSD and lambda across all datasets
-time Rscript real-11-inflation-across-datasets.R
-# model fit:
-# rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
-#         a         b 
-# 0.5607461 0.6221887 
-# log-linear approx: log(lambda) = RMSD * 5.73
-# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00851
-# threshold map (log-linear): lambda = 1.05, RMSD = 0.00851
-#
-# OLD
-#         a         b 
-# 0.5481480 0.6381526
-# log-linear approx: log(lambda) = RMSD * 5.72
-# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00853
-# threshold map (log-linear): lambda = 1.05, RMSD = 0.00853
-
-# reports on actual m_causal values used in all sims (used for paper, and to catch an unexpected error from an early run!)
-time Rscript real-14-report-m-causal.R
-# sim-n1000-k10-f0.1-s0.5-g1: 100
-# sim-n100-k10-f0.1-s0.5-g1: 10
-# sim-n1000-k10-f0.1-s0.5-g20: 100
-# HoPacAll_ld_prune_1000kb_0.3: 292
-# hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01: 93
-# all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01: 250
-
 # final plot gathers all three datasets into a single multipanel figure
 time Rscript real-15-plots-big.R --real
-
-# MAF plot code
-time Rscript real-17-mafs-plot.R
-# 0m13.937s ideapad
 
 ########################
 ### const_herit_loci ###
@@ -307,25 +276,6 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_heri
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
 
 time Rscript real-15-plots-big.R --real --const_herit_loci
-
-# a comparison of RMSD and lambda across all datasets
-time Rscript real-11-inflation-across-datasets.R --const_herit_loci
-# model fit:
-# rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
-#         a         b 
-# 0.5291012 0.6772195 
-# log-linear approx: log(lambda) = RMSD * 5.58
-# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00874
-# threshold map (log-linear): lambda = 1.05, RMSD = 0.00874
-
-# reports on actual m_causal values used in all sims (used for paper, and to catch an unexpected error from an early run!)
-time Rscript real-14-report-m-causal.R --const_herit_loci
-# sim-n1000-k10-f0.1-s0.5-g1: 100
-# sim-n100-k10-f0.1-s0.5-g1: 10
-# sim-n1000-k10-f0.1-s0.5-g20: 100
-# HoPacAll_ld_prune_1000kb_0.3: 292
-# hgdp_wgs_autosomes_ld_prune_1000kb_0.3: 93
-# all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1: 250
 
 
 ####################
@@ -441,6 +391,24 @@ time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --fin
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
 Rscript real-13-stats.R --bfile $name
+# HO-sim-rand
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      84    51
+# 2 pca-plink-pure auc       49    25
+# 3 gcta           rmsd       5     5
+# 4 gcta           auc       25    17
+# best rmsd: pca-plink-pure (significant)
+# best auc: gcta (significant)
+#
+# TGP-sim-rand
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      86    15
+# 2 pca-plink-pure auc        6     6
+# 3 gcta           rmsd       5     3
+# 4 gcta           auc       25     3
+# best rmsd: gcta (significant)
+# best auc: gcta (significant)
+#
 # HGDP-sim-rand
 #   method         metric  best   min
 # 1 pca-plink-pure rmsd      88    16
@@ -458,6 +426,9 @@ Rscript real-13-stats.R --bfile $name
 # 4 gcta           auc        1     0
 # best rmsd: gcta (significant)
 # best auc: gcta (significant)
+
+time Rscript real-15-plots-big.R --real_sim
+
 
 ### const_herit_loci ###
 for rep in {1..50}; do
@@ -480,6 +451,24 @@ time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --fin
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
 Rscript real-13-stats.R --bfile $name --const_herit_loci
+# HO-sim-inv
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      89    37
+# 2 pca-plink-pure auc       47    16
+# 3 gcta           rmsd       5     5
+# 4 gcta           auc       47     0
+# best rmsd: pca-plink-pure (tie)
+# best auc: gcta (significant)
+#
+# TGP-sim-inv
+#   method         metric  best   min
+# 1 pca-plink-pure rmsd      17    15
+# 2 pca-plink-pure auc       15     6
+# 3 gcta           rmsd       3     3
+# 4 gcta           auc        9     6
+# best rmsd: gcta (significant)
+# best auc: gcta (significant)
+#
 # HGDP-sim-inv
 #   method         metric  best   min
 # 1 pca-plink-pure rmsd      88    14
@@ -498,4 +487,75 @@ Rscript real-13-stats.R --bfile $name --const_herit_loci
 # best rmsd: gcta (tie)
 # best auc: gcta (significant)
 
-############# HERE on LABBYDUKE
+time Rscript real-15-plots-big.R --real_sim --const_herit_loci
+
+###############
+### GLOBALS ###
+###############
+
+# cross-dataset analyses, including all of: sim, real, and real-sim
+
+# reports on actual m_causal values used in all sims (used for paper, and to catch an unexpected error from an early run!)
+time Rscript real-14-report-m-causal.R
+# sim-n1000-k10-f0.1-s0.5-g1: 100
+# sim-n100-k10-f0.1-s0.5-g1: 10
+# sim-n1000-k10-f0.1-s0.5-g20: 100
+# HoPacAll_ld_prune_1000kb_0.3: 292
+# HoPacAll_ld_prune_1000kb_0.3_sim: 292
+# hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01: 93
+# hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim: 93
+# all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01: 250
+# all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim: 250
+time Rscript real-14-report-m-causal.R --const_herit_loci
+# sim-n1000-k10-f0.1-s0.5-g1: 100
+# sim-n100-k10-f0.1-s0.5-g1: 10
+# sim-n1000-k10-f0.1-s0.5-g20: 100
+# HoPacAll_ld_prune_1000kb_0.3: 292
+# HoPacAll_ld_prune_1000kb_0.3_sim: 292
+# hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01: 93
+# hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim: 93
+# all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01: 250
+# all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim: 250
+
+# MAF plot code
+time Rscript real-17-mafs-plot.R
+# 0m13.937s ideapad
+
+# a comparison of RMSD and lambda across all datasets
+time Rscript real-11-inflation-across-datasets.R
+# model fit:
+# rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
+#         a         b 
+# 0.5804150 0.5994265 
+# log-linear approx: log(lambda) = RMSD * 5.75
+# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00849
+# threshold map (log-linear): lambda = 1.05, RMSD = 0.00849
+#
+# OLD pre-real-sim
+#         a         b 
+# 0.5607461 0.6221887 
+# log-linear approx: log(lambda) = RMSD * 5.73
+# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00851
+# threshold map (log-linear): lambda = 1.05, RMSD = 0.00851
+#
+# OLDEST
+#         a         b 
+# 0.5481480 0.6381526
+# log-linear approx: log(lambda) = RMSD * 5.72
+# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00853
+# threshold map (log-linear): lambda = 1.05, RMSD = 0.00853
+time Rscript real-11-inflation-across-datasets.R --const_herit_loci
+# model fit:
+# rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
+#         a         b 
+# 0.5448049 0.6532107 
+# log-linear approx: log(lambda) = RMSD * 5.62
+# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00868
+# threshold map (log-linear): lambda = 1.05, RMSD = 0.00868
+#
+# OLD pre-real-sim
+#         a         b 
+# 0.5291012 0.6772195 
+# log-linear approx: log(lambda) = RMSD * 5.58
+# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00874
+# threshold map (log-linear): lambda = 1.05, RMSD = 0.00874
