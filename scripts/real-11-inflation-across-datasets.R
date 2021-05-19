@@ -5,7 +5,6 @@ library(readr)
 library(dplyr) # for bind_rows
 library(tibble)
 library(ochoalabtools)
-library(optparse)
 
 ## # FOR FAILED EXPERIMENT AT END OF SCRIPT
 ## library(simtrait) # for rmsd
@@ -13,6 +12,9 @@ library(optparse)
 #################
 ### CONSTANTS ###
 #################
+
+# to toggle between fitting the whole data or just the bottom half
+fit_top_half_only <- TRUE
 
 # output file name (big table)
 file_table <- 'sum.txt'
@@ -24,6 +26,7 @@ name_out <- 'sum-rmsd-vs-lambda'
 methods <- c('pca-plink-pure', 'gcta')
 # report on the RMSD predicted for lambda = 1.05
 lambda_cut <- 1.05
+srmsd_cut <- 0.01
 
 # names of datasets (paired list)
 datasets <- tibble(
@@ -62,23 +65,6 @@ lty_fit_loglin <- 2
 col_guides <- 'gray95'
 lty_guides <- 1
 
-############
-### ARGV ###
-############
-
-# define options
-option_list = list(
-    make_option("--const_herit_loci", action = "store_true", default = FALSE, 
-                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)")
-)
-
-opt_parser <- OptionParser(option_list = option_list)
-opt <- parse_args(opt_parser)
-
-# get values
-const_herit_loci <- opt$const_herit_loci
-
-
 ################
 ### DATA/FIG ###
 ################
@@ -88,45 +74,49 @@ setwd( '../data/' )
 
 # big table of interest
 # initialize this way, it'll grow correctly
-tib_main <- NULL
+data <- NULL
 
 # load each dataset
 for ( i in 1 : nrow( datasets ) ) {
     # enter dir
     setwd( datasets$name_long[ i ] )
-    # move in one more level in this case
-    if ( const_herit_loci )
-        setwd( dir_phen )
-    
-    # read the big table!
-    tib <- read_tsv(
-        file_table,
-        col_types = 'ciiddd'
-    )
 
-    # subset to use only the two methods we talk about in the paper
-    tib <- tib[ tib$method %in% methods, ]
+    for ( const_herit_loci in c(FALSE, TRUE) ) {
+        # move in one more level in this case
+        if ( const_herit_loci )
+            setwd( dir_phen )
+        
+        # read the big table!
+        tib <- read_tsv(
+            file_table,
+            col_types = 'ciiddd'
+        )
 
-    # recall the dataset of origin
-    tib$dataset <- datasets$name_short[ i ]
+        # subset to use only the two methods we talk about in the paper
+        tib <- tib[ tib$method %in% methods, ]
 
-    # boring idea, obviously GCTA was always negative and PCA was always positive SRMSD
-##     # color by method
-##     tib$col <- 'blue' # default
-## #    tib$col[ tib$method == methods[1] ] <- 'blue'
-##     tib$col[ tib$method == methods[2] ] <- 'red' # GCTA is red
+        # recall the dataset of origin
+        tib$dataset <- datasets$name_short[ i ]
+        # and the trait simulation type (in a shorter-hand notation)
+        tib$trait <- if ( const_herit_loci ) 'inv' else 'rand'
+        
+        ## # color by method
+        ## # (boring idea, obviously GCTA was always negative and PCA was always positive SRMSD)
+        ## tib$col <- 'blue' # default
+        ## tib$col[ tib$method == methods[2] ] <- 'red' # GCTA is red
 
-    # color by dataset
-    tib$col <- datasets$col[ i ]
-    
-    # concatenate into bigger table
-    tib_main <- bind_rows( tib_main, tib )
-    
+        # color by dataset
+        tib$col <- datasets$col[ i ]
+        
+        # concatenate into bigger table
+        data <- bind_rows( data, tib )
+        
+        # move back one more level in this case
+        if ( const_herit_loci )
+            setwd( '..' )
+    }
     # go back down
     setwd( '..' )
-    # move back one more level in this case
-    if ( const_herit_loci )
-        setwd( '..' )
 }
 
 ######################
@@ -140,44 +130,34 @@ lab_lambda <- expression( bold( paste("Inflation Factor (", lambda, ")") ) )
 # sigmoid fit
 # remove NAs for simplicity
 # test on one of these, it should be the same for all other metrics
-indexes_missing <- is.na( tib_main$rmsd )
-stopifnot( all( is.na( tib_main$lambda[ indexes_missing ] ) ) )
-stopifnot( all( is.na( tib_main$auc[ indexes_missing ] ) ) )
+indexes_missing <- is.na( data$rmsd )
+stopifnot( all( is.na( data$lambda[ indexes_missing ] ) ) )
+stopifnot( all( is.na( data$auc[ indexes_missing ] ) ) )
 # subset now
-tib_main <- tib_main[ !indexes_missing, ]
+data <- data[ !indexes_missing, ]
 
 # NOTE: x and y are reversed from actual plot
-y <- tib_main$rmsd
-#x <- log(tib_main$lambda)
-x <- tib_main$lambda
+y <- data$rmsd
+#x <- log(data$lambda)
+x <- data$lambda
 x2 <- sort(x)
 
-# fit full data (lambda < 1 seems to mess things up though)
-## obj <- nls( y ~ a * (x^b - 1) / (x^b + 1), start = list(a = 1/2, b = 1) )
-## Nonlinear regression model
-##   model: y ~ a * (x^b - 1)/(x^b + 1)
-##    data: parent.frame()
-##      a      b 
-## 0.5392 0.6046 
-##  residual sum-of-squares: 0.3812
-## Number of iterations to convergence: 5 
-## Achieved convergence tolerance: 2.558e-06
-
-# fit on top data only
-indexes <- x > 1
-xp <- x[ indexes ]
-yp <- y[ indexes ]
+if ( fit_top_half_only ) {
+    # fit on top data only
+    indexes <- x > 1
+    xp <- x[ indexes ]
+    yp <- y[ indexes ]
+} else {
+    # use all data (copy to the same variables so downstream code works both ways)
+    xp <- x
+    yp <- y
+}
 objp <- nls( yp ~ a * (xp^b - 1) / (xp^b + 1), start = list(a = 1/2, b = 1) )
-#print( objp )
 print( coef( objp ) )
-## Nonlinear regression model
-##   model: yp ~ a * (xp^b - 1)/(xp^b + 1)
-##    data: parent.frame()
-##      a      b 
-## 0.5481 0.6382 
-##  residual sum-of-squares: 0.01682
-## Number of iterations to convergence: 4 
-## Achieved convergence tolerance: 3.601e-07
+
+# extract coefficients for predictions
+a_fit <- coef( objp )[1]
+b_fit <- coef( objp )[2]
 
 # report on the RMSD predicted for lambda = 1.05
 # lambda is in linear scale here
@@ -200,6 +180,17 @@ message(
 ## Error in numericDeriv(form[[3L]], names(ind), env) : 
 ##   Missing value or an infinity produced when evaluating the model
 ## obj2 <- nls( x ~ ( (a + y) / (a - y) )^c, start = list(a = 0.6, c = 1) )
+# this is the inverse function
+srmsd_to_lambda <- function ( y, a, b ) {
+    ( (a + y) / (a - y) ) ^ ( 1 / b )
+}
+lambda_cut_by_srmsd <- srmsd_to_lambda( srmsd_cut, a_fit, b_fit )
+message(
+    'Inverse threshold map (sigmoidal): ',
+    'RMSD = ', srmsd_cut, ', ',
+    'lambda = ', signif( lambda_cut_by_srmsd, 3 )
+)
+
 
 # test plot
 ## plot( x, y, pch = '.', log = 'x' )
@@ -209,8 +200,8 @@ message(
 ## lines( x2, predict(objp, list(xp = x2) ), col = 3 ) # best fit!
 
 # find common data range
-range_rmsd <- range( tib_main$rmsd, na.rm = TRUE )
-range_lambda <- range( tib_main$lambda, na.rm = TRUE )
+range_rmsd <- range( data$rmsd, na.rm = TRUE )
+range_lambda <- range( data$lambda, na.rm = TRUE )
 
 # symetrize lambda range (in log scale)
 log_max_lambda <- max( abs( log( range_lambda ) ) )
@@ -221,10 +212,6 @@ range_rmsd <- c( -max_srmsd, max_srmsd )
 
 # uniformly spaced points for curve
 xp <- exp( log_max_lambda * (-100 : 100) / 100 )
-
-# place fig output here!
-if ( const_herit_loci )
-    setwd( dir_phen )
 
 # plot in base data dir
 fig_start(
@@ -252,7 +239,7 @@ lines( predict(objp, list(xp = xp) ), xp, lty = lty_fit_sigmoid, col = col_fit_s
 
 # slope prediction at lambda = 1
 # (linear approx)
-lm_m <- 1 / ( coef( objp )[1] * coef( objp )[2] / 2)
+lm_m <- 1 / ( a_fit * b_fit / 2)
 ## message( 'linear approx: lambda = RMSD * ', signif( lm_m, 3)  )
 message( 'log-linear approx: log(lambda) = RMSD * ', signif( lm_m, 3)  )
 ## abline(
@@ -280,12 +267,12 @@ message(
 
 
 # randomize rows so last dataset doesn't just overlap previous datasets
-tib_main <- tib_main[ sample( nrow(tib_main) ), ]
+data <- data[ sample( nrow(data) ), ]
 # add data on top
 points(
-    tib_main$rmsd,
-    tib_main$lambda,
-    col = tib_main$col,
+    data$rmsd,
+    data$lambda,
+    col = data$col,
     pch = '.'
 )
 # legend
@@ -308,9 +295,10 @@ legend(
     ),
     col = c('black', col_fit_sigmoid, col_fit_loglin),
     lty = c(NA, lty_fit_sigmoid, lty_fit_loglin),
-    pch = c('.', NA),
+    pch = c('.', NA, NA),
     bty = 'n',
-    cex = 0.5
+    cex = 0.5,
+    seg.len = 5
 )
 fig_end()
 

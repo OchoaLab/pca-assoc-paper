@@ -521,41 +521,14 @@ time Rscript real-14-report-m-causal.R --const_herit_loci
 time Rscript real-17-mafs-plot.R
 # 0m13.937s ideapad
 
-# a comparison of RMSD and lambda across all datasets
+# a comparison of RMSD and lambda across ALL datasets (including inv and rand traits)
+# this version that fits top half only (makes most sense for our goal of talking mostly about inflation)
 time Rscript real-11-inflation-across-datasets.R
 # model fit:
 # rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
 #         a         b 
-# 0.5804150 0.5994265 
-# log-linear approx: log(lambda) = RMSD * 5.75
-# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00849
-# threshold map (log-linear): lambda = 1.05, RMSD = 0.00849
-#
-# OLD pre-real-sim
-#         a         b 
-# 0.5607461 0.6221887 
-# log-linear approx: log(lambda) = RMSD * 5.73
-# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00851
-# threshold map (log-linear): lambda = 1.05, RMSD = 0.00851
-#
-# OLDEST
-#         a         b 
-# 0.5481480 0.6381526
-# log-linear approx: log(lambda) = RMSD * 5.72
-# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00853
-# threshold map (log-linear): lambda = 1.05, RMSD = 0.00853
-time Rscript real-11-inflation-across-datasets.R --const_herit_loci
-# model fit:
-# rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
-#         a         b 
-# 0.5448049 0.6532107 
-# log-linear approx: log(lambda) = RMSD * 5.62
-# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00868
-# threshold map (log-linear): lambda = 1.05, RMSD = 0.00868
-#
-# OLD pre-real-sim
-#         a         b 
-# 0.5291012 0.6772195 
-# log-linear approx: log(lambda) = RMSD * 5.58
-# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00874
-# threshold map (log-linear): lambda = 1.05, RMSD = 0.00874
+# 0.5604132 0.6289476 
+# log-linear approx: log(lambda) = RMSD * 5.67
+# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.0086
+# threshold map (log-linear): lambda = 1.05, RMSD = 0.0086
+# Inverse threshold map (sigmoidal): RMSD = 0.01, lambda = 1.06
