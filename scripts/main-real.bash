@@ -495,27 +495,10 @@ time Rscript real-15-plots-big.R --real_sim --const_herit_loci
 
 # cross-dataset analyses, including all of: sim, real, and real-sim
 
-# reports on actual m_causal values used in all sims (used for paper, and to catch an unexpected error from an early run!)
-time Rscript real-14-report-m-causal.R
-# sim-n1000-k10-f0.1-s0.5-g1: 100
-# sim-n100-k10-f0.1-s0.5-g1: 10
-# sim-n1000-k10-f0.1-s0.5-g20: 100
-# HoPacAll_ld_prune_1000kb_0.3: 292
-# HoPacAll_ld_prune_1000kb_0.3_sim: 292
-# hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01: 93
-# hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim: 93
-# all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01: 250
-# all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim: 250
-time Rscript real-14-report-m-causal.R --const_herit_loci
-# sim-n1000-k10-f0.1-s0.5-g1: 100
-# sim-n100-k10-f0.1-s0.5-g1: 10
-# sim-n1000-k10-f0.1-s0.5-g20: 100
-# HoPacAll_ld_prune_1000kb_0.3: 292
-# HoPacAll_ld_prune_1000kb_0.3_sim: 292
-# hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01: 93
-# hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim: 93
-# all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01: 250
-# all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim: 250
+# reports actual dimensions (n_ind, m_loci, K, and m_causal) used in all datasets
+# (validates every replicate too! for m_causal compares both "inv" and "rand"!)
+# writes data/dimensions.txt
+time Rscript real-14-dimensions.R
 
 # MAF plot code
 time Rscript real-17-mafs-plot.R
