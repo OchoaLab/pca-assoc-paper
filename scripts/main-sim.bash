@@ -103,6 +103,8 @@ done
 
 # for MAF comparisons plot (only needs rep-1)
 time Rscript real-16-mafs.R --bfile $name --sim
+# get popkin estimates for an overview plot only (also rep-1/ only)
+time Rscript real-03-popkin.R --bfile $name --sim
 
 
 # summarizes p-values into AUC and RMSD for each method/rep/pc
@@ -242,4 +244,3 @@ Rscript real-13-stats.R --bfile $name --const_herit_loci
 # best auc: gcta (significant)
 
 time Rscript real-15-plots-big.R --const_herit_loci
-

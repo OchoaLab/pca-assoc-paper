@@ -46,54 +46,59 @@ for ( name in datasets$name_long ) {
     setwd( '..' )
 }
 
-# start plot
-fig_start( 'mafs' )
+plot_mafs_panel <- function( datasets, mafs, leg_cex = 0.5, leg_seg_len = 3 ) {
+    # set up plot area
+    plot(
+        NA,
+        # axis labels for first time
+        xlab = 'Minor Allele Frequency',
+        ylab = 'Cumulative Probability',
+        main = '',
+        xlim = c(0, 0.5),
+        ylim = c(0, 1)
+    )
 
-# set up plot area
-plot(
-    NA,
-    # axis labels for first time
-    xlab = 'Minor Allele Frequency',
-    ylab = 'Cumulative Probability',
-    main = '',
-    xlim = c(0, 0.5),
-    ylim = c(0, 1)
-)
+    # navigate datasets
+    for ( i in 1 : nrow( datasets ) ) {
+        # get name used in key
+        name_long <- datasets$name_long[ i ]
+        
+        # a nicer alternative to `ecdf`, more flexibility for me
+        # https://stat.ethz.ch/pipermail/r-help/2016-June/439416.html
+        x <- sort( mafs[[ name_long ]] )
+        y <- ppoints( x )
+        
+        # plot, with add as needed
+        lines(
+            x,
+            y,
+            col = datasets$col[ i ],
+            lty = datasets$lty[ i ]
+        )
+    }
 
-# navigate datasets
-for ( i in 1 : nrow( datasets ) ) {
-    # get name used in key
-    name_long <- datasets$name_long[ i ]
-    
-    # a nicer alternative to `ecdf`, more flexibility for me
-    # https://stat.ethz.ch/pipermail/r-help/2016-June/439416.html
-    x <- sort( mafs[[ name_long ]] )
-    y <- ppoints( x )
-    
-    # plot, with add as needed
-    lines(
-        x,
-        y,
-        col = datasets$col[ i ],
-        lty = datasets$lty[ i ]
+    # legend, (almost the) same as RMSD-vs-lambda fig
+    # reverse order because it matches curve appearance better
+    legend(
+        'bottomright',
+        # these two are reversed together
+        rev( datasets$name_short ),
+        text.col = rev( datasets$col ),
+        title = 'Dataset',
+        title.col = 'black',
+        pch = NA,
+        col = rev( datasets$col ),
+        lty = rev( datasets$lty ),
+        bty = 'n',
+        cex = leg_cex,
+        seg.len = leg_seg_len
     )
 }
 
-# legend, (almost the) same as RMSD-vs-lambda fig
-# reverse order because it matches curve appearance better
-legend(
-    'bottomright',
-    # these two are reversed together
-    rev( datasets$name_short ),
-    text.col = rev( datasets$col ),
-    title = 'Dataset',
-    title.col = 'black',
-    pch = NA,
-    col = rev( datasets$col ),
-    lty = rev( datasets$lty ),
-    bty = 'n',
-    cex = 0.5,
-    seg.len = 3
-)
-
+# make independent plot
+fig_start( 'mafs' )
+plot_mafs_panel( datasets, mafs )
 fig_end()
+
+# save data and panel function for replotting as part of bigger, multipanel figure
+save( plot_mafs_panel, datasets, mafs, file = 'mafs.RData' )
