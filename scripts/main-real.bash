@@ -1,3 +1,8 @@
+
+# creates a table other scripts might use, especially when creating figures, for consistent human-facing naming, and loops across all datasets
+# writes data/datasets.txt
+Rscript real-00-datasets.R
+
 # make links to data
 # based on: gas-rgls/scripts/data_links.bash
 # use LD pruned only
@@ -119,53 +124,6 @@ time Rscript real-09-figs.R --bfile $name
 # # OBSOLETE compares PCAs only (for internal purposes only); Not redone after m_causal bug was found
 # time Rscript real-09-figs.R --bfile $name --pca
 
-# a summary of "best PCs" in a simple analysis
-Rscript real-13-stats.R --bfile $name
-# Human Origins
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      90    81 # OLD: 90,80
-# 2 pca-plink-pure auc       34    33 # OLD: 34,31
-# 3 gcta           rmsd       5     0
-# 4 gcta           auc       12     0
-# best rmsd: gcta (significant)
-# best auc: gcta (significant)
-#
-# HGDP MAF
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      57    26
-# 2 pca-plink-pure auc       19     8
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        3     0
-# best rmsd: gcta (significant)
-# best auc: gcta (significant)
-#
-# TGP MAF
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      68    39
-# 2 pca-plink-pure auc       11     6
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc       10     0
-# best rmsd: gcta (significant)
-# best auc: gcta (significant)
-#
-# HGDP
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      35    17 # OLD: 72,17
-# 2 pca-plink-pure auc       11     4
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        0     0
-# best rmsd: pca-plink-pure (tie) # OLD: significant
-# best auc: gcta (significant) # OLD tie
-#
-# TGP
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      90     6 # OLD: 4,4
-# 2 pca-plink-pure auc        7     4
-# 3 gcta           rmsd       4     0
-# 4 gcta           auc        5     0
-# best rmsd: pca-plink-pure (significant)
-# best auc: gcta (tie)
-
 # tests that p-value vectors have the right lengths of m_loci
 # to make sure nothing was corrupted due to scripts stopping unexpectedly or incomplete file transfers
 # (now test is peformed within real-07-auc-rmsd.R above too, but this can retest everything without recalculating expensive summary statistics).
@@ -225,52 +183,6 @@ time Rscript real-02-subset-eigenvec.R --bfile $name --dcc --clean
 time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
 time Rscript real-09-figs.R --bfile $name --const_herit_loci
-Rscript real-13-stats.R --bfile $name --const_herit_loci
-# Human Origins
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      90    71 # OLD: 90,65
-# 2 pca-plink-pure auc       34    16 # OLD: 34,9
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        1     0
-# best rmsd: gcta (significant)
-# best auc: gcta (significant)
-#
-# HGDP MAF
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      90    31
-# 2 pca-plink-pure auc       17    15
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        1     0
-# best rmsd: gcta (significant)
-# best auc: gcta (significant)
-#
-# TGP MAF
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      51    34
-# 2 pca-plink-pure auc        9     8
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        1     0
-# best rmsd: gcta (significant)
-# best auc: gcta (significant)
-#
-# HGDP
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      90    87 # OLD 2,2
-# 2 pca-plink-pure auc        4     1
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        1     0
-# best rmsd: pca-plink-pure (significant)
-# best auc: gcta (significant) # OLD: tie
-#
-# TGP
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd       1     0 # OLD 0,0
-# 2 pca-plink-pure auc        2     2
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        0     0
-# best rmsd: pca-plink-pure (significant)
-# best auc: gcta (significant)
-
 time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90 --final --const_herit_loci
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
@@ -390,43 +302,6 @@ time Rscript real-09-figs.R --bfile $name
 time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --final
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
-Rscript real-13-stats.R --bfile $name
-# HO-sim-rand
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      84    51
-# 2 pca-plink-pure auc       49    25
-# 3 gcta           rmsd       5     5
-# 4 gcta           auc       25    17
-# best rmsd: pca-plink-pure (significant)
-# best auc: gcta (significant)
-#
-# TGP-sim-rand
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      86    15
-# 2 pca-plink-pure auc        6     6
-# 3 gcta           rmsd       5     3
-# 4 gcta           auc       25     3
-# best rmsd: gcta (significant)
-# best auc: gcta (significant)
-#
-# HGDP-sim-rand
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      88    16
-# 2 pca-plink-pure auc       17    13
-# 3 gcta           rmsd       2     0
-# 4 gcta           auc       10     0
-# best rmsd: pca-plink-pure (tie)
-# best auc: gcta (tie)
-#
-# HGDP-sim-rand-UNIF
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      81    18
-# 2 pca-plink-pure auc       15    14
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        1     0
-# best rmsd: gcta (significant)
-# best auc: gcta (significant)
-
 time Rscript real-15-plots-big.R --real_sim
 
 
@@ -450,42 +325,6 @@ time Rscript real-09-figs.R --bfile $name --const_herit_loci
 time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --final --const_herit_loci
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
-Rscript real-13-stats.R --bfile $name --const_herit_loci
-# HO-sim-inv
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      89    37
-# 2 pca-plink-pure auc       47    16
-# 3 gcta           rmsd       5     5
-# 4 gcta           auc       47     0
-# best rmsd: pca-plink-pure (tie)
-# best auc: gcta (significant)
-#
-# TGP-sim-inv
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      17    15
-# 2 pca-plink-pure auc       15     6
-# 3 gcta           rmsd       3     3
-# 4 gcta           auc        9     6
-# best rmsd: gcta (significant)
-# best auc: gcta (significant)
-#
-# HGDP-sim-inv
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      88    14
-# 2 pca-plink-pure auc       20     7
-# 3 gcta           rmsd       2     0
-# 4 gcta           auc        8     2
-# best rmsd: gcta (tie)
-# best auc: gcta (significant)
-#
-# HGDP-sim-inv-UNIF
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      25    14
-# 2 pca-plink-pure auc       15    14
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        0     0
-# best rmsd: gcta (tie)
-# best auc: gcta (significant)
 
 time Rscript real-15-plots-big.R --real_sim --const_herit_loci
 
@@ -499,6 +338,7 @@ time Rscript real-15-plots-big.R --real_sim --const_herit_loci
 # (validates every replicate too! for m_causal compares both "inv" and "rand"!)
 # writes data/dimensions.txt
 time Rscript real-14-dimensions.R
+# 21s ideapad
 
 # MAF plot code
 time Rscript real-17-mafs-plot.R
@@ -508,6 +348,9 @@ time Rscript real-17-mafs-plot.R
 # includes data generated by MAF script above
 time Rscript all-01-kinship.R
 # 30s ideapad
+
+# main statistical evaluations between methods
+time Rscript real-13-stats.R
 
 # a comparison of RMSD and lambda across ALL datasets (including inv and rand traits)
 # this version that fits top half only (makes most sense for our goal of talking mostly about inflation)

@@ -1,4 +1,4 @@
-name_short	type	m_loci	n_ind	K	m_causal
+name_paper	type	m_loci	n_ind	K	m_causal
 Large sample size sim.	Admix.	100000	1000	10	100
 Small sample size sim.	Admix.	100000	100	10	10
 Family structure sim.	Admix.+Pedig.	100000	1000	10	100

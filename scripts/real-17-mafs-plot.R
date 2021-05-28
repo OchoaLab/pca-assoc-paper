@@ -1,45 +1,33 @@
 # plots MAF distributions gathered in previous script
 
-library(tibble)
+library(readr)
 library(ochoalabtools)
 
-# names of datasets (paired list)
-# data matches rmsd-vs-lambdas fig, including short names and colors
-datasets <- tibble(
-    name_short = c(
-        'Large sample size sim.',
-        'Small sample size sim.',
-        'Family structure sim.',
-        'Human Origins sim',
-        'Human Origins',
-        'HGDP sim.',
-        'HGDP',
-        '1000 Genomes sim.',
-        '1000 Genomes'
-    ),
-    name_long = c(
-        'sim-n1000-k10-f0.1-s0.5-g1',
-        'sim-n100-k10-f0.1-s0.5-g1',
-        'sim-n1000-k10-f0.1-s0.5-g20',
-        'HoPacAll_ld_prune_1000kb_0.3_sim',
-        'HoPacAll_ld_prune_1000kb_0.3',
-        #'hgdp_wgs_autosomes_ld_prune_1000kb_0.3',
-        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim',
-        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
-        #'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'
-        'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim',
-        'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'
-    ),
-    col = c(1, 2, 3, 4, 4, 5, 5, 6, 6),
-    lty = c(2, 2, 2, 2, 1, 2, 1, 2, 1)
+# only thing compared to other plots is we want this alternate order
+name_dir_order <- c(
+    'sim-n1000-k10-f0.1-s0.5-g1',
+    'sim-n100-k10-f0.1-s0.5-g1',
+    'sim-n1000-k10-f0.1-s0.5-g20',
+    'HoPacAll_ld_prune_1000kb_0.3_sim',
+    'HoPacAll_ld_prune_1000kb_0.3',
+    'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim',
+    'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
+    'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim',
+    'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'
 )
 
 # move to where the data is
 setwd( '../data/' )
 
+# read datasets info (names for inputs and output, colors, line types)
+datasets <- read_tsv( 'datasets.txt', col_types = 'cccii' )
+# reorder as desired
+indexes <- match( name_dir_order, datasets$name_dir )
+datasets <- datasets[ indexes, ]
+
 # loads individual `maf` vectors into named list for all datasets
 mafs <- list()
-for ( name in datasets$name_long ) {
+for ( name in datasets$name_dir ) {
     setwd( name )
     load( 'maf.RData' )
     mafs[[ name ]] <- maf
@@ -61,11 +49,11 @@ plot_mafs_panel <- function( datasets, mafs, leg_cex = 0.5, leg_seg_len = 3 ) {
     # navigate datasets
     for ( i in 1 : nrow( datasets ) ) {
         # get name used in key
-        name_long <- datasets$name_long[ i ]
+        name_dir <- datasets$name_dir[ i ]
         
         # a nicer alternative to `ecdf`, more flexibility for me
         # https://stat.ethz.ch/pipermail/r-help/2016-June/439416.html
-        x <- sort( mafs[[ name_long ]] )
+        x <- sort( mafs[[ name_dir ]] )
         y <- ppoints( x )
         
         # plot, with add as needed
@@ -82,7 +70,7 @@ plot_mafs_panel <- function( datasets, mafs, leg_cex = 0.5, leg_seg_len = 3 ) {
     legend(
         'bottomright',
         # these two are reversed together
-        rev( datasets$name_short ),
+        rev( datasets$name_paper ),
         text.col = rev( datasets$col ),
         title = 'Dataset',
         title.col = 'black',

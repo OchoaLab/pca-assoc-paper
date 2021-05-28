@@ -161,7 +161,7 @@ lineplots_rmsd_auc_one_panel <- function( data, lab, r_max, guide_max = FALSE, m
         lty = 2,
         col = 'gray'
     )
-    
+
     # method curves/areas go last
     # first pass gets data (in case we want a guide line in the background)
     stats <- list()
@@ -184,6 +184,17 @@ lineplots_rmsd_auc_one_panel <- function( data, lab, r_max, guide_max = FALSE, m
             h = median_max,
             lty = 2,
             col = 'gray'
+        )
+    } else {
+        # assumptions: `guide_max = TRUE` only for AUC plots, so it's FALSE for RMSD plots (here)
+        # add area to mark acceptably low SRMSDs
+        # NOTE: `x` overflows from `c(0, 90)` (from -10 to 100) because we want area to extend like it's just in the background (looks better, contrasts with data)
+        srmsd_cut <- 0.01
+        polygon(
+            c(-10, 100, 100, -10),
+            c( srmsd_cut, srmsd_cut, -srmsd_cut, -srmsd_cut ),
+            col = alpha( 'gray', alpha_q ), # the darker of the two areas to see it more easily
+            border = FALSE # no border lines
         )
     }
     

@@ -14,51 +14,6 @@ file_simtrait <- 'simtrait.RData'
 file_bnpsd <- 'bnpsd.RData'
 rep_max <- 50
 
-# names of datasets (paired list)
-datasets <- tibble(
-    name_short = c(
-        'Large sample size sim.',
-        'Small sample size sim.',
-        'Family structure sim.',
-        'Human Origins',
-        'HGDP',
-        '1000 Genomes',
-        'Human Origins sim.',
-        'HGDP sim.',
-        '1000 Genomes sim.'
-    ),
-    name_long = c(
-        'sim-n1000-k10-f0.1-s0.5-g1',
-        'sim-n100-k10-f0.1-s0.5-g1',
-        'sim-n1000-k10-f0.1-s0.5-g20',
-        'HoPacAll_ld_prune_1000kb_0.3',
-        #'hgdp_wgs_autosomes_ld_prune_1000kb_0.3',
-        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
-        #'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'
-        'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01',
-        'HoPacAll_ld_prune_1000kb_0.3_sim',
-        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim',
-        'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim'
-    ),
-    type = c(
-        'Admix.',
-        'Admix.',
-        'Admix.+Pedig.',
-        'Real',
-        'Real',
-        'Real',
-        'Tree',
-        'Tree',
-        'Tree'
-    )
-)
-
-# initialize other columns to avoid errors
-datasets$m_loci <- NA
-datasets$n_ind <- NA
-datasets$K <- NA
-datasets$m_causal <- NA
-
 # directory name, needed in one mode (weird var name just stuck)
 dir_phen <- 'const_herit_loci/'
 
@@ -69,17 +24,29 @@ dir_phen <- 'const_herit_loci/'
 # move to where the data is
 setwd( '../data/' )
 
+# read in some starter info
+datasets <- read_tsv( 'datasets.txt', col_types = 'cccii' )
+# toss some data we don't need here and don't want in output
+datasets$col <- NULL
+datasets$lty <- NULL
+
+# initialize other columns to avoid errors
+datasets$m_loci <- NA
+datasets$n_ind <- NA
+datasets$K <- NA
+datasets$m_causal <- NA
+
 # shared in all cases
 reps <- 1 : rep_max
 
 # load each dataset
 for ( i in 1 : nrow( datasets ) ) {
     # copy down name
-    name_long <- datasets$name_long[ i ]
+    name_dir <- datasets$name_dir[ i ]
     # enter dir
-    setwd( name_long )
+    setwd( name_dir )
     # decide if it's simulation or not, which decides where some genotype data ought to be
-    is_sim <- grepl( 'sim', name_long )
+    is_sim <- grepl( 'sim', name_dir )
     
     # get data dimensions
     # for real datasets, the data is in this directory (not inside reps)
@@ -154,9 +121,9 @@ for ( i in 1 : nrow( datasets ) ) {
     # check coherence of dimensions for simulations (where there's more than one rep)
     if ( is_sim ) {
         if ( length( unique( n_ind ) ) != 1 )
-            stop( 'n_ind did not all agree: ', datasets$name_short[ i ], ': ', toString( n_ind ) )
+            stop( 'n_ind did not all agree: ', datasets$name_paper[ i ], ': ', toString( n_ind ) )
         if ( length( unique( m_loci ) ) != 1 )
-            stop( 'm_loci did not all agree: ', datasets$name_short[ i ], ': ', toString( m_loci ) )
+            stop( 'm_loci did not all agree: ', datasets$name_paper[ i ], ': ', toString( m_loci ) )
         # store result in same tibble as other data
         # since all are now verified to be equal, just store first one
         datasets$n_ind[ i ] <- n_ind[ 1 ]
@@ -168,7 +135,7 @@ for ( i in 1 : nrow( datasets ) ) {
     # if these don't all agree, complain and stop (expect complete agreement!)
     # error message includes complete list
     if ( length( unique( m_causals ) ) != 1 )
-        stop( 'm_causals did not all agree: ', datasets$name_short[ i ], ': ', toString( m_causals ) )
+        stop( 'm_causals did not all agree: ', datasets$name_paper[ i ], ': ', toString( m_causals ) )
     # store result in same tibble as other data
     # since all are now verified to be equal, just store first one
     datasets$m_causal[ i ] <- m_causals[ 1 ]
@@ -179,7 +146,7 @@ for ( i in 1 : nrow( datasets ) ) {
 
 # clean up things before saving table, so it's ready for the paper to just load
 # delete this column only
-datasets$name_long <- NULL
+datasets$name_dir <- NULL
 # would rename other columns, but since we need LaTeX codes (math and superscripts), better to do that on LaTeX's side instead of here
 
 # write table to a file

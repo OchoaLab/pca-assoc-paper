@@ -130,35 +130,6 @@ time Rscript real-09-figs.R --bfile $name
 # exploratory version compares pure PCA to PCs from popkinsuppl::kinship_std (practically the same)
 time Rscript real-09-figs.R --bfile $name --pca
 
-# a summary of "best PCs" in a simple analysis
-Rscript real-13-stats.R --bfile $name
-# LARGE
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      21     3 # OLD 45,3
-# 2 pca-plink-pure auc        3     3
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        1     0
-# best rmsd: pca-plink-pure (tie) # OLD significant
-# best auc: gcta (significant)
-#
-# SMALL
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd       5     2 # OLD 88,3
-# 2 pca-plink-pure auc        2     1
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        0     0
-# best rmsd: gcta (significant) # OLD: pca-plink-pure (tie)
-# best auc: gcta (tie)
-#
-# FAMILY
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      90    84
-# 2 pca-plink-pure auc       10     4
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        0     0
-# best rmsd: gcta (significant)
-# best auc: gcta (significant)
-
 # tests that p-value vectors have the right lengths of m_loci
 # to make sure nothing was corrupted due to scripts stopping unexpectedly or incomplete file transfers
 # (now test is peformed within real-07-auc-rmsd.R above too, but this can retest everything without recalculating expensive summary statistics).
@@ -214,33 +185,5 @@ time Rscript real-09-figs.R --bfile $name --const_herit_loci
 time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --final --const_herit_loci
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
-
-Rscript real-13-stats.R --bfile $name --const_herit_loci
-# LARGE
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      90     8 # OLD: 90,4
-# 2 pca-plink-pure auc        4     3
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        1     0
-# best rmsd: gcta (tie) # OLD: pca-plink-pure (significant)
-# best auc: gcta (significant)
-#
-# SMALL
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd       3     2 # OLD 84,2
-# 2 pca-plink-pure auc        1     1
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        0     0
-# best rmsd: gcta (significant) # OLD: tie
-# best auc: gcta (significant)
-#
-# FAMILY
-#   method         metric  best   min
-# 1 pca-plink-pure rmsd      90    85
-# 2 pca-plink-pure auc       24     6 # OLD: 24,5
-# 3 gcta           rmsd       0     0
-# 4 gcta           auc        0     0
-# best rmsd: gcta (significant)
-# best auc: gcta (significant)
 
 time Rscript real-15-plots-big.R --const_herit_loci

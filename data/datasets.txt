@@ -1,0 +1,10 @@
+name_paper	name_dir	type	col	lty
+Large sample size sim.	sim-n1000-k10-f0.1-s0.5-g1	Admix.	1	2
+Small sample size sim.	sim-n100-k10-f0.1-s0.5-g1	Admix.	2	2
+Family structure sim.	sim-n1000-k10-f0.1-s0.5-g20	Admix.+Pedig.	3	2
+Human Origins	HoPacAll_ld_prune_1000kb_0.3	Real	4	1
+HGDP	hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01	Real	5	1
+1000 Genomes	all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01	Real	6	1
+Human Origins sim.	HoPacAll_ld_prune_1000kb_0.3_sim	Tree	4	2
+HGDP sim.	hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim	Tree	5	2
+1000 Genomes sim.	all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim	Tree	6	2

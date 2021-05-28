@@ -3,7 +3,6 @@
 
 library(readr)
 library(dplyr) # for bind_rows
-library(tibble)
 library(ochoalabtools)
 
 ## # FOR FAILED EXPERIMENT AT END OF SCRIPT
@@ -28,34 +27,19 @@ methods <- c('pca-plink-pure', 'gcta')
 lambda_cut <- 1.05
 srmsd_cut <- 0.01
 
-# names of datasets (paired list)
-datasets <- tibble(
-    name_short = c(
-        'Large sample size sim.',
-        'Small sample size sim.',
-        'Family structure sim.',
-        'Human Origins',
-        'Human Origins sim.',
-        'HGDP',
-        'HGDP sim.',
-        '1000 Genomes',
-        '1000 Genomes sim.'
-    ),
-    name_long = c(
-        'sim-n1000-k10-f0.1-s0.5-g1',
-        'sim-n100-k10-f0.1-s0.5-g1',
-        'sim-n1000-k10-f0.1-s0.5-g20',
-        'HoPacAll_ld_prune_1000kb_0.3',
-        'HoPacAll_ld_prune_1000kb_0.3_sim',
-        #'hgdp_wgs_autosomes_ld_prune_1000kb_0.3',
-        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
-        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim',
-        #'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'
-        'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01',
-        'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim'
-    ),
-    col = c(1,2,3,4,4,5,5,6,6)
+# only thing compared to other plots is we want this alternate order
+name_dir_order <- c(
+    'sim-n1000-k10-f0.1-s0.5-g1',
+    'sim-n100-k10-f0.1-s0.5-g1',
+    'sim-n1000-k10-f0.1-s0.5-g20',
+    'HoPacAll_ld_prune_1000kb_0.3',
+    'HoPacAll_ld_prune_1000kb_0.3_sim',
+    'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
+    'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim',
+    'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01',
+    'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim'
 )
+
 # color for fit curve
 col_fit_sigmoid <- 'gray40'
 lty_fit_sigmoid <- 5
@@ -72,6 +56,12 @@ lty_guides <- 1
 # move to where the data is
 setwd( '../data/' )
 
+# read datasets info (names for inputs and output, colors, line types)
+datasets <- read_tsv( 'datasets.txt', col_types = 'cccii' )
+# reorder as desired
+indexes <- match( name_dir_order, datasets$name_dir )
+datasets <- datasets[ indexes, ]
+
 # big table of interest
 # initialize this way, it'll grow correctly
 data <- NULL
@@ -79,7 +69,7 @@ data <- NULL
 # load each dataset
 for ( i in 1 : nrow( datasets ) ) {
     # enter dir
-    setwd( datasets$name_long[ i ] )
+    setwd( datasets$name_dir[ i ] )
 
     for ( const_herit_loci in c(FALSE, TRUE) ) {
         # move in one more level in this case
@@ -96,7 +86,7 @@ for ( i in 1 : nrow( datasets ) ) {
         tib <- tib[ tib$method %in% methods, ]
 
         # recall the dataset of origin
-        tib$dataset <- datasets$name_short[ i ]
+        tib$dataset <- datasets$name_paper[ i ]
         # and the trait simulation type (in a shorter-hand notation)
         tib$trait <- if ( const_herit_loci ) 'inv' else 'rand'
         
@@ -278,7 +268,7 @@ points(
 # legend
 legend(
     'bottomright',
-    datasets$name_short,
+    datasets$name_paper,
     title = 'Dataset',
     text.col = datasets$col,
     pch = NA,
