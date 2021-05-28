@@ -190,56 +190,6 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_heri
 time Rscript real-15-plots-big.R --real --const_herit_loci
 
 
-####################
-### m_causal_fac ###
-####################
-
-# NOTE: this is a failed/abandoned experiment
-
-#fac=100
-#fac=70
-#fac=60
-#fac=55
-fac=50
-#fac=45
-#fac=40
-
-for rep in {1..50}; do
-    time Rscript real-04-simtrait.R --bfile $name -r $rep --m_causal_fac $fac --const_herit_loci
-done
-# 0m4.383s ideapad HGDP each
-# 0m3.740s ideapad TGP each
-
-# PCA version
-time Rscript real-02-subset-eigenvec.R --bfile $name --plink
-for pcs in {0..90}; do
-    for rep in {1..50}; do
-	time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs --plink --m_causal_fac $fac --const_herit_loci
-    done
-done
-# 1m1.205s ideapad HGDP
-# 0m27.351s ideapad TGP
-time Rscript real-02-subset-eigenvec.R --bfile $name --plink --clean
-
-# GCTA version
-time Rscript real-02-subset-eigenvec.R --bfile $name
-for pcs in {0..90}; do
-    for rep in {1..50}; do
-	time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs --m_causal_fac $fac --const_herit_loci
-    done
-done
-time Rscript real-02-subset-eigenvec.R --bfile $name --clean
-# 8m51.743s ideapad HGDP
-# 20m42.459s ideapad TGP
-
-# ends up doing just the one file
-time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90 --m_causal_fac $fac --const_herit_loci
-# 0m19.992s ideapad HGDP (both runs)
-# 0m6.597s ideapad TGP (both runs)
-
-time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 --m_causal_fac $fac --const_herit_loci
-time Rscript real-09-figs.R --bfile $name --m_causal_fac $fac --const_herit_loci
-
 ###################
 ### FIT FOR SIM ###
 ###################
