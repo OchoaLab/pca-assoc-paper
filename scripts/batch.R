@@ -3,13 +3,28 @@ library(ochoalabtools)
 # slurm job submission script for DCC
 
 # shared items for all runs
-#plink <- TRUE
-plink <- FALSE
-#bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short <- 'l'
+plink <- TRUE # FALSE
+inv <- FALSE # TRUE
+#bfile <- 'sim-n100-k10-f0.1-s0.5-g1'; short <- 's'
+bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short <- 'l'
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'; short <- 'f'
 #bfile <- 'HoPacAll_ld_prune_1000kb_0.3'; short <- 'h'
 #bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01'; short <- 'd'
-bfile <- 'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'; short <- 'k'
+#bfile <- 'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'; short <- 'k'
+#bfile <- 'HoPacAll_ld_prune_1000kb_0.3_sim'; short <- 'H'
+#bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim'; short <- 'D'
+#bfile <- 'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim'; short <- 'K'
+
+# needed to make sure each process gets enough memory if all my jobs saturate the machines
+# (didn't have to change last time, but before TGP was thinned I needed 4 threads for GCTA runs)
+threads <- 1
+
+#############################
+
+# set some settings/etc automatically fron here down
+
+# add trait type marker to output
+short <- paste0( short, if ( inv ) 'i' else 'r' )
 
 # GCTA uses more memory, this works for the largest cases
 mem <- if ( plink ) '4G' else '16G'
@@ -20,10 +35,6 @@ script <- if ( plink ) 'real-06-pca-plink.R' else 'real-05-gcta.R'
 # so names don't overlap between plink and gcta runs
 short <- paste0( short, if (plink) 'p' else 'g' )
 
-# needed to make sure each process gets enough memory if all my jobs saturate the machines
-# (didn't have to change last time, but before TGP was thinned I needed 4 threads for GCTA runs)
-threads <- 1
-
 # main submission steps
 # global vars: script, bfile, short, mem, plink
 submit_rep_pcs <- function(
@@ -31,19 +42,26 @@ submit_rep_pcs <- function(
                            pcs
                            ) {
     # pass params to command
+    # first do core set of parameters, more to be added below as needed
     commands <- paste0(
         'time Rscript ', script,
         ' --bfile ', bfile,
         ' -r ', rep,
         ' --n_pcs ', pcs,
         ' -t ', threads,
-        ' --const_herit_loci', # NEW!
         ' --dcc'
-#        ' --sim'
     )
+
+    # use desired trait type from global var (indicates trait file locations)
+    if ( inv )
+        commands <- paste0( commands, ' --const_herit_loci' )
+
+    # infer if this is a simulation or not (indicates genotype file locations)
+    if ( grepl( 'sim', bfile ) )
+        commands <- paste0( commands, ' --sim' )
     
     # load plink module if needed
-    if ( plink )
+    if ( plink ) {
         # first add --plink flag (same line)
         commands <- paste0( commands, ' --plink' )
         # then load plink module (separate lines)
@@ -52,9 +70,10 @@ submit_rep_pcs <- function(
             commands,
             'module unload Plink/2.00a3LM'
         )
+    }
     
     # give name clear params too
-    name <- paste0( short, 'r', rep, 'p', pcs )
+    name <- paste0( short, rep, '-', pcs )
     
     # create submission file
     batch_writer(
