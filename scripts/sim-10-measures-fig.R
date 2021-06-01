@@ -14,26 +14,26 @@ rep <- args[1]
 # use this simulation only for illustration
 name <- 'sim-n1000-k10-f0.1-s0.5-g1'
 # these have weird names, simplify mapping
-method_pca <- 'pca-plink-pure'
-method_lmm <- 'gcta'
+model_pca <- 'pca-plink-pure'
+model_lmm <- 'gcta'
 # dir for archived data, for sims it's present on viiiaX6 only
 dir_archive <- '~/dbs2/PCA/'
 
 # define curves to look at
 # good case (LMM with zero PCs)
-# bad case inflated (PCA with zero PCs)
 # bad case deflated (LMM with 90 PCs)
-methods <- c(
-    method_lmm,
-    method_pca,
-    method_lmm
+# bad case inflated (PCA with zero PCs)
+models <- c(
+    model_lmm,
+    model_lmm,
+    model_pca
 )
-method_names <- 1:length(methods)
-rs <- c( 0, 0, 90 )
+model_names <- paste0( 'M', 1:length(models) )
+rs <- c( 0, 90, 0 )
 colors <- c(
     'green',
-    'red',
-    'blue'
+    'blue',
+    'red'
 )
 
 # load causal_indexes (in ordinary data location)
@@ -52,9 +52,9 @@ setwd( dir_archive )
 setwd( name )
 setwd( dir_rep )
 
-read_pvals <- function( method, n_pcs, m_loci = NA ) {
+read_pvals <- function( model, n_pcs, m_loci = NA ) {
     # file to read
-    file_pvals <- paste0( 'pvals_', method, '_', n_pcs, '.txt.gz' )
+    file_pvals <- paste0( 'pvals_', model, '_', n_pcs, '.txt.gz' )
     
     # if there's no input file, die!
     if ( !file.exists( file_pvals ) )
@@ -82,9 +82,9 @@ read_pvals <- function( method, n_pcs, m_loci = NA ) {
 }
 
 # read p-values in loop, shared by all panels
-pvals <- vector( 'list', length(methods) )
-for ( i in 1 : length(methods) ) {
-    pvals[[i]] <- read_pvals( methods[i], rs[i] )
+pvals <- vector( 'list', length(models) )
+for ( i in 1 : length(models) ) {
+    pvals[[i]] <- read_pvals( models[i], rs[i] )
 }
 
 # switch back to ordinary data location
@@ -118,17 +118,17 @@ abline( 0, 1, col = 'gray', lty = 2 )
 panel_letter('A')
 # add a legend
 legend(
-    'bottomright',
-    title = 'Methods',
-    legend = method_names,
+    'topleft',
+    title = 'Models',
+    legend = model_names,
     lty = 1,
     col = colors,
-    cex = 0.7
+    cex = 0.8
 )
 
-srmsd <- vector( 'numeric', length(methods) )
+srmsd <- vector( 'numeric', length(models) )
 # plot backwards so green is on top
-for ( i in rev( 1 : length(methods) ) ) {
+for ( i in rev( 1 : length(models) ) ) {
     # calculate SRMSD_p
     obj <- pval_srmsd(pvals[[i]], causal_indexes, detailed = TRUE)
     # record value for second panel
@@ -143,15 +143,15 @@ for ( i in rev( 1 : length(methods) ) ) {
     # calculate inflation factor, just for reference
     # just print out, will not be in figure
     lambda <- pval_infl( pvals[[i]] )
-    message( 'Inflation factor: ', methods[i], ': ', lambda )
+    message( 'Inflation factor: ', models[i], ': ', lambda )
 }
 
 # second panel is just a bar plot
 barplot(
     srmsd,
-    names.arg = method_names,
+    names.arg = model_names,
     col = colors,
-    xlab = 'Methods',
+    xlab = 'Models',
     ylab = expression( bold( SRMSD[p] ) )
 )
 # add a nice panel letter
@@ -159,15 +159,15 @@ panel_letter('B')
 
 # third panel: AUC plot
 # in this case we don't start it until inside the loop (for first element only)
-aucpr <- vector( 'numeric', length(methods) )
+aucpr <- vector( 'numeric', length(models) )
 # plot backwards so green is on top
-for ( i in rev( 1 : length(methods) ) ) {
+for ( i in rev( 1 : length(models) ) ) {
     # calculate AUC_PR
     obj <- pval_aucpr(pvals[[i]], causal_indexes, curve = TRUE)
     # record value for next panel
     aucpr[i] <- obj$auc.integral
-    # add for all but last method (first in reverse order)
-    add <- i < length( methods )
+    # add for all but last model (first in reverse order)
+    add <- i < length( models )
     # plot curve
     plot(
         obj,
@@ -184,9 +184,9 @@ for ( i in rev( 1 : length(methods) ) ) {
 # last panel is just a bar plot
 barplot(
     aucpr,
-    names.arg = method_names,
+    names.arg = model_names,
     col = colors,
-    xlab = 'Methods',
+    xlab = 'Models',
     ylab = expression( bold( AUC[PR] ) )
 )
 # add a nice panel letter
