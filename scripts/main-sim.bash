@@ -127,8 +127,8 @@ time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 -a # to run on fully
 
 # creates final plot for paper!
 time Rscript real-09-figs.R --bfile $name
-# exploratory version compares pure PCA to PCs from popkinsuppl::kinship_std (practically the same)
-time Rscript real-09-figs.R --bfile $name --pca
+# OBSOLETE: exploratory version compares pure PCA to PCs from popkinsuppl::kinship_std (practically the same)
+#time Rscript real-09-figs.R --bfile $name --pca
 
 # tests that p-value vectors have the right lengths of m_loci
 # to make sure nothing was corrupted due to scripts stopping unexpectedly or incomplete file transfers
@@ -146,7 +146,13 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test fi
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
 
 # a simple figure that illustrates the methods
-Rscript sim-10-measures-fig.R 13
+Rscript sim-10-measures-fig.R 3
+# NEW rep-2
+# Inflation factor: gcta: 0.87992175683473
+# Inflation factor: pca-plink-pure: 2.96003533785624
+# Inflation factor: gcta: 0.984541944592377
+#
+# ORIG rep-13
 # Inflation factor: gcta: 0.977811992816224
 # Inflation factor: pca-plink-pure: 2.55503828726139
 # Inflation factor: gcta: 0.861113356022774

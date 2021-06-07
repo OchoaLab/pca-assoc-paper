@@ -8,6 +8,8 @@ library(BEDMatrix)
 
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
+# minimum MAF for causal loci
+min_maf_causal <- 0.01
 
 ############
 ### ARGV ###
@@ -68,7 +70,8 @@ obj_trait <- sim_trait(
     m_causal = m_causal,
     herit = herit,
     kinship = kinship,
-    const_herit_loci = const_herit_loci
+    const_herit_loci = const_herit_loci,
+    maf_cut = min_maf_causal
 )
 # extract data of interest
 # trait vector

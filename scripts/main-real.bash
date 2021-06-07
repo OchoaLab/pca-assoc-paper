@@ -12,12 +12,10 @@ name='HoPacAll_ld_prune_1000kb_0.3'
 DATA_DIR='/home/viiia/dbs/humanOrigins'
 
 # version for HGDP WGS
-#name='hgdp_wgs_autosomes_ld_prune_1000kb_0.3'
 name='hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01'
 DATA_DIR='/home/viiia/dbs/hgdp_wgs'
 
 # version for TGP
-#name='all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'
 name='all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'
 DATA_DIR='/home/viiia/dbs/tgp/plink2'
 
@@ -308,9 +306,21 @@ time Rscript real-11-inflation-across-datasets.R
 # model fit:
 # rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
 #         a         b 
+# 0.5775952 0.6056219 
+# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00853
+# Inverse threshold map (sigmoidal): RMSD = 0.01, lambda = 1.06
+# Writing: sum-rmsd-vs-lambda.pdf
+# log-linear approx: log(lambda) = RMSD * 5.72
+# threshold map (log-linear): lambda = 1.05, RMSD = 0.00853
+#
+# ORIG
+#         a         b 
 # 0.5604132 0.6289476 
 # log-linear approx: log(lambda) = RMSD * 5.67
 # threshold map (sigmoidal): lambda = 1.05, RMSD = 0.0086
 # threshold map (log-linear): lambda = 1.05, RMSD = 0.0086
 # Inverse threshold map (sigmoidal): RMSD = 0.01, lambda = 1.06
 
+# for troubleshooting some potential trait and min causal MAF issues
+time Rscript real-20-trait-normality.R
+# 12m25.216s ideapad
