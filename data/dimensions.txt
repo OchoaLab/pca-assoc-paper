@@ -1,10 +1,10 @@
-name_paper	type	m_loci	n_ind	K	m_causal
-Large sample size sim.	Admix.	100000	1000	10	100
-Small sample size sim.	Admix.	100000	100	10	10
-Family structure sim.	Admix.+Pedig.	100000	1000	10	100
-Human Origins	Real	243136	2922	11-243	292
-HGDP	Real	924421	929	7-54	93
-1000 Genomes	Real	1185208	2504	5-26	250
-Human Origins sim.	Tree	100000	2922	243	292
-HGDP sim.	Tree	100000	929	54	93
-1000 Genomes sim.	Tree	100000	2504	26	250
+name_paper	type	m_loci	n_ind	K	m_causal	fst
+Large sample size sim.	Admix.	100000	1000	10	100	0.1
+Small sample size sim.	Admix.	100000	100	10	10	0.1
+Family structure sim.	Admix.+Pedig.	100000	1000	10	100	0.1
+Human Origins	Real	190394	2922	11-243	292	0.28
+HGDP	Real	924421	929	7-54	93	0.21
+1000 Genomes	Real	1185208	2504	5-26	250	0.19
+Human Origins sim.	Tree	100000	2922	243	292	0.26
+HGDP sim.	Tree	100000	929	54	93	0.22
+1000 Genomes sim.	Tree	100000	2504	26	250	0.21

@@ -11,6 +11,7 @@
 
 library(optparse) # for terminal options
 library(bnpsd)    # simulate admixed population (structured population)
+library(readr)    # to save FST value, for tables on paper
 
 # load new functions from external scripts
 dir_orig <- getwd()
@@ -116,3 +117,6 @@ if ( generations > 1 ) {
     # save parents structure (for current code, it's most natural to use an RData file, rather than a FAM file, which we can write but can't parse back easily into the structure we want)
     save( parents, file = 'parents.RData' )
 }
+
+# save FST value of simulation
+write_lines( fst, 'fst.txt' )

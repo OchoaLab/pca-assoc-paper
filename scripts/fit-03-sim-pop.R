@@ -5,10 +5,13 @@
 
 # creates:
 # - bnpsd.RData
+# - fst.txt
 
 library(optparse)
 library(bnpsd)
 library(genio)
+library(readr)
+library(popkin)
 
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
@@ -40,32 +43,14 @@ setwd( name )
 # load FAM table, for subpopulation labels
 fam <- read_fam( name_in )
 
+# read annotations
+subpop_info <- read_tsv('pops-annot.txt', comment = '#')
+
+# map subpopulations using sub-subpopulations
+fam$superpop <- subpop_info$superpop[ match( fam$fam, subpop_info$pop ) ]
+
 # load tree calculated last time
-load( 'tree.RData' ) # load `tree` and other things we don't use here
-
-# labels come from fam file
-# subpops are desired order, match tree order
-admix_proportions <- admix_prop_indep_subpops( fam$fam, subpops = tree$tip.label )
-# copy names of individuals, to have correspondence to real data (though these are completely simulated)
-rownames( admix_proportions ) <- fam$id
-
-## # try things with this info
-## # coanc_est is ancestral coancestry according to tree (came from 'tree.RData')
-## coanc_tree_all <- coanc_admix( admix_proportions, coanc_est )
-## 
-## # compare to popkin
-## # read existing popkin data
-## data <- read_grm( 'popkin' )
-## kinship <- data$kinship
-## 
-## # subpopulations are scrambled, but there's mostly agreement considering that
-## library(popkin)
-## plot_popkin(
-##     list(
-##         inbr_diag( kinship ),
-##         coanc_tree_all
-##     )
-## )
+load( 'tree.RData' ) # loads: tree, coanc_est, kinship_pop
 
 # save things into a new destination
 name <- paste0( name, '_sim' )
@@ -80,12 +65,59 @@ if ( dir.exists( name ) )
 dir.create( name )
 setwd( name )
 
+
+# labels come from fam file
+# subpops are desired order, match tree order
+admix_proportions <- admix_prop_indep_subpops( fam$fam, subpops = tree$tip.label )
+# copy names of individuals, to have correspondence to real data (though these are completely simulated)
+rownames( admix_proportions ) <- fam$id
+
 # edit tree a bit
 # save under this name
 tree_subpops <- tree
 # also remove root edge (otherwise `bnpsd` complains about it, doesn't make sense to simulate using it)
 tree_subpops$root.edge <- NULL
 
+# recalculate tree coancestry after root edge is removed!
+coanc_est <- coanc_tree( tree_subpops )
+
+# calculate FST from tree, ignoring individuals/admixture (trivial here).
+# do want to weigh superpops evenly
+# easiest to map onto tree, where tip.label is subpops, to ensure agreement
+tree_subpops$superpop <- subpop_info$superpop[ match( tree_subpops$tip.label, subpop_info$pop ) ]
+# calculate weights that balance everything!
+weights_tree <- weights_subpops( tree_subpops$superpop )
+# use coanc_est to get inbreeding values out of
+# NOTE: must pass as inbreeding (vector), rather than self-kinship (matrix)!
+fst_tree <- fst( diag( coanc_est ), weights_tree )
+# save FST for table
+write_lines( fst_tree, 'fst.txt' )
+
+# compared manually, agreed!
+## # as a check, calculate FST the regular way, with individuals
+## # coanc_est is ancestral coancestry according to tree (came from 'tree.RData')
+## coanc_tree_all <- coanc_admix( admix_proportions, coanc_est )
+## # these are weights for individuals
+## weights_ind <- weights_subpops( fam$superpop, fam$fam )
+## # NOTE: must pass as inbreeding (vector), rather than self-kinship (matrix)!
+## fst_ind <- fst( diag( coanc_tree_all ), weights_ind )
+
 # save bnpsd data to an RData file
 # here add copy of real `fam` table, for checks
 save( admix_proportions, tree_subpops, fam, file = 'bnpsd.RData' )
+
+## # try things with this info
+## # compare to popkin
+## # read existing popkin data
+## data <- read_grm( 'popkin' )
+## kinship <- data$kinship
+## 
+## # subpopulations are scrambled, but there's mostly agreement considering that
+## library(popkin)
+## plot_popkin(
+##     list(
+##         inbr_diag( kinship ),
+##         coanc_tree_all
+##     )
+## )
+

@@ -35,6 +35,7 @@ datasets$m_loci <- NA
 datasets$n_ind <- NA
 datasets$K <- NA
 datasets$m_causal <- NA
+datasets$fst <- NA
 
 # shared in all cases
 reps <- 1 : rep_max
@@ -139,6 +140,11 @@ for ( i in 1 : nrow( datasets ) ) {
     # store result in same tibble as other data
     # since all are now verified to be equal, just store first one
     datasets$m_causal[ i ] <- m_causals[ 1 ]
+
+    # load FST value (model, or estimated if real data; all in same location)
+    # round and add to table
+    fst <- read_lines( 'fst.txt' )
+    datasets$fst[ i ] <- round( as.numeric( fst ), digits = 2 )
     
     # go back down
     setwd( '..' )

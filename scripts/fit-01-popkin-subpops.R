@@ -5,6 +5,8 @@ library(readr)
 library(ochoalabtools)
 library(tibble)
 
+# calculates coancestry of subpopulations, and FST
+
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
 
@@ -51,6 +53,12 @@ stopifnot( fam$id == colnames( kinship ) )
 indexes <- order( match( fam$fam, subpop_info$pop ) )
 fam <- fam[ indexes, ]
 kinship <- kinship[ indexes, indexes ]
+
+# calculate weights that balance everything!
+weights <- weights_subpops( fam$superpop, fam$fam )
+fst_est <- fst( kinship, weights )
+# save FST for table
+write_lines( fst_est, 'fst.txt' )
 
 # transform diagonal just before plotting
 kinship <- inbr_diag( kinship )
