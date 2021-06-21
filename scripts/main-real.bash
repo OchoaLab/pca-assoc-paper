@@ -8,7 +8,7 @@ Rscript real-00-datasets.R
 # use LD pruned only
 
 # shared by R script calls further below
-name='HoPacAll_ld_prune_1000kb_0.3'
+name='HoPacAll_ld_prune_1000kb_0.3_maf-0.01'
 DATA_DIR='/home/viiia/dbs/humanOrigins'
 
 # version for HGDP WGS
@@ -32,12 +32,9 @@ ln -s "$DATA_DIR/$name.fam" data.fam
 cd ../../scripts/
 # preprocess with GCTA (makes GRM and max PCs)
 time Rscript real-00-preprocess-gcta.R --bfile $name
-# 1m25.639s viiiaX6 HO
-# 1m26.897s ideapad HGDP
-# 1m51.228s ideapad HGDP MAF
-# 19m50.614s ideapad TGP
-# 2m27.177s ideapad TGP thinned
-# 2m3.016s ideapad TGP MAF
+# 0m36.076s ideapad HO
+# 1m51.228s ideapad HGDP
+# 2m3.016s ideapad TGP
 
 # get PCs in R, using my formula
 # hope for similar average performance, although these PCs are very different than GCTA (except for top 2)
@@ -49,21 +46,15 @@ time Rscript real-00-preprocess-gcta.R --bfile $name
 
 # get PCs using plink2
 time Rscript real-01-pcs-plink.R --bfile $name
-# 0m39.102s ideapad HO
-# 0m25.582s ideapad HGDP
-# 0m18.244s ideapad HGDP MAF
-# 2m48.309s ideapad TGP
-# 0m5.659s ideapad TGP thinned, removed kinship_std comparison
-# 0m32.804s ideapad TGP MAF
+# 0m19.751s ideapad HO
+# 0m18.244s ideapad HGDP
+# 0m32.804s ideapad TGP
 
 # calculates kinship matrix with popkin, to get mean kinship to pass to simtrait
 time Rscript real-03-popkin.R --bfile $name
-# 4m54.676s ideapad HO
-# 8m37.050s ideapad HGDP
-# 3m57.744s ideapad HGDP MAF
-# 255m35.418s ideapad TGP
-# 20m25.597s ideapad TGP thinned
-# 21m53.466s ideapad TGP MAF
+# 4m28.038s ideapad HO
+# 3m57.744s ideapad HGDP
+# 21m53.466s ideapad TGP
 
 # draws random traits
 # 0m2.166s ideapad HO (each rep)
@@ -101,18 +92,14 @@ time Rscript real-02-subset-eigenvec.R --bfile $name --clean
 
 # summarizes p-values into AUC and RMSD for each method/rep/pc
 time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90
-# all are plink + GCTA, labbyDuke 12 threads
-# 19m16.850s HO
-# 174m22.306s HGDP
-# 71m22.370s TGP
-# 80m32.881s TGP MAF
+# all are plink + GCTA
+# 25m13.604s HO viiiaX6 6 threads
+# 80m32.881s TGP labbyDuke 12 threads
 
 # read all individual summary tables (tiny files), gather into a master table
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
-# 0m20.941s labbyDuke HO
-# 0m27.567s labbyDuke HGDP
-# 0m24.078s labbyDuke TGP
-# 0m24.390s labbyDuke TGP MAF
+# 0m42.030s viiiaX6 HO
+# 0m24.390s labbyDuke TGP
 
 # creates final plot for paper!
 time Rscript real-09-figs.R --bfile $name
@@ -128,11 +115,9 @@ time Rscript real-09-figs.R --bfile $name
 # --final requires that all files exist!
 time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90
 time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90 --final
-# 5m12.610s labbyDuke HO
-# 35m17.690s labbyDuke HGDP
-# 12m26.386s labbyDuke HGDP MAF
-# 13m33.181s labbyDuke TGP
-# 15m10.066s labbyDuke TGP MAF
+# 7m57.939s viiiaX6 HO
+# 12m26.386s labbyDuke HGDP
+# 15m10.066s labbyDuke TGP
 
 # archive p-values and individual summary files (move out of space that gets synced between computers; these files take up loads of space and are no longer needed)
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test first!
@@ -238,6 +223,8 @@ done
 # new steps to make sure simulation is as expected (validates not just tree but also Q matrix and their respective alignment)
 # estimates from rep-1 only!
 time Rscript real-03-popkin.R --bfile $name --sim
+# an FST validation (model vs sim)
+time Rscript fit-05-fst-validate.R --bfile $name
 # make plot based on those estimates
 time Rscript fit-10-plot-real-vs-sim.R --bfile $name
 # get MAFs for comparison plot too (only needs rep-1)

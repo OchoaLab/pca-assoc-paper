@@ -1,6 +1,10 @@
 # this script reads big table of AUC and RMSD estimates
 # version that combines three datasets in a single panel
 
+# TODO:
+# - switch to `ochoalabtools` solution for fig dimensions
+# - get data from `datasets.txt`
+
 library(optparse)
 library(scales) # for transparency
 library(readr)
@@ -63,10 +67,8 @@ datasets_real <- tibble(
         '1000 Genomes'
     ),
     name_long = c(
-        'HoPacAll_ld_prune_1000kb_0.3',
-        #'hgdp_wgs_autosomes_ld_prune_1000kb_0.3',
+        'HoPacAll_ld_prune_1000kb_0.3_maf-0.01',
         'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
-        #'all_phase3_filt-minimal_ld_prune_1000kb_0.3_thinned-0.1'
         'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'
     )
 )
