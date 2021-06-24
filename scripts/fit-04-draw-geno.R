@@ -9,7 +9,7 @@
 library(optparse)
 library(bnpsd)
 library(genio)
-#library(popkin)
+library(readr)
 
 # hardcoded params
 verbose <- TRUE # to print messages
@@ -30,7 +30,7 @@ option_list = list(
                 help = "Replicate number", metavar = "int"),
     make_option("--maf_real", action = "store_true", default = FALSE, 
                 help = "Draw ancestral allele frequencies from real distribution"),
-    make_option("--maf_min", type = "double", default = 0, # 0.01, 
+    make_option("--maf_min", type = "double", default = 0.01, 
                 help = "Minimum MAF, to simulate MAF-based ascertainment bias", metavar = "double")
 )
 
@@ -55,7 +55,7 @@ if ( is.na(name) )
 # directory above must already exist
 setwd( '../data/' )
 
-p_anc <- NULL
+p_anc_distr <- NULL
 if ( maf_real ) {
     # deduce original file path
     name_real <- sub( '_sim$', '', name )
@@ -65,9 +65,6 @@ if ( maf_real ) {
     load( 'maf.RData' )
     # loads: maf
 
-    # select random allele frequencies
-    p_anc <- sample( maf, m_loci )
-    
     # go back down so we can find the simulated path
     setwd( '..' )
 }
@@ -77,6 +74,14 @@ setwd( name )
 # load precalculated bnpsd data from RData file
 load( 'bnpsd.RData' )
 # loads: admix_proportions, tree_subpops, fam
+
+if (maf_real) {
+    # need FST of this simulation, which has been calculated already
+    fst_tree <- as.numeric( read_lines( 'fst.txt' ) )
+    
+    # undifferentiate whole original distribution
+    p_anc_distr <- undiff_af( maf, fst_tree )$p
+}
 
 #####################
 ### SIM GENOTYPES ###
@@ -103,7 +108,7 @@ out <- draw_all_admix(
     admix_proportions = admix_proportions,
     tree_subpops = tree_subpops,
     m_loci = m_loci,
-    p_anc = p_anc,
+    p_anc_distr = p_anc_distr,
     maf_min = maf_min,
     verbose = verbose
 )

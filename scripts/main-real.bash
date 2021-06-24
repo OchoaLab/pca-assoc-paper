@@ -204,6 +204,23 @@ time Rscript fit-03-sim-pop.R --bfile $name
 # from here on, the real data name needs a '_sim' suffix
 # the rest of the pipeline is the same as for the regular simulations
 name=$name"_sim"
+
+# OPTIONAL experiments to help me decide how to fit this all
+# can skip: ultimately does not produce required outputs, only influenced choices hardcoded into fit-04-draw-geno.R now
+time Rscript fit-06-bigger-fitting.R --bfile $name
+# 2m23.877s viiiaR5 HGDP
+# 6m25.336s viiiaR5 HO
+time Rscript fit-06-bigger-fitting.R --bfile $name --beta
+# 3m23.708s viiiaR5 HGDP
+# 20m50.410s viiiaR5 HO
+time Rscript fit-06-bigger-fitting.R --bfile $name --distr
+# 6m54.920s viiiaR5 TGP
+# 1m41.267s viiiaR5 HGDP
+# 6m45.279s viiiaR5 HO
+# and plotter code (after all three are done)
+time Rscript fit-07-bigger-fitting-plot.R --bfile $name
+
+# actually simulate data
 for rep in {1..50}; do
     time Rscript fit-04-draw-geno.R --bfile $name -r $rep --maf_real
     time Rscript sim-02-sim-trait.R --bfile $name -r $rep
@@ -263,6 +280,7 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_heri
 
 time Rscript real-15-plots-big.R --real_sim --const_herit_loci
 
+
 ###############
 ### GLOBALS ###
 ###############
@@ -273,7 +291,7 @@ time Rscript real-15-plots-big.R --real_sim --const_herit_loci
 # (validates every replicate too! for m_causal compares both "inv" and "rand"!)
 # writes data/dimensions.txt
 time Rscript real-14-dimensions.R
-# 21s ideapad
+# 21s ideapad, 7s viiiaR5
 
 # MAF plot code
 time Rscript real-17-mafs-plot.R
@@ -311,3 +329,4 @@ time Rscript real-11-inflation-across-datasets.R
 # for troubleshooting some potential trait and min causal MAF issues
 time Rscript real-20-trait-normality.R
 # 12m25.216s ideapad
+# 6m30.113s viiiaR5

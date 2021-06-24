@@ -8,8 +8,7 @@ name_dir_order <- c(
     'sim-n1000-k10-f0.1-s0.5-g1',
     'sim-n100-k10-f0.1-s0.5-g1',
     'sim-n1000-k10-f0.1-s0.5-g20',
-#    'HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim',
-    'HoPacAll_ld_prune_1000kb_0.3_sim',
+    'HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim',
     'HoPacAll_ld_prune_1000kb_0.3_maf-0.01',
     'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim',
     'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
@@ -91,15 +90,3 @@ fig_end()
 
 # save data and panel function for replotting as part of bigger, multipanel figure
 save( plot_mafs_panel, datasets, mafs, file = 'mafs.RData' )
-
-# make an alternate version to look at pool available to causal loci
-# NOTE: will edit `mafs`, so do after saving above
-for ( name in datasets$name_dir ) {
-    maf <- mafs[[ name ]] # copy down
-    maf <- maf[ maf > 0.01 ] # apply threshold
-    mafs[[ name ]] <- maf # copy back/overwrite
-}
-# make independent plot
-fig_start( 'mafs_0.01' )
-plot_mafs_panel( datasets, mafs )
-fig_end()

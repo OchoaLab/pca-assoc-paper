@@ -98,9 +98,6 @@ setwd( '../data/' )
 # read dataset paths and names for output
 datasets <- read_tsv( 'datasets.txt', col_types = 'cccii' )
 
-# HACK filter
-#datasets <- datasets[ datasets$name_dir %in% c('sim-n1000-k10-f0.1-s0.5-g1', 'sim-n100-k10-f0.1-s0.5-g1', 'sim-n1000-k10-f0.1-s0.5-g20'), ]
-
 # store data in a list, for boxplots
 dataset_to_rmsds <- list()
 dataset_to_mafs <- list()

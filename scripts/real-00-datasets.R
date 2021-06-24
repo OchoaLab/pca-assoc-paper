@@ -28,7 +28,7 @@ datasets <- tibble(
         'HoPacAll_ld_prune_1000kb_0.3_maf-0.01',
         'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
         'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01',
-        'HoPacAll_ld_prune_1000kb_0.3_sim',
+        'HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim',
         'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim',
         'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim'
     ),
