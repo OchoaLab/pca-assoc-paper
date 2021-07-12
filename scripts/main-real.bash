@@ -199,6 +199,7 @@ time Rscript fit-01-popkin-subpops.R --bfile $name
 time Rscript fit-02-tree.R --bfile $name
 
 # set up simulation params Q and Psi tree
+# also calculates FST for paper table and kinship_mean for undiff_af
 time Rscript fit-03-sim-pop.R --bfile $name
 
 # from here on, the real data name needs a '_sim' suffix
@@ -217,8 +218,18 @@ time Rscript fit-06-bigger-fitting.R --bfile $name --distr
 # 6m54.920s viiiaR5 TGP
 # 1m41.267s viiiaR5 HGDP
 # 6m45.279s viiiaR5 HO
+time Rscript fit-06-bigger-fitting.R --bfile $name --kin
+# 2m3.379s viiiaR5 HGDP
+# 8m2.776s viiiaR5 TGP
+# 8m9.043s viiiaR5 HO
 # and plotter code (after all three are done)
 time Rscript fit-07-bigger-fitting-plot.R --bfile $name
+# runs with final m (default is smaller) to have more accurate error measurements (way slower though)
+# didn't run for HO (all previous signs suggested it wasn't needed, though ultimately these weren't needed either)
+time Rscript fit-06-bigger-fitting.R --bfile $name --kin -m 100000
+# 19m41.688s viiiaR5 HGDP
+# 72m39.955s viiiaR5 TGP
+time Rscript fit-07-bigger-fitting-plot.R --bfile $name -m 100000
 
 # actually simulate data
 for rep in {1..50}; do
@@ -254,6 +265,7 @@ time Rscript real-09-figs.R --bfile $name
 time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --final
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
+
 time Rscript real-15-plots-big.R --real_sim
 
 
@@ -311,20 +323,11 @@ time Rscript real-11-inflation-across-datasets.R
 # model fit:
 # rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
 #         a         b 
-# 0.5775952 0.6056219 
-# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00853
+# 0.5666406 0.6150152 
+# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.0085
 # Inverse threshold map (sigmoidal): RMSD = 0.01, lambda = 1.06
-# Writing: sum-rmsd-vs-lambda.pdf
-# log-linear approx: log(lambda) = RMSD * 5.72
-# threshold map (log-linear): lambda = 1.05, RMSD = 0.00853
-#
-# ORIG
-#         a         b 
-# 0.5604132 0.6289476 
-# log-linear approx: log(lambda) = RMSD * 5.67
-# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.0086
-# threshold map (log-linear): lambda = 1.05, RMSD = 0.0086
-# Inverse threshold map (sigmoidal): RMSD = 0.01, lambda = 1.06
+# log-linear approx: log(lambda) = RMSD * 5.74
+# threshold map (log-linear): lambda = 1.05, RMSD = 0.0085
 
 # for troubleshooting some potential trait and min causal MAF issues
 time Rscript real-20-trait-normality.R

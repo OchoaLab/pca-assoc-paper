@@ -1,0 +1,284 @@
+pop	superpop	fam	x	y	country	comment
+#
+# SAfrica
+#
+Ju_hoan_South	SAfrica	Kxa	20.7	-21.2	Botswana	Laz14 NP
+Ju_hoan_North	SAfrica	Kxa	21.5	-18.9	Namibia	Laz14 (P+NP); HGDP San
+Taa_West	SAfrica	Tuu	20.3	-23.6	Botswana	Laz14 NP
+Taa_East	SAfrica	Tuu	22.8	-24.2	Botswana	Laz14 NP
+Taa_North	SAfrica	Tuu	22.4	-23.0	Botswana	Laz14 NP
+Naro	SAfrica	Khoe	21.6	-22.0	Botswana	Laz14 NP
+Gui	SAfrica	Khoe	23.3	-21.5	Botswana	Laz14 NP
+Hoan	SAfrica	Kxa	23.4	-24.0	Botswana	Laz14 NP
+Xuun	SAfrica	Kxa	19.7	-18.7	Namibia	Laz14 NP
+Gana	SAfrica	Khoe	23.4	-21.7	Botswana	Laz14 NP
+Tshwa	SAfrica	Khoe	25.9	-21.0	Botswana	Laz14 NP
+Khomani	SAfrica	Khoe	21.1	-27.8	SAfrica	Laz14; Kgalagadi transfrontier park
+Nama	SAfrica	Khoe	17.3	-24.3	Namibia	Laz14 NP
+Haiom	SAfrica	Khoe	17.0	-19.3	Namibia	Laz14 NP
+Kgalagadi	SAfrica	Bantu	21.8	-24.8	Botswana	Laz14 NP
+Shua	SAfrica	Khoe	25.3	-20.6	Botswana	Laz14 NP
+Khwe	SAfrica	Khoe	21.9	-18.4	Botswana	Laz14 NP
+#
+# MAfrica
+#
+Mbuti	MAfrica	Pygmy	29.0	1.0	Congo	Laz14; HGDP MbutiPygmy
+Biaka	MAfrica	Pygmy	17.0	4.0	CntrAfrRep	Laz14; HGDP BiakaPygmy
+BantuSA	MAfrica	Bantu	24.0	-26.0	Angola,Botswana,Namibia,Lesotho,SAfrica	Laz14; HGDP BantuSouthAfrica
+Tswana	MAfrica	Bantu	25.4	-24.1	Botswana	Laz14 NP
+Damara	MAfrica	Khoe	16.2	-19.8	Namibia	Laz14 NP
+Himba	MAfrica	Bantu	14.1	-19.1	Namibia	Laz14 NP
+Wambo	MAfrica	Bantu	18.1	-17.7	Namibia	Laz14 NP
+Yoruba	MAfrica	NigerCongo	3.9	7.4	Nigeria	Laz14; HGDP
+Esan	MAfrica	NigerCongo	6.0	6.5	Nigeria	Laz14; NE of Benin City
+Mende	MAfrica	NigerCongo	-13.2	8.5	SierraLeone	Laz14; Freetown
+BantuKenya	MAfrica	Bantu	37.0	-3.0	Kenya	Laz14; HGDP
+Luhya	MAfrica	Bantu	36.8	1.3	Kenya	Laz14; Western Province, Kenya
+Mandenka	MAfrica	NigerCongo	-12	12	Senegal	Laz14; HGDP 
+Gambian	MAfrica	NigerCongo	-16.7	13.4	Gambia	Laz14 (x sign wrong)
+Luo	MAfrica	NiloSaharan	34.3	-0.1	Kenya	Laz14
+Dinka	MAfrica	NiloSaharan	27.4	8.8	Sudan	Laz14 NP
+AA	MAfrica	NigerCongo	-105.0	39.7	USA	Laz14; Denver; African-Americans?
+Kikuyu	MAfrica	Bantu	36.9	-0.4	Kenya	Laz14; Mount Kenya
+Hadza	MAfrica	Hadza	35.2	-3.7	Tanzania	Laz14 (P+NP); Lake Eyasi
+Sandawe	MAfrica	Sandawe	35.5	-5.5	Tanzania	Laz14 NP
+Masai	MAfrica	NiloSaharan	35.55	-1.3	Kenya	Laz14; Lake Victoria
+Datog	MAfrica	NiloSaharan	35.7	-3.3	Tanzania	Laz14; Manyara Region
+Somali	MAfrica	Afroasiatic	48.3	5.6	Kenya	Laz14
+Oromo	MAfrica	Afroasiatic	36.5	9.0	Ethiopia	Laz14 NP
+Jew_Ethiopian	MAfrica	Afroasiatic	38.7	9.0	Ethiopia	Laz14; Addis Ababa
+#
+# NAfrica
+#
+Saharawi	NAfrica	Afroasiatic	-8.9	27.3	WSahara	Laz14
+Moroccan	NAfrica	Afroasiatic	-6.4	32.3	Morocco	Laz14+Laz16
+Mozabite	NAfrica	Afroasiatic	3.0	32.0	Algeria	Laz14; HGDP
+Algerian	NAfrica	Afroasiatic	3.0	36.8	Algeria	Laz14
+Tunisian	NAfrica	Afroasiatic	10.2	36.8	Tunisia	Laz14
+Libyan	NAfrica	Afroasiatic	13.190	32.880	Libya	Laz16
+Egyptian	NAfrica	Afroasiatic	31.2	30.6	Egypt	Laz14
+Yemeni	NAfrica	Afroasiatic	44.6	14.0	Yemen	Laz14
+Jew_Libyan	NAfrica	Afroasiatic	13.18	32.92	Libya	Laz14
+Jew_Tunisian	NAfrica	Afroasiatic	10.18	36.8	Tunisia	Laz14
+Jew_Moroccan	NAfrica	Afroasiatic	-6.84	34.02	Morocco	Laz14
+Jew_Yemenite	NAfrica	Afroasiatic	44.2	15.35	Yemen	Laz14
+#
+# MiddleEast
+#
+Saudi	MiddleEast	Afroasiatic	42.52	18.49	SaudiArabia	Laz14
+BedouinB	MiddleEast	Afroasiatic	35.0	31.0	Israel	Laz14; HGDP Bedouin
+BedouinA	MiddleEast	Afroasiatic	35.0	31.0	Israel	Laz14; HGDP Bedouin
+Palestinian	MiddleEast	Afroasiatic	35.0	32.0	Israel	Laz14; HGDP
+Jordanian	MiddleEast	Afroasiatic	35.91	32.05	Jordan	Laz14
+Syrian	MiddleEast	Afroasiatic	36.87	35.13	Syria	Laz14
+Lebanese_Muslim	MiddleEast	Afroasiatic	35.500	33.890	Lebanon	Laz16
+Lebanese_Christian	MiddleEast	Afroasiatic	35.500	33.890	Lebanon	Laz16
+Jew_Turkish	MiddleEast	Afroasiatic	28.95	41.02	Turkey	Laz14
+Assyrian	MiddleEast	Afroasiatic	44.21	37.27	Iraq,Turkey	Laz16; N Iraq?
+Druze	MiddleEast	Afroasiatic	35.0	32.0	Israel	Laz14; HGDP
+Lebanese	MiddleEast	Afroasiatic	35.57	33.82	Lebanon	Laz14
+Jew_iraqi	MiddleEast	Afroasiatic	44.42	33.33	Iraq	Laz14
+Iranian_Bandari	MiddleEast	Iranian	56.267	27.183	Iran	Laz16; South Iran, Afro-Iranians?
+Iranian	MiddleEast	Iranian	51.46	35.59	Iran	Laz14+Laz16
+Jew_Iranian	MiddleEast	Iranian	51.42	35.7	Iran	Laz14
+Turkish	MiddleEast	Turkic	32.66	39.22	Turkey	Laz14
+#
+# Europe
+#
+Jew_Ashkenazi	Europe	Germanic	21.02	52.23	Poland	Laz14
+Cypriot	Europe	Greek	33.43	35.13	Cyprus	Laz14
+Maltese	Europe	Afroasiatic	14.38	35.94	Malta	Laz14
+Canary_Islander	Europe	Romance	-15.4	28.1	Spain	Laz14
+Italian_South	Europe	Romance	15.5	39.4	Italy	Laz14+Laz16
+Sicilian	Europe	Romance	13.77	37.59	Italy	Laz14
+Romanian	Europe	Romance	22.950	45.776	Romania	Laz16
+Spanish	Europe	Romance	-2.83	40.43	Spain	Laz14
+Greek	Europe	Greek	23.17	39.84	Greece	Laz14
+Italian_North	Europe	Romance	11.0	43.0	Italy	Laz14 (diff coords); HGDP Italian and Tuscan
+French	Europe	Romance	2.0	46.0	France	Laz14+Laz16; HGDP
+Sardinian	Europe	Romance	9.0	40.0	Italy	Laz14; HGDP
+Spanish_North	Europe	Romance	-2.7	42.8	Spain	Laz14
+Basque	Europe	Basque	-0.65	43.04	France	Laz14; HGDP
+Orcadian	Europe	Celtic	-3.0	59.0	UK	Laz14; HGDP
+English	Europe	Germanic	-2.09	50.75	UK	Laz14
+Icelandic	Europe	Germanic	-21.93	64.13	Iceland	Laz14
+Norwegian	Europe	Germanic	5.36	60.36	Norway	Laz14
+Irish	Europe	Celtic	-8.265	52.753	Ireland	Laz16 NP
+Irish_Ulster	Europe	Celtic	-6.95	54.71	Ireland	Laz16 NP
+Scottish	Europe	Celtic	-3.94	56.04	UK	Laz14+Laz16 (P+NP)
+Shetlandic	Europe	Germanic/Celtic	-1.15	60.15	UK	Laz16 NP
+German	Europe	Germanic	12.373	51.34	Germany	Laz16 NP
+Sorb	Europe	Slavic	14.102	51.275	Germany	Laz16 NP
+Polish	Europe	Slavic	19.743	51.745	Poland	Laz16 NP
+Czech	Europe	Slavic	14.4	50.1	Czechoslovia(pre1989)	Laz14
+Croatian	Europe	Slavic	16.45	43.51	Croatia	Laz14
+Hungarian	Europe	FinnoUgric	19.08	47.49	Hungary	Laz14
+Albanian	Europe	Albanian	19.83	41.33	Albania	Laz14
+Bulgarian	Europe	Slavic	24.74	42.16	Bulgaria	Laz14
+Mordovian	Europe	FinnoUgric	45.18	54.18	Russia	Laz14
+Saami_WGA	Europe	FinnoUgric	23.6	68.4	Finland	Laz14; Norway
+Finnish	Europe	FinnoUgric	24.9	60.2	Finland	Laz14
+Russian	Europe	Slavic	40.0	61.0	Russia	Laz14; HGDP
+Estonian	Europe	FinnoUgric	24.89	58.54	Estonia	Laz14
+Ukrainian	Europe	Slavic	31.56	50.29	Ukraine	Laz14
+Belarusian	Europe	Slavic	28.01	53.92	Belarus	Laz14
+Lithuanian	Europe	Baltic	23.92	54.9	Lithuania	Laz14
+#
+# Caucasus
+#
+Armenian	Caucasus	Armenian	44.55	40.19	Armenia	Laz14
+Jew_Georgian	Caucasus	Afroasiatic	44.78	41.72	Georgia	Laz14
+Georgian	Caucasus	Kartvelian	41.85	42.5	Georgia	Laz14
+Abkhasian	Caucasus	NWCaucasian	41.0	43.0	Georgia	Laz14
+Adygei	Caucasus	NWCaucasian	39.0	44.0	Russia	Laz14; HGDP
+North_Ossetian	Caucasus	Iranian	44.65	43.02	Russia	Laz14
+Chechen	Caucasus	NECaucasian	45.65	43.33	Russia	Laz14
+Lezgin	Caucasus	NECaucasian	48.18	42.12	Russia	Laz14; Dagestan, Russia and Azerbaijan
+Kumyk	Caucasus	Turkic	46.58	43.25	Russia	Laz14; Dagestan
+Balkar	Caucasus	Turkic	43.62	43.48	Russia	Laz14
+Nogai	Caucasus	Turkic	41.9	44.4	Russia	Laz14; Dagestan
+#
+# SAsia
+#
+Makrani	SAsia	Iranian	64.0	26.0	Pakistan	Laz14; HGDP
+Brahui	SAsia	Dravidian	66.5	30.5	Pakistan	Laz14; HGDP
+Balochi	SAsia	Iranian	66.5	30.5	Pakistan	Laz14; HGDP
+Jew_Cochin	SAsia	Afroasiatic	76.3	10.0	India	Laz14; Kerala
+Tajik	SAsia	Iranian	71.7	37.4	Tajikistan	Laz14 (Tajik_Pomiri); Persians in Tajikistan, Afghanistan and Uzbekistan
+Kalash	SAsia	IndoAryan	71.5	36.0	Pakistan	Laz14; HGDP
+Pathan	SAsia	Iranian	70.5	33.5	Pakistan	Laz14; HGDP
+Sindhi	SAsia	IndoAryan	69.0	25.5	Pakistan	Laz14; HGDP
+Burusho	SAsia	Burushaski	74.0	36.5	Pakistan	Laz14; HGDP
+Brahmin_Tiwari	SAsia	IndoAryan	83.4	21.9	India	Laz14 NP
+Gujarati	SAsia	IndoAryan	72.7	23.2	India	Laz14; I merged A-D (no apparent kinship diff)
+Punjabi	SAsia	IndoAryan	74.3	31.5	Pakistan	Laz14
+Vishwabrahmin	SAsia	IndoAryan	80.5	16.3	India	Laz14 NP
+Lodhi	SAsia	Austroasiatic	78.6	25.5	India	Laz14 NP
+Mala	SAsia	Dravidian	78.2	18.7	India	Laz14 NP
+Bengali	SAsia	IndoAryan	90.4	23.7	Bangladesh	Laz14
+Kharia	SAsia	Austroasiatic	82.7	25.8	India	Laz14 NP
+Onge	SAsia	Ongan	92.5	10.8	India	Laz14 NP
+Chuvash	SAsia	Turkic	47.3	56.1	Russia	Laz14; Chuvashia
+Turkmen	SAsia	Turkic	59.6	42.5	Uzbekistan	Laz14
+Uzbek	SAsia	Turkic	69.2	41.3	Uzbekistan	Laz14
+Hazara	SAsia	Iranian	70.0	33.5	Pakistan	Laz14; HGDP
+Uygur	SAsia	Turkic	81	44	China	Laz14; HGDP
+#
+# NAsia
+#
+Tubalar	NAsia	Turkic	87.0	51.1	Russia	Laz14
+Mansi	NAsia	FinnoUgric	63.3	62.5	Russia	Laz14; Tyumen Oblast, Russia
+Selkup	NAsia	Samoyedic	82.3	65.5	Russia	Laz14
+Kyrgyz	NAsia	Turkic	74.6	42.9	Kyrgyzstan	Laz14
+Altaian	NAsia	Turkic	86.0	51.9	Russia	Laz14
+Tuvinian	NAsia	Turkic	95.2	50.3	Russia	Laz14
+Nganasan	NAsia	Samoyedic	96.1	71.1	Russia	Laz14
+Dolgan	NAsia	Turkic	115.4	73.0	Russia	Laz14
+Yakut	NAsia	Turkic	129.5	63	Russia	Laz14; HGDP
+Xibo	NAsia	Tungusic	81.5	43.5	China	Laz14; HGDP
+Hezhen	NAsia	Tungusic	133.5	47.5	China	Laz14; HGDP
+Oroqen	NAsia	Tungusic	126.5	50.4	China	Laz14; HGDP
+Ulchi	NAsia	Tungusic	140.4	52.2	Russia	Laz14
+Even	NAsia	Tungusic	135.9	57.5	Russia	Laz14
+Yukagir	NAsia	Yukaghir	152.0	67.05	Russia	Laz14
+Itelmen	NAsia	ChukotkoKamchatkan	156.9	57.2	Russia	Laz14
+Koryak	NAsia	ChukotkoKamchatkan	159.0	58.1	Russia	Laz14
+Chukchi	NAsia	ChukotkoKamchatkan	171.35	66.95	Russia	Laz14; Chukchi Peninsula, Russia
+Eskimo	NAsia	EskimoAleut	172.17	64.97	Russia	Laz14
+Aleut	NAsia	EskimoAleut	160.8	53.6	Russia	Laz14
+Aleut_Tlingit	NAsia	EskimoAleut	164.5	54.7	Russia	Laz14 (Tlingit)
+#
+# EAsia
+#
+Kusunda	EAsia	Kusunda	82.5	28.1	Nepal	Laz14
+Kalmyk	EAsia	Mongolic	45.3	46.2	Russia	Laz14
+Burmese	EAsia	SinoTibetan	95.89	16.41	Myanmar	Sko16
+Cambodian	EAsia	Austroasiatic	105	12	Cambodia	Laz14; HGDP
+Thai	EAsia	TaiKadai	100.5	13.8	Thailand	Laz14
+Tu	EAsia	Mongolic	101	36	China	Laz14; HGDP
+Mongola	EAsia	Mongolic	111.0	45.0	China	Laz14; HGDP (diff coords)
+Daur	EAsia	Mongolic	124	48.5	China	Laz14; HGDP
+Kinh	EAsia	Austroasiatic	105.9	21.0	Vietnam	Laz14
+Vietnamese	EAsia	Austroasiatic	106.64	10.82	Vietnam	Sko16
+Dai	EAsia	TaiKadai	100	21	China	Laz14; HGDP
+Lahu	EAsia	SinoTibetan	100	22	China	Laz14; HGDP
+Naxi	EAsia	SinoTibetan	100	26	China	Laz14; HGDP
+Yi	EAsia	SinoTibetan	103	28	China	Laz14; HGDP
+Tujia	EAsia	SinoTibetan	109	29	China	Laz14; HGDP
+Han	EAsia	SinoTibetan	114	32.3	China	Laz14; HGDP Han and Han-NChina (diff y)
+Miao	EAsia	HmongMien	109	28	China	Laz14; HGDP
+She	EAsia	HmongMien	119	27	China	Laz14; HGDP
+Japanese	EAsia	Japonic	138	38	Japan	Laz14; HGDP
+Korean	EAsia	Koreanic	127.0	37.6	Korea	Laz14
+Ami	EAsia	Austronesian	121.2	22.8	Taiwan	Laz14
+Atayal	EAsia	Austronesian	121.3	24.6	Taiwan	Laz14
+Kankanaey	EAsia	Austronesian	121.03	17.07	Philippines	Sko16
+Murut	EAsia	Austronesian	115.14	4.62	Brunei	Sko16
+Dusun	EAsia	Austronesian	114.67	4.71	Brunei	Sko16
+Ilocano	EAsia	Austronesian	120.98	14.6	Philippines	Sko16
+Tagalog	EAsia	Austronesian	120.98	14.6	Philippines	Sko16
+Visayan	EAsia	Austronesian	125.51	9.76	Philippines	Sko16 NP
+Bajo	EAsia	Austronesian	122.59	-3.97	Indonesia	Sko16 NP
+Malay	EAsia	Austronesian	103.82	1.35	Singapore	Sko16
+Lebbo	EAsia	Austronesian	117.16	1.66	Indonesia	Sko16 NP
+#
+# Americas
+#
+Chipewyan	Americas	NaDene	-107.3	59.6	Canada	Laz14 NP
+Cree	Americas	Algic	-102.5	50.3	Canada	Laz14 NP
+Algonquin	Americas	Algic	-71.1	48.4	Canada	Laz14 NP
+Ojibwa	Americas	Algic	-81.0	46.5	Canada	Laz14 NP
+Pima	Americas	UtoAztecan	-108.0	29.0	Mexico	Laz14; HGDP
+Mixe	Americas	MixeZoquean	-96.6	17.0	Mexico	Laz14 (x sign wrong)
+Mixtec	Americas	OtoManguean	-97.2	16.7	Mexico	Laz14
+Zapotec	Americas	OtoManguean	-96.5	17.0	Mexico	Laz14
+Mayan	Americas	Mayan	-91.0	19.0	Mexico	Laz14; HGDP Maya
+Inga	Americas	Quechua	-77.0	1.0	Colombia	Laz14 NP
+Kaqchikel	Americas	Mayan	-91.0	15.0	Guatemala	Laz14 NP
+Cabecar	Americas	Chibchan	-84.0	9.5	CostaRica	Laz14 NP
+Wayuu	Americas	Arawakan	-73.0	11.0	Colombia	Laz14 NP, n==1
+Piapoco	Americas	Arawakan	-68.0	3.0	Colombia	Laz14; HGDP Colombian
+Ticuna	Americas	Ticuna	-70.0	-3.8	Colombia	Laz14 NP, n==1
+Karitiana	Americas	Tupian	-63.0	-10.0	Brazil	Laz14; HGDP
+Surui	Americas	Tupian	-62	-11.0	Brazil	Laz14; HGDP
+Bolivian	Americas	Romance	-67.2	-15.0	Bolivia	Laz14
+Aymara	Americas	Aymaran	-68.2	-16.5	Bolivia	Laz14 NP
+Quechua	Americas	Quechua	-66.0	-20.0	Bolivia/Peru	Laz14 (P+NP)
+Chane	Americas	Arawakan	-60.0	-25.0	Argentina	Laz14 NP, n==1
+Guarani	Americas	Tupian	-59.0	-27.5	Argentina	Laz14 NP
+Chilote	Americas	Mapudungun	-73.9	-42.5	Chile	Laz14 NP
+#
+# Oceania
+#
+Mussau	Oceania	Austronesian	149.73	-1.58	PapuaNewGuinea	Sko16 NP
+Saposa	Oceania	Austronesian	154.67	-5.58	PapuaNewGuinea	Sko16 NP
+Buka	Oceania	Austronesian	154.67	-5.42	PapuaNewGuinea	Sko16 NP
+Teop	Oceania	Austronesian	155.18	-5.85	PapuaNewGuinea	Sko16 NP
+Tigak	Oceania	Austronesian	150.83	-2.57	PapuaNewGuinea	Sko16 NP
+Australian	Oceania	Australian	143.0	-13.0	Australia	Laz14
+Kove	Oceania	Austronesian	148.95	-5.47	PapuaNewGuinea	Sko16 NP
+Melamela	Oceania	Austronesian	151.25	-5	PapuaNewGuinea	Sko16 NP
+Nakanai_Bileki	Oceania	Austronesian	150.8	-5.75	PapuaNewGuinea	Sko16 NP
+Mangseng	Oceania	Austronesian	150.7	-5.93	PapuaNewGuinea	Sko16 NP
+Manus	Oceania	Austronesian	147	-2.08	PapuaNewGuinea	Sko16 NP
+#
+Nasoi	Oceania	SBougainville	155	-6	PapuaNewGuinea	Laz14 (Bougainville); HGDP Melanesian
+Nailik	Oceania	Austronesian	151.52	-2.98	PapuaNewGuinea	Sko16 NP
+Notsi	Oceania	Austronesian	151.65	-3.05	PapuaNewGuinea	Sko16 NP
+SW_Bougainville	Oceania	Papuan	155.5	-6.6	PapuaNewGuinea	Sko16 NP
+#
+Kuot_Kabil	Oceania	Papuan	151.7	-3.07	PapuaNewGuinea	Sko16 NP
+Kuot_Lamalaua	Oceania	Papuan	151.5	-3	PapuaNewGuinea	Sko16 NP
+Lavongai	Oceania	Austronesian	150.43	-2.57	PapuaNewGuinea	Sko16 NP
+Madak	Oceania	Austronesian	151.7	-3.1	PapuaNewGuinea	Sko16 NP
+Tolai	Oceania	Papuan	152.14	-4.31	PapuaNewGuinea	Sko16 NP
+Mengen	Oceania	Austronesian	151.4	-5.1	PapuaNewGuinea	Sko16 NP
+Mamusi	Oceania	Austronesian	151	-6	PapuaNewGuinea	Sko16 NP
+Mamusi_Paleabu	Oceania	Austronesian	150.9	-5.95	PapuaNewGuinea	Sko16 NP
+Nakanai_Loso	Oceania	Austronesian	150.8	-5.48	PapuaNewGuinea	Sko16 NP
+Ata	Oceania	Papuan	150.9	-5.7	PapuaNewGuinea	Sko16 NP
+Sulka	Oceania	Papuan	152.3	-4.5	PapuaNewGuinea	Sko16 NP
+Kol_New_Britain	Oceania	Papuan	151.63	-5.38	PapuaNewGuinea	Sko16 NP
+Baining_Malasait	Oceania	Papuan	151.9	-4.47	PapuaNewGuinea	Sko16 NP
+Baining_Marabu	Oceania	Papuan	152.3	-4.63	PapuaNewGuinea	Sko16 NP
+Papuan	Oceania	Papuan	143	-4	PapuaNewGuinea	Laz14; HGDP

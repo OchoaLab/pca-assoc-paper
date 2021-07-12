@@ -76,11 +76,17 @@ load( 'bnpsd.RData' )
 # loads: admix_proportions, tree_subpops, fam
 
 if (maf_real) {
-    # need FST of this simulation, which has been calculated already
-    fst_tree <- as.numeric( read_lines( 'fst.txt' ) )
+    # need mean kinship of this simulation, which has been calculated already
+    if ( name == 'HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim' ) {
+        kinship_mean <- as.numeric( read_lines( 'kinship_mean.txt' ) )
+    } else {
+        # override with this hardcoded value that performed best in simulations
+        kinship_mean <- 0.4
+    }
+    message( 'kinship_mean used for undiff_af: ', kinship_mean )
     
     # undifferentiate whole original distribution
-    p_anc_distr <- undiff_af( maf, fst_tree )$p
+    p_anc_distr <- undiff_af( maf, kinship_mean )$p
 }
 
 #####################

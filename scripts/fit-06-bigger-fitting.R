@@ -1,4 +1,4 @@
-# a slower, empirical approach for deciding on F for undifferentiating MAFs to result in more reasonable structures in terms of popkin and also MAF distribution.
+# a slower, empirical approach for deciding on mean kinship for undifferentiating MAFs to result in more reasonable structures in terms of popkin and also MAF distribution.
 # computes table of sum of squared errors for both kinship and MAF, so we're explicitly trying to fit both/either
 # MAF ascertainment is built into test, which is actually what makes this so hard (without it, popkin fits are generally great, so it would just be MAF distributions to worry about)
 
@@ -29,7 +29,9 @@ option_list = list(
     make_option("--beta", action = "store_true", default = FALSE, 
                 help = "Fit symmetric Beta distributions instead of `bnpsd::undiff_af`"),
     make_option("--distr", action = "store_true", default = FALSE, 
-                help = "Pass AFs from `bnpsd::undiff_af` to `draw_all_admix` as distribution instead of fixed vector.")
+                help = "Pass AFs from `bnpsd::undiff_af` to `draw_all_admix` as distribution instead of fixed vector."),
+    make_option("--kin", action = "store_true", default = FALSE, 
+                help = "Series based on mean kinship instead of FST for `bnpsd::undiff_af`")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -41,6 +43,7 @@ m_loci <- opt$m_loci
 maf_min <- opt$maf_min
 fit_beta <- opt$beta
 as_distr <- opt$distr
+kin <- opt$kin
 
 # stop if name is missing
 if ( is.na(name) )
@@ -49,6 +52,13 @@ if ( is.na(name) )
 # don't try to do two things at once!
 if ( fit_beta && as_distr )
     stop( 'Cannot use `--beta` and `--distr` together!' )
+if ( fit_beta && kin )
+    stop( 'Cannot use `--beta` and `--kin` together!' )
+# kinship (latest) only makes sense with --distr
+if ( kin ) {
+    message( 'NOTE: --kin forcing --distr!' )
+    as_distr <- TRUE
+}
 
 ##############################
 ### LOAD PRECALCUATED DATA ###
@@ -70,6 +80,7 @@ maf_real <- maf
 maf_real_m <- sort( sample( maf_real, m_loci ) )
 
 # also load kinship estimate from real data
+# (for error measurements, not used in simulations)
 kinship_real <- read_grm( 'popkin' )$kinship
 
 # go back down so we can find the simulated path
@@ -132,7 +143,10 @@ if ( fit_beta ) {
 } else {
     # need FST of this simulation, which has been calculated already
     # this is sort of like a minimum, in that we might want to un-differentiate even more
-    fst_tree <- as.numeric( read_lines( 'fst.txt' ) )
+    # actually latest theory says it should be mean kinship, not FST!
+    file_fst_or_kin <- if ( kin ) 'kinship_mean.txt' else 'fst.txt'
+    # load whichever (call "fst" in code, but it can be mean kinship)
+    fst_tree <- as.numeric( read_lines( file_fst_or_kin ) )
     # round for simplicity
     fst_min <- round( fst_tree, 2 )
     # this is the max allowed by `undiff_af`:
@@ -163,6 +177,11 @@ if ( fit_beta ) {
     }
 }
 
+# place in a separate subfolder
+if ( !dir.exists( 'fits' ) )
+    dir.create( 'fits' )
+setwd( 'fits' )
+
 # hopefully results are similar for smaller m to run faster tests!
-file_out <- paste0( if ( fit_beta ) 'B' else if ( as_distr ) 'Fd' else 'F', '-fit_m-', m_loci, '.txt' )
+file_out <- paste0( if ( fit_beta ) 'B' else if ( kin ) 'K' else 'F', if ( as_distr ) 'd' else '', '-fit_m-', m_loci, '.txt' )
 write_tsv( dat, file_out )

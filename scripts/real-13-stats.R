@@ -113,14 +113,14 @@ report_cross_method <- function( method_to_vals, metric ) {
     # decide which performed best, by mean
     method_to_mean <- sapply( method_to_vals, mean )
     if ( metric == 'auc' ) {
-        method_best <- methods$code[ which.max( method_to_mean ) ]
+        method_best <- methods$name[ which.max( method_to_mean ) ]
         alternative <- 'l' # alternative is lesser than max
     } else if ( metric == 'rmsd' ) {
-        method_best <- methods$code[ which.min( method_to_mean ) ]
+        method_best <- methods$name[ which.min( method_to_mean ) ]
         alternative <- 'g' # alternative is greater than min
     }
     # to get direction right, need to identify worst method too
-    method_worst <- setdiff( methods$code, method_best )
+    method_worst <- setdiff( methods$name, method_best )
     
     # and decide if they're statistically significantly different or not
     sig <- wilcox.test(
@@ -144,6 +144,11 @@ process_dataset <- function( name, const_herit_loci ) {
         file_table,
         col_types = 'ciiddd'
     )
+
+    # translate method names to nicer ones for paper
+    # replace method names for paper
+    for ( i in 1 : nrow( methods ) )
+        tib$method[ tib$method == methods$code[ i ] ] <- methods$name[ i ]
     
     # RMSD data is signed, but in the comparisons of this entire script we don't care about the sign/direction
     # for simplicity, take absolute value now for all data (all PCs and all methods)!
@@ -160,7 +165,7 @@ process_dataset <- function( name, const_herit_loci ) {
         method_to_pc <- list()
         
         # begin processing each method separately
-        for ( method in methods$code ) {
+        for ( method in methods$name ) {
             # subset big table
             tib_i <- tib[ tib$method == method, ]
             
@@ -247,10 +252,6 @@ for ( i in 1 : nrow( datasets ) ) {
     # go back down
     setwd( '../..' )
 }
-
-# replace method names for paper
-for ( i in 1 : nrow( methods ) )
-    output[ output == methods$code[ i ] ] <- methods$name[ i ]
 
 # reorder so all Fixed Effect Size traits are listed first
 output <- arrange( output, trait )

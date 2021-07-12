@@ -6,6 +6,7 @@
 # creates:
 # - bnpsd.RData
 # - fst.txt
+# - kinship_mean.txt
 
 library(optparse)
 library(bnpsd)
@@ -121,3 +122,11 @@ save( admix_proportions, tree_subpops, fam, file = 'bnpsd.RData' )
 ##     )
 ## )
 
+# lastly, also need mean kinship to undifferentiate real MAF
+# NOTES:
+# - must be "unweighted", because MAF weighed individuals uniformly
+# - but at individual level (not subpops)
+# - and it must be kinship, not coancestry
+# - (these are probably all small differences, but might as well get it right)
+kinship_mean <- mean( coanc_to_kinship( coanc_admix( admix_proportions, coanc_est ) ) )
+write_lines( kinship_mean, 'kinship_mean.txt' )

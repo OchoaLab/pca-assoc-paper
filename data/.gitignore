@@ -10,3 +10,9 @@ sum-pca-num-reps.pdf
 sum-pca-rmsd-vs-lambda.pdf
 sum-pca-rmsd-auc.pdf
 pca-comparison2.pdf
+# these are very bad unrefined plots, not suitable for presentations/etc
+tree.pdf
+popkin_subpops.pdf
+causal-maf-mins.pdf
+trait-normality.pdf
+fits/
