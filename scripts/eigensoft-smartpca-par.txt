@@ -1,0 +1,6 @@
+genotypename:    data.bed
+snpname:         data.bim
+indivname:       data.fam
+evecoutname:     eigensoft.evec
+evaloutname:     eigensoft.eval
+numoutlieriter:  0

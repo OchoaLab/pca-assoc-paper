@@ -11,9 +11,9 @@ library(tibble)
 # names of datasets (paired list)
 datasets <- tibble(
     name_paper = c(
-        'Large sample size sim.',
-        'Small sample size sim.',
-        'Family structure sim.',
+        'Admix. Large sim.',
+        'Admix. Small sim.',
+        'Admix. Family sim.',
         'Human Origins',
         'HGDP',
         '1000 Genomes',

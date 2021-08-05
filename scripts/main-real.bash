@@ -333,3 +333,7 @@ time Rscript real-11-inflation-across-datasets.R
 time Rscript real-20-trait-normality.R
 # 12m25.216s ideapad
 # 6m30.113s viiiaR5
+
+# calculages popkin and eigensoft eigenvectors, calculates TW stats, makes plot
+time Rscript all-02-eigen.R
+# 30m14.103s viiiaR5 first time
