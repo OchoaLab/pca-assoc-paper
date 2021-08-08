@@ -13,6 +13,10 @@ setwd( dir_orig ) # go back to where we were
 
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
+# identify the PCs used, for input covariates file and for a temporary output path
+name_pcs <- 'plink'
+# for final outputs
+method <- 'pca-plink-pure'
 
 ############
 ### ARGV ###
@@ -26,8 +30,6 @@ option_list = list(
                 help = "Number of PCs to use", metavar = "int"),
     make_option(c("-r", "--rep"), type = "integer", default = 1,
                 help = "Replicate number", metavar = "int"),
-    make_option("--plink", action = "store_true", default = FALSE, 
-                help = "use PCs calculated with plink (default is to use PCs from `kinship_std`)"),
     make_option("--sim", action = "store_true", default = FALSE, 
                 help = "Genotypes are simulated (rather than real; alters paths only)"),
     make_option("--dcc", action = "store_true", default = FALSE, 
@@ -84,14 +86,6 @@ setwd( dir_out )
 ###########
 ### PCA ###
 ###########
-
-# identify the PCs used
-# (std are from kinship_std, plink are for pure plink like others would)
-# for input covariates file and for a temporary output path
-name_pcs <- if ( opt$plink ) 'plink' else 'std'
-
-# this is for final outputs
-method <- if ( opt$plink ) 'pca-plink-pure' else 'pca-plink'
 
 # message so we know where we're at
 message(

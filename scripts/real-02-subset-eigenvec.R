@@ -18,8 +18,6 @@ name_in <- 'data'
 option_list = list(
     make_option("--bfile", type = "character", default = NA, 
                 help = "Base name for input plink files (.BED/BIM/FAM)", metavar = "character"),
-    make_option("--std", action = "store_true", default = FALSE, 
-                help = "Process 'standard' estimates, instead of GCTA's"),
     make_option("--plink", action = "store_true", default = FALSE, 
                 help = "Process 'plink2' estimates, instead of GCTA's"),
     make_option("--clean", action = "store_true", default = FALSE, 
@@ -34,17 +32,11 @@ opt <- parse_args(opt_parser)
 # get values
 name <- opt$bfile
 
-# these are mutually exclusive
-if ( opt$std && opt$plink )
-    stop( 'Select only one of `--std` and `--plink`!' )
-
-# all but plink2 estimates have columns
+# only plink2 estimates have columns
 col_names <- FALSE
 
-# this is the only change needed to work with "standard" kinship estimates
-if ( opt$std ) {
-    name_in <- 'data-std'
-} else if ( opt$plink ) {
+# this is the only change needed to work with "plink" estimates
+if ( opt$plink ) {
     name_in <- 'data-plink'
     col_names <- TRUE
 }
@@ -53,7 +45,6 @@ if ( opt$std ) {
 if ( is.na(name) )
     stop('`--bfile` terminal option is required!')
 
-# move to where the data is
 # move to where the data is
 if ( opt$dcc ) {
     # on DCC we go here, no name for simplicity (data is only temporarily there, so I won't have more than one dataset there at the time)
@@ -77,7 +68,7 @@ if ( opt$clean ) {
         )
 } else {
     # read the original file
-    tib <- read_table2(
+    tib <- read_table(
         file_eigenvec( name_in, n_pcs_max ),
         col_names = col_names
     )

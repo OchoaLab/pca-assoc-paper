@@ -67,64 +67,43 @@ gas_plink_pca(
 # cleanup
 invisible( file.remove( paste0( name_out, '.log' ) ) )
 
-# load the data for comparisons
-out <- read_eigenvec(
-    file = name_out
-)
-eigenvec_plink <- out$eigenvec
-
-#################
-### LOAD GCTA ###
-#################
-
-# first load GCTA's precomputed PCs, for comparison
-out <- read_eigenvec(
-    file = paste0( name_in, '-n_pcs_', n_pcs_max )
-)
-eigenvec_gcta <- out$eigenvec
-
-## ###################
-## ### LOAD MY PCA ###
-## ###################
-
-## # also load my custom precomputed PCs (from kinship_std), for comparison
+## # load the data for comparisons
 ## out <- read_eigenvec(
-##     file = paste0( name_in, '-std-n_pcs_', n_pcs_max )
+##     file = name_out
 ## )
-## eigenvec_std <- out$eigenvec
+## eigenvec_plink <- out$eigenvec
 
-###################
-### COMPARISONS ###
-###################
+## #################
+## ### LOAD GCTA ###
+## #################
 
-# the key comparison is this inner product of vectors, which in a perfect agreement leads to the identity matrix (as these are orthonormal)
-# results in a dim-`n_pcs_max` square matrix (i.e. 90 x 90)
-# in this version we do 3 times!
-#comparison_gcta_std <- crossprod( eigenvec_gcta, eigenvec_std )
-comparison_gcta_plink <- crossprod( eigenvec_gcta, eigenvec_plink )
-#comparison_std_plink <- crossprod( eigenvec_std, eigenvec_plink )
+## # first load GCTA's precomputed PCs, for comparison
+## out <- read_eigenvec(
+##     file = paste0( name_in, '-n_pcs_', n_pcs_max )
+## )
+## eigenvec_gcta <- out$eigenvec
 
-# a crude comparison shows that only the top eigenvectors sort of agree
-# this is ok as r becomes very large, they don't fit well regardless, but some of the reranking is surprising
-fig_start(
-    'pca-comparison2',
-    width = 4, # 10,
-    mar_t = 2,
-    mar_b = 0,
-    mar_l = 0
-)
-plot_popkin(
-    list(
-#        abs( comparison_gcta_std ),
-        abs( comparison_gcta_plink )
-#        abs( comparison_std_plink )
-    ),
-    titles = c(
-#        'GCTA-STD',
-        'GCTA-plink'
-#        'STD-plink'
-    ),
-    ylab = 'Eigenvector',
-    leg_title = 'Abs. Correlation'
-)
-fig_end()
+## ###################
+## ### COMPARISONS ###
+## ###################
+
+## # the key comparison is this inner product of vectors, which in a perfect agreement leads to the identity matrix (as these are orthonormal)
+## # results in a dim-`n_pcs_max` square matrix (i.e. 90 x 90)
+## comparison_gcta_plink <- crossprod( eigenvec_gcta, eigenvec_plink )
+
+## # a crude comparison shows that only the top eigenvectors sort of agree
+## # this is ok as r becomes very large, they don't fit well regardless, but some of the reranking is surprising
+## fig_start(
+##     'pca-comparison2',
+##     width = 4,
+##     mar_t = 2,
+##     mar_b = 0,
+##     mar_l = 0
+## )
+## plot_popkin(
+##     abs( comparison_gcta_plink ),
+##     titles = 'GCTA-plink',
+##     ylab = 'Eigenvector',
+##     leg_title = 'Abs. Correlation'
+## )
+## fig_end()

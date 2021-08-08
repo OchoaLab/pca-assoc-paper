@@ -49,6 +49,10 @@ X <- BEDMatrix( name_in, simple_names = TRUE )
 # load FAM table, for subpopulation labels
 fam <- read_fam( name_in )
 
+# hack fam to behave like it used to for simulations (using "min" to normalize kinship)
+if ( length( unique( fam$fam ) ) == 1 )
+    fam$fam <- 1 : nrow(fam)
+
 # now estimate kinship
 kinship <- popkin( X, fam$fam )
 

@@ -7,21 +7,12 @@
 
 # creates:
 # - bnpsd.RData
-# - parents.RData (if generations > 1)
 
 library(optparse) # for terminal options
 library(bnpsd)    # simulate admixed population (structured population)
 library(readr)    # to save FST value, for tables on paper
 
-# load new functions from external scripts
-dir_orig <- getwd()
-setwd("../../scripts") # scripts of main GAS project
-# sim_children_generations_* code
-source('draw_geno_child.R')
-setwd( dir_orig ) # go back to where we were
-
 # hardcoded params
-iterations <- 100 # GENERATIONS number of iterations until "pairing" code gives up and restarts pairing simulation at an earlier generation (in small populations there may be no solution as there are not enough sufficiently unrelated individuals)
 verbose <- TRUE # to print messages
 # the name is for dir only, actual file is just "data"
 name_out <- 'data'
@@ -99,24 +90,6 @@ inbr_subpops <- obj$coanc_subpops # rescaled Fst vector for intermediate subpops
 # save bnpsd data to an RData file
 save( admix_proportions, inbr_subpops, file = 'bnpsd.RData' )
 
-if ( generations > 1 ) {
-    # simulate realistic generations of families
-
-    if (verbose)
-        message('sim_children_generations_kinship')
-    # defines parents semi-randomly based on avoidance of close relatives
-    # but otherwise with strong assortative mating to preserve population structure
-    data_G <- sim_children_generations_kinship(
-        G = generations,
-        n = n_ind,
-        iterations = iterations,
-        verbose = verbose
-    )
-    parents <- data_G$parents # list with a matrix per generation
-
-    # save parents structure (for current code, it's most natural to use an RData file, rather than a FAM file, which we can write but can't parse back easily into the structure we want)
-    save( parents, file = 'parents.RData' )
-}
-
 # save FST value of simulation
 write_lines( fst, 'fst.txt' )
+

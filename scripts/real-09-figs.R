@@ -20,8 +20,6 @@ rep_max <- 50
 option_list = list(
     make_option("--bfile", type = "character", default = NA, 
                 help = "Base name for input plink files (.BED/BIM/FAM)", metavar = "character"),
-    make_option("--pca", action = "store_true", default = FALSE, 
-                help = "Compare PCA versions (PCs from R popkinsuppl::kinship_std vs pure plink)"),
     make_option("--complete", action = "store_true", default = FALSE, 
                 help = "Plot only complete replicates (useful for partial runs)"),
     make_option("--const_herit_loci", action = "store_true", default = FALSE, 
@@ -35,7 +33,6 @@ opt <- parse_args(opt_parser)
 
 # get values
 name <- opt$bfile
-pca_test <- opt$pca
 const_herit_loci <- opt$const_herit_loci
 m_causal_fac <- opt$m_causal_fac
 
@@ -43,25 +40,14 @@ m_causal_fac <- opt$m_causal_fac
 if ( is.na(name) )
     stop('`--bfile` terminal option is required!')
 
-# a temporary boolean to compare PCA versions
-# (PCs from R popkinsuppl::kinship_std vs pure plink)
-if (pca_test) {
-    method_to_label <- list(
-        'pca-plink' = 'Fixed effects (PCA)',
-        'pca-plink-pure' = 'Fixed effects (PCA) pure'
-    )
-    name_base <- 'sum-pca-'
-} else {
-    # final versions for papers
-    # pure plink version is only PCA version, add LMM too
-    method_to_label <- list(
-        'pca-plink-pure' = 'Fixed effects (PCA)',
-        gcta = 'Mixed effects (LMM)'
-    )
-    name_base <- 'sum-'
-}
+# final versions for papers
+# pure plink version is only PCA version, add LMM too
+method_to_label <- list(
+    'pca-plink-pure' = 'Fixed effects (PCA)',
+    gcta = 'Mixed effects (LMM)'
+)
+name_base <- 'sum-'
 # hardcoded same order as method_to_label
-# whether pca_test or not, there's only two things to look at
 method_cols <- c(
     'red',
     'blue'
@@ -217,7 +203,7 @@ if ( any( counts > 0 ) ) {
 # default legend position
 legend_pos <- 'topright'
 # hack for small sample size simulation only
-if (name == 'sim-n100-k10-f0.1-s0.5-g1' && !pca_test)
+if ( name == 'sim-n100-k10-f0.1-s0.5-g1' )
     legend_pos <- 'bottomleft'
 
 # gather data into lists, best for boxplots

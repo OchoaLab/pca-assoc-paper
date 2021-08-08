@@ -36,14 +36,6 @@ time Rscript real-00-preprocess-gcta.R --bfile $name
 # 1m51.228s ideapad HGDP
 # 2m3.016s ideapad TGP
 
-# get PCs in R, using my formula
-# hope for similar average performance, although these PCs are very different than GCTA (except for top 2)
-# NOTE: uses ROM version (known bias, does not match popular versions; I think this is best)
-# time Rscript real-01-pca-test.R --bfile $name # Not repeated on TGP after m_causal bugs were fixed and thinning performed
-# 6m57.502s viiiaX6 HO
-# 5m21.411s ideapad HGDP
-# 30m45.184s labbyDuke TGP # ideapad and viiiaX6 ran out of mem (~16G RAM)
-
 # get PCs using plink2
 time Rscript real-01-pcs-plink.R --bfile $name
 # 0m19.751s ideapad HO
@@ -70,7 +62,7 @@ time Rscript real-02-subset-eigenvec.R --bfile $name --plink
 # PCA runs (with pure plink)
 for pcs in {0..90}; do
     for rep in {1..50}; do
-	time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs --plink
+	time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs
     done
 done
 # removes redundant, auxiliary plink2 PCA files
@@ -148,7 +140,7 @@ time Rscript real-02-subset-eigenvec.R --bfile $name --dcc --plink
 # PCA runs (with pure plink)
 for pcs in {0..90}; do
     for rep in {1..50}; do
-	time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs --plink --const_herit_loci
+	time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs --const_herit_loci
     done
 done
 time Rscript real-02-subset-eigenvec.R --bfile $name --dcc --clean --plink
@@ -239,7 +231,7 @@ for rep in {1..50}; do
     time Rscript real-01-pcs-plink.R --bfile $name/rep-$rep
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink
     for pcs in {0..90}; do
-	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs --plink
+	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs
     done
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink --clean
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep
@@ -274,7 +266,7 @@ for rep in {1..50}; do
     time Rscript sim-02-sim-trait.R --bfile $name -r $rep --const_herit_loci
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink
     for pcs in {0..90}; do
-	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs --plink --const_herit_loci
+	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs --const_herit_loci
     done
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink --clean
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep
