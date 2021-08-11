@@ -1,45 +1,45 @@
 # updated version most coherent with HO16ep
 # since superpop is distinguished anyway, coords will be sampling
-pop	superpop	x	y	native	HumanOrigins	HGDP	# comment
+pop	superpop	x	y	native	HumanOrigins	HGDP	comment
 #
 # MAfrica: African Ancestry (AFR)
 #
-MSL	AFR	-13.2	8.5	1	Mende	NA	# Mende in Sierra Leone # none in chip, coords of HO Mende
-YRI	AFR	4	7	1	Yoruba	Yoruba	# Yoruba in Ibadan, Nigeria  # 7°23′47″N 3°55′0″E
-ESN	AFR	6.0	6.5	1	Esan	NA	# Esan in Nigeria # none in chip, coords HO Esan
-GWD	AFR	-16.7	13.4	1	Gambian	NA	# Gambian in Western Division, The Gambia # none in chip, coords of HO Gambian
-LWK	AFR	35	1	1	Luhya	NA	# Luhya in Webuye, Kenya # Lat 0.6166667°, Lon 34.7666667°
-ACB	AFR	-59	13	0	NA	NA	# African Caribbean in Barbados # Bridgetown, Barbados 13°06′N 59°37′W
-ASW	AFR	-112	33	0	NA	NA	# African Ancestry in Southwest US # Phoenix, AZ, USA 33°27′N 112°04′W
+MSL	AFR	-13.2	8.5	1	Mende	NA	Mende in Sierra Leone; coords of HO Mende
+YRI	AFR	4	7	1	Yoruba	Yoruba	Yoruba in Ibadan, Nigeria
+ESN	AFR	6.0	6.5	1	Esan	NA	Esan in Nigeria; coords HO Esan
+GWD	AFR	-16.7	13.4	1	Gambian	NA	Gambian in Western Division, The Gambia; coords of HO Gambian
+LWK	AFR	35	1	1	Luhya	NA	Luhya in Webuye, Kenya
+ACB	AFR	-59	13	0	NA	NA	African Caribbean in Barbados; coords of Bridgetown, Barbados
+ASW	AFR	-112	33	0	NA	NA	African Ancestry in Southwest US; coords of Phoenix, AZ
 #
 # Europe: European Ancestry (EUR)
 # 
-CEU	EUR	-111	40	0	NA	NA	# Utah residents with Northern and Western European ancestry # Salt Lake City 40°45′0″N 111°53′0″W
-GBR	EUR	0	52	1	English	NA	# British in England and Scotland # London 51°30′N 0°7′W
-IBS	EUR	-4	40	1	Spanish	NA	# Iberian populations in Spain # Madrid 40°26′N 3°42′W
-TSI	EUR	11	44	1	Italian_North	BergamoItalian	# Toscani in Italy # Florence 43°47′N 11°15′E
-FIN	EUR	25	60	1	Finnish	NA	# Finnish in Finland # Helsinki 60°10′N 024°56′E
+CEU	EUR	-111	40	0	NA	NA	Utah residents with Northern and Western European ancestry; coords of Salt Lake City
+GBR	EUR	0	52	1	English	NA	British in England and Scotland; coords of London
+IBS	EUR	-4	40	1	Spanish	NA	Iberian populations in Spain; coords of Madrid
+TSI	EUR	11	44	1	Italian_North	BergamoItalian	Toscani in Italy; coords of Florence
+FIN	EUR	25	60	1	Finnish	NA	Finnish in Finland; coords of Helsinki
 #
 # SAsia: South Asian Ancestry (SAS)
 #
-PJL	SAS	74.3	31.5	1	Punjabi	NA	# Punjabi in Lahore,Pakistan (PJL) # none in chip, coords of HO Punjabi
-GIH	SAS	-95	29	0	Gujarati	NA	# Gujarati Indian in Houston, TX # 29°45′46″N 95°22′59″W
-ITU	SAS	0	52	0	NA	NA	# Indian Telugu in the UK (ITU) # none in chip, coords of London
-STU	SAS	0	52	0	NA	NA	# Sri Lankan Tamil in the UK (STU) # none in chip, coords of London
-BEB	SAS	90.4	23.7	1	Bengali	NA	# Bengali in Bangladesh (BEB) # none in chip, coords of HO Bengali
+PJL	SAS	74.3	31.5	1	Punjabi	NA	Punjabi in Lahore, Pakistan; coords of HO Punjabi
+GIH	SAS	-95	29	0	Gujarati	NA	Gujarati Indian in Houston, TX
+ITU	SAS	0	52	0	NA	NA	Indian Telugu in the UK; coords of London
+STU	SAS	0	52	0	NA	NA	Sri Lankan Tamil in the UK; coords of London
+BEB	SAS	90.4	23.7	1	Bengali	NA	Bengali in Bangladesh; coords of HO Bengali
 #
 # EAsia: East Asian Ancestry (EAS)
 # 
-CHS	EAS	113	23	1	NA	NA	# Southern Han Chinese, China # chose Guangzhou 23°08′N 113°16′E
-CDX	EAS	101	22	1	Dai	Dai	# Chinese Dai in Xishuangbanna, China # 22°00′N 100°48′E
-KHV	EAS	107	11	1	Kinh	NA	# Kinh in Ho Chi Minh City, Vietnam # 10°46′10″N 106°40′55″E
-CHB	EAS	116	40	1	Han	Han	# Han Chinese in Bejing, China # 39°54′50″N 116°23′30″E
-JPT	EAS	140	36	1	Japanese	Japanese	# Japanese in Tokyo, Japan # 35°41′22.22″N 139°41′30.12″E
-#CHD	EAS	-105	39	0	NA	NA	# Chinese in metropolitan Denver # 39°45′43″N 104°52′52″W, NOT in final data only chip
+CHS	EAS	113	23	1	NA	NA	Southern Han Chinese, China; coords of Guangzhou
+CDX	EAS	101	22	1	Dai	Dai	Chinese Dai in Xishuangbanna, China
+KHV	EAS	107	11	1	Kinh	NA	Kinh in Ho Chi Minh City, Vietnam
+CHB	EAS	116	40	1	Han	Han	Han Chinese in Bejing, China
+JPT	EAS	140	36	1	Japanese	Japanese	Japanese in Tokyo, Japan
+#CHD	EAS	-105	39	0	NA	NA	Chinese in metropolitan Denver; NOT in final data only chip
 #
 # Americas: Americas Ancestry (AMR)
 #
-PEL	AMR	-77	-12	0	NA	NA	# Peruvian in Lima, Peru # 12°2′36″S 77°1′42″W
-MXL	AMR	-118	34	0	NA	NA	# Mexican Ancestry in Los Angeles, California # 34°03′N 118°15′W
-CLM	AMR	-76	6	0	NA	NA	# Colombian in Medellin, Colombia # 6°13′51″N 75°35′26″W
-PUR	AMR	-66	18	0	NA	NA	# Puerto Rican in Puerto Rico # 18°27′00″N 66°04′00″W
+PEL	AMR	-77	-12	0	NA	NA	Peruvian in Lima, Peru
+MXL	AMR	-118	34	0	NA	NA	Mexican Ancestry in Los Angeles, California
+CLM	AMR	-76	6	0	NA	NA	Colombian in Medellin, Colombia
+PUR	AMR	-66	18	0	NA	NA	Puerto Rican in Puerto Rico
