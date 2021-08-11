@@ -116,37 +116,36 @@ time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --fin
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
 
-########################
-### const_herit_loci ###
-########################
+###########
+### FES ###
+###########
 
-# addition to complement existing analysis with alternative trait from const_herit_loci model
-# not sure if it will make a meaningful difference
-# NOTE: many steps that depend on genotypes only aren't redone (are shared from prev run)
+# addition to complement existing analysis with trait from FES model
+# NOTE: steps that depend only on genotypes aren't redone (are shared from prev run)
 
 for rep in {1..50}; do
-    time Rscript sim-02-sim-trait.R --bfile $name -r $rep --const_herit_loci
+    time Rscript sim-02-sim-trait.R --bfile $name -r $rep --fes
 
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink
     for pcs in {0..90}; do
-	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs --const_herit_loci
+	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs --fes
     done
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink --clean
 
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep
     for pcs in {0..90}; do
-	time Rscript real-05-gcta.R --sim --bfile $name -r $rep --n_pcs $pcs --const_herit_loci
+	time Rscript real-05-gcta.R --sim --bfile $name -r $rep --n_pcs $pcs --fes
     done
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --clean
 done
 
-time Rscript real-07-auc-rmsd.R --sim --bfile $name -r 50 --n_pcs 90 --const_herit_loci
-time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
+time Rscript real-07-auc-rmsd.R --sim --bfile $name -r 50 --n_pcs 90 --fes
+time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 --fes
+time Rscript real-09-figs.R --bfile $name --fes
+time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --final --fes
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes -t # test first!
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes
 
-time Rscript real-09-figs.R --bfile $name --const_herit_loci
-time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --final --const_herit_loci
-time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci -t # test first!
-time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --const_herit_loci
 
 ###############
 ### GLOBALS ###
@@ -163,4 +162,4 @@ Rscript sim-10-measures-fig.R 3
 
 # final plot gathers all three simulations into a single multipanel figure
 time Rscript real-15-plots-big.R
-time Rscript real-15-plots-big.R --const_herit_loci
+time Rscript real-15-plots-big.R --fes

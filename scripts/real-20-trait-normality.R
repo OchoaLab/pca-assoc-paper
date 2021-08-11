@@ -38,10 +38,10 @@ causal_maf_min <- function( X, causal_indexes ) {
 # in addition to calculating trait normality, also gets MAF distributions of causal loci
 process_reps <- function( is_sim ) {
     # data we are collecting
-    rmsds_rand <- vector( 'numeric', rep_max )
-    rmsds_inv <- vector( 'numeric', rep_max )
-    mafs_rand <- vector( 'numeric', rep_max )
-    mafs_inv <- vector( 'numeric', rep_max )
+    rmsds_rc <- vector( 'numeric', rep_max )
+    rmsds_fes <- vector( 'numeric', rep_max )
+    mafs_rc <- vector( 'numeric', rep_max )
+    mafs_fes <- vector( 'numeric', rep_max )
     
     if ( !is_sim )
         X <- BEDMatrix( 'data' )
@@ -50,28 +50,28 @@ process_reps <- function( is_sim ) {
         # move to where the data is
         setwd( paste0( 'rep-', rep ) )
         
-        # genotype data is here always (for sims), not in const_herit_loci
+        # genotype data is here always (for sims), not in fes
         if ( is_sim )
             X <- BEDMatrix( 'data' )
 
-        # process "rand" trait
+        # process RC trait
 
         # load trait vector (and other data we may or may not need later)
         load( 'simtrait.RData' )
         # loads: "causal_coeffs"  "causal_indexes" "trait"
         # calculations
-        rmsds_rand[ rep ] <- trait_normality_rmsd( trait )
-        mafs_rand[ rep ] <- causal_maf_min( X, causal_indexes )
+        rmsds_rc[ rep ] <- trait_normality_rmsd( trait )
+        mafs_rc[ rep ] <- causal_maf_min( X, causal_indexes )
         
-        # process "inv" trait
-        setwd( 'const_herit_loci' )
+        # process FES trait
+        setwd( 'fes' )
         
         # load trait vector (and other data we may or may not need later)
         load( 'simtrait.RData' )
         # loads: "causal_coeffs"  "causal_indexes" "trait"
         # calculations
-        rmsds_inv[ rep ] <- trait_normality_rmsd( trait )
-        mafs_inv[ rep ] <- causal_maf_min( X, causal_indexes )
+        rmsds_fes[ rep ] <- trait_normality_rmsd( trait )
+        mafs_fes[ rep ] <- causal_maf_min( X, causal_indexes )
         
         # go back down for next rep
         setwd( '../..' )
@@ -80,10 +80,10 @@ process_reps <- function( is_sim ) {
     # return desired data
     return(
         list(
-            rmsds_rand = rmsds_rand,
-            rmsds_inv = rmsds_inv,
-            mafs_rand = mafs_rand,
-            mafs_inv = mafs_inv
+            rmsds_rc = rmsds_rc,
+            rmsds_fes = rmsds_fes,
+            mafs_rc = mafs_rc,
+            mafs_fes = mafs_fes
         )
     )
 }
@@ -111,18 +111,18 @@ for ( i in 1 : nrow( datasets ) ) {
     # decide if it's simulation or not, which decides where some genotype data ought to be
     is_sim <- grepl( 'sim', name_dir )
 
-    # do all processing (combined rand/inv and rmsd/maf)
+    # do all processing (combined RC/FES and rmsd/maf)
     obj <- process_reps( is_sim )
     
-    # store "rand" traits
+    # store RC traits
     name_out <- paste0( name_paper, ' RC' )
-    dataset_to_rmsds[[ name_out ]] <- obj$rmsds_rand
-    dataset_to_mafs[[ name_out ]] <- obj$mafs_rand
+    dataset_to_rmsds[[ name_out ]] <- obj$rmsds_rc
+    dataset_to_mafs[[ name_out ]] <- obj$mafs_rc
 
-    # store "inv" traits
+    # store FES traits
     name_out <- paste0( name_paper, ' FES' )
-    dataset_to_rmsds[[ name_out ]] <- obj$rmsds_inv
-    dataset_to_mafs[[ name_out ]] <- obj$mafs_inv
+    dataset_to_rmsds[[ name_out ]] <- obj$rmsds_fes
+    dataset_to_mafs[[ name_out ]] <- obj$mafs_fes
     
     # go back down
     setwd( '..' )

@@ -1,6 +1,6 @@
 # reports actual m_causal values used in every simulation
 # (for paper, noticed some very odd issues)
-# checks both "inv" and "rand" traits (no need for separate runs)
+# checks both FES and RC traits (no need for separate runs)
 
 library(readr)
 library(tibble)
@@ -15,7 +15,7 @@ file_bnpsd <- 'bnpsd.RData'
 rep_max <- 50
 
 # directory name, needed in one mode (weird var name just stuck)
-dir_phen <- 'const_herit_loci/'
+dir_phen <- 'fes/'
 
 ############
 ### DATA ###
@@ -86,9 +86,9 @@ for ( i in 1 : nrow( datasets ) ) {
     }
     
     # data to save
-    # gather for both rand and inv (const_herit_loci) traits, they should all agree!
-    m_causals_rnd <- vector( 'integer', rep_max )
-    m_causals_inv <- vector( 'integer', rep_max )
+    # gather for both RC and FES traits, they should all agree!
+    m_causals_rc <- vector( 'integer', rep_max )
+    m_causals_fes <- vector( 'integer', rep_max )
 
     # navigate reps
     for ( rep in reps ) {
@@ -101,19 +101,19 @@ for ( i in 1 : nrow( datasets ) ) {
             m_loci[ rep ] <- count_lines( 'data.bim', verbose = FALSE )
         }
 
-        # read "rand" trait first
+        # read RC trait first
         # load file that has true m_causal
         load( file_simtrait )
         # and extract such value, save in vector
-        m_causals_rnd[ rep ] <- length(causal_indexes)
+        m_causals_rc[ rep ] <- length(causal_indexes)
 
-        # now read "inv" trait
+        # now read FES trait
         # move in an additional level in this case (must exist)
         setwd( dir_phen )
         # load file that has true m_causal
         load( file_simtrait )
         # and extract such value, save in vector
-        m_causals_inv[ rep ] <- length(causal_indexes)
+        m_causals_fes[ rep ] <- length(causal_indexes)
         
         # go down two levels now
         setwd( '../..' )
@@ -132,7 +132,7 @@ for ( i in 1 : nrow( datasets ) ) {
     }
 
     # merge lists
-    m_causals <- c( m_causals_rnd, m_causals_inv )
+    m_causals <- c( m_causals_rc, m_causals_fes )
     # if these don't all agree, complain and stop (expect complete agreement!)
     # error message includes complete list
     if ( length( unique( m_causals ) ) != 1 )

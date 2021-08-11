@@ -4,7 +4,7 @@ library(ochoalabtools)
 
 # shared items for all runs
 plink <- TRUE # FALSE
-inv <- FALSE # TRUE
+fes <- FALSE # TRUE
 #bfile <- 'sim-n100-k10-f0.1-s0.5-g1'; short <- 's'
 bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short <- 'l'
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'; short <- 'f'
@@ -24,7 +24,7 @@ threads <- 1
 # set some settings/etc automatically fron here down
 
 # add trait type marker to output
-short <- paste0( short, if ( inv ) 'i' else 'r' )
+short <- paste0( short, if ( fes ) 'f' else 'r' )
 
 # GCTA uses more memory, this works for the largest cases
 mem <- if ( plink ) '4G' else '16G'
@@ -53,8 +53,8 @@ submit_rep_pcs <- function(
     )
 
     # use desired trait type from global var (indicates trait file locations)
-    if ( inv )
-        commands <- paste0( commands, ' --const_herit_loci' )
+    if ( fes )
+        commands <- paste0( commands, ' --fes' )
 
     # infer if this is a simulation or not (indicates genotype file locations)
     if ( grepl( 'sim', bfile ) )

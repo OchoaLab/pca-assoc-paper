@@ -36,8 +36,8 @@ option_list = list(
                 help = "Duke Compute Cluster runs (alters paths only)"),
     make_option(c("-t", "--threads"), type = "integer", default = 0, 
                 help = "number of threads (default use all cores if not DCC, 1 core if DCC)", metavar = "int"),
-    make_option("--const_herit_loci", action = "store_true", default = FALSE, 
-                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)"),
+    make_option("--fes", action = "store_true", default = FALSE, 
+                help = "Use FES instead of RC trait model"),
     make_option("--m_causal_fac", type = "double", default = 10,
                 help = "Proportion of individuals to causal loci", metavar = "double")
 )
@@ -50,7 +50,7 @@ name <- opt$bfile
 rep <- opt$rep
 n_pcs <- opt$n_pcs
 threads <- opt$threads
-const_herit_loci <- opt$const_herit_loci
+fes <- opt$fes
 m_causal_fac <- opt$m_causal_fac
 
 # figure out what threads should be
@@ -108,11 +108,11 @@ file_covar <- paste0( name_in_lower, '-', name_pcs, '-n_pcs_', n_pcs, '.eigenvec
 if ( n_pcs == 0 )
     file_covar <- NULL
 
-# adjust paths if using const_herit_loci model
+# adjust paths if using fes model
 dir_phen <- '' # current dir
 # use subdir instead in this case
-if ( const_herit_loci )
-    dir_phen <- 'const_herit_loci/'
+if ( fes )
+    dir_phen <- 'fes/'
 
 # only these are in dir_phen
 name_phen <- paste0( dir_phen, name_in )

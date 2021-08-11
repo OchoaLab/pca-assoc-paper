@@ -28,8 +28,8 @@ option_list = list(
                 help = "Genotypes are simulated (rather than real; alters location only)"),
     make_option(c("-t", "--threads"), type = "integer", default = detectCores(), 
                 help = "number of threads (default use all cores, but may consume excessive memory)", metavar = "int"),
-    make_option("--const_herit_loci", action = "store_true", default = FALSE, 
-                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)"),
+    make_option("--fes", action = "store_true", default = FALSE, 
+                help = "Use FES instead of RC trait model"),
     make_option("--m_causal_fac", type = "double", default = 10,
                 help = "Proportion of individuals to causal loci", metavar = "double")
 )
@@ -42,7 +42,7 @@ name <- opt$bfile
 rep_max <- opt$rep
 n_pcs_max <- opt$n_pcs
 threads <- opt$threads
-const_herit_loci <- opt$const_herit_loci
+fes <- opt$fes
 m_causal_fac <- opt$m_causal_fac
 
 # stop if name is missing
@@ -146,8 +146,8 @@ for ( rep in 1 : rep_max ) {
     setwd( dir_out )
 
     # move in an additional level in this case
-    if ( const_herit_loci ) {
-        dir_phen <- 'const_herit_loci/'
+    if ( fes ) {
+        dir_phen <- 'fes/'
         # directory can be missing, skip in that case
         if ( !dir.exists( dir_phen ) ) {
             # just move down from rep-* case
@@ -179,6 +179,6 @@ for ( rep in 1 : rep_max ) {
     # move back down when done with this rep
     setwd( '..' )
     # move back an additional level in this case
-    if ( const_herit_loci )
+    if ( fes )
         setwd( '..' )
 }

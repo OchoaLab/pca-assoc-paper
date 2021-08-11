@@ -22,8 +22,8 @@ option_list = list(
                 help = "Base name for input plink files (.BED/BIM/FAM)", metavar = "character"),
     make_option("--complete", action = "store_true", default = FALSE, 
                 help = "Plot only complete replicates (useful for partial runs)"),
-    make_option("--const_herit_loci", action = "store_true", default = FALSE, 
-                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)"),
+    make_option("--fes", action = "store_true", default = FALSE, 
+                help = "Use FES instead of RC trait model"),
     make_option("--m_causal_fac", type = "double", default = 10,
                 help = "Proportion of individuals to causal loci", metavar = "double")
 )
@@ -33,7 +33,7 @@ opt <- parse_args(opt_parser)
 
 # get values
 name <- opt$bfile
-const_herit_loci <- opt$const_herit_loci
+fes <- opt$fes
 m_causal_fac <- opt$m_causal_fac
 
 # stop if name is missing
@@ -64,9 +64,9 @@ if ( m_causal_fac != 10 ) {
     setwd( dir_out )
 }
 
-# if const_herit_loci is true, move to directory containing input and outputs
-if ( const_herit_loci )
-    setwd( 'const_herit_loci' )
+# if fes is true, move to directory containing input and outputs
+if ( fes )
+    setwd( 'fes' )
 
 # read the big table!
 tib <- read_tsv(

@@ -18,7 +18,7 @@ fit_top_half_only <- TRUE
 # output file name (big table)
 file_table <- 'sum.txt'
 # directory name, needed in one mode (weird var name just stuck)
-dir_phen <- 'const_herit_loci'
+dir_phen <- 'fes'
 # output name
 name_out <- 'sum-rmsd-vs-lambda'
 # methods to keep in analysis
@@ -71,9 +71,9 @@ for ( i in 1 : nrow( datasets ) ) {
     # enter dir
     setwd( datasets$name_dir[ i ] )
 
-    for ( const_herit_loci in c(FALSE, TRUE) ) {
+    for ( fes in c(FALSE, TRUE) ) {
         # move in one more level in this case
-        if ( const_herit_loci )
+        if ( fes )
             setwd( dir_phen )
         
         # read the big table!
@@ -88,7 +88,7 @@ for ( i in 1 : nrow( datasets ) ) {
         # recall the dataset of origin
         tib$dataset <- datasets$name_paper[ i ]
         # and the trait simulation type (in a shorter-hand notation)
-        tib$trait <- if ( const_herit_loci ) 'inv' else 'rand'
+        tib$trait <- if ( fes ) 'inv' else 'rand'
         
         ## # color by method
         ## # (boring idea, obviously GCTA was always negative and PCA was always positive SRMSD)
@@ -102,7 +102,7 @@ for ( i in 1 : nrow( datasets ) ) {
         data <- bind_rows( data, tib )
         
         # move back one more level in this case
-        if ( const_herit_loci )
+        if ( fes )
             setwd( '..' )
     }
     # go back down

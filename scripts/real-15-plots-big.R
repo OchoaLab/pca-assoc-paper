@@ -106,8 +106,8 @@ option_list = list(
                 help = "Process real datasets (default: simulated datasets)"),
     make_option("--real_sim", action = "store_true", default = FALSE, 
                 help = "Process real-sim datasets (default: simulated datasets)"),
-    make_option("--const_herit_loci", action = "store_true", default = FALSE, 
-                help = "Causal coefficients constructed to result in constant per-locus heritability (saved in diff path)")
+    make_option("--fes", action = "store_true", default = FALSE, 
+                help = "Use FES instead of RC trait model")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -126,7 +126,7 @@ if ( opt$real ) {
     name_out <- name_out_real_sim
 }
 # get values
-const_herit_loci <- opt$const_herit_loci
+fes <- opt$fes
 
 
 ################
@@ -137,8 +137,8 @@ const_herit_loci <- opt$const_herit_loci
 setwd( '../data/' )
 
 # move in an additional level in this case
-dir_phen <- 'const_herit_loci'
-if ( const_herit_loci ) {
+dir_phen <- 'fes'
+if ( fes ) {
     # create directory if it didn't already exist
     if ( !dir.exists( dir_phen ) )
         dir.create( dir_phen )
@@ -161,13 +161,13 @@ par( lab = c(10, 3, 7) )
 
 # load each of our datasets
 # move back one more level in this case
-if ( const_herit_loci )
+if ( fes )
     setwd( '..' )
 for ( index_dataset in 1 : nrow( datasets ) ) {
     name <- datasets$name_long[ index_dataset ]
     setwd( name )
     # move in one more level in this case
-    if ( const_herit_loci )
+    if ( fes )
         setwd( dir_phen )
 
     # read the big table!
@@ -211,7 +211,7 @@ for ( index_dataset in 1 : nrow( datasets ) ) {
     # go back down, for next dataset
     setwd( '..' )
     # move back one more level in this case
-    if ( const_herit_loci )
+    if ( fes )
         setwd( '..' )
 }
 

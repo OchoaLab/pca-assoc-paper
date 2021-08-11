@@ -137,7 +137,7 @@ report_cross_method <- function( method_to_vals, metric ) {
 }
 
 # gathers more loops essentially and massages data to look as needed for output table
-process_dataset <- function( name, const_herit_loci ) {
+process_dataset <- function( name, fes ) {
     # read the big table!
     # load from wherever current location is
     tib <- read_tsv(
@@ -206,7 +206,7 @@ process_dataset <- function( name, const_herit_loci ) {
     output <- bind_cols(
         tibble(
             name_paper = name,
-            trait = if ( const_herit_loci ) 'FES' else 'RC'
+            trait = if ( fes ) 'FES' else 'RC'
         ),
         output_rmsd,
         output_auc
@@ -237,23 +237,23 @@ for ( i in 1 : nrow( datasets ) ) {
     # load local data, calculate row, add to final output immediately
     output <- bind_rows(
         output, 
-        process_dataset( name_paper, const_herit_loci = FALSE )
+        process_dataset( name_paper, fes = FALSE )
     )
     
-    # now do `const_herit_loci = TRUE` case
-    setwd( 'const_herit_loci' )
+    # now do `fes = TRUE` case
+    setwd( 'fes' )
     
     # load local data, calculate row, add to final output immediately
     output <- bind_rows(
         output, 
-        process_dataset( name_paper, const_herit_loci = TRUE )
+        process_dataset( name_paper, fes = TRUE )
     )
     
     # go back down
     setwd( '../..' )
 }
 
-# reorder so all Fixed Effect Size traits are listed first
+# reorder so all FES traits are listed first
 output <- arrange( output, trait )
 
 # write table to a file
