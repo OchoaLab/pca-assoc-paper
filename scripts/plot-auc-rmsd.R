@@ -104,7 +104,7 @@ plot_mean_quarts_lines <- function( stats, x, col, alpha_q, alpha_e ) {
 }
 
 # generic legend for quantiles data
-leg_mean_quarts <- function( alpha_q, alpha_e, x = '', col = 'black', cex = 0.7 ) {
+leg_mean_quarts <- function( alpha_q, alpha_e, x = '', col = 'black', cex = 0.7, title = NULL ) {
     # because the quartile area is always inside the extrema area, the combined alpha is this:
     # https://en.wikipedia.org/wiki/Alpha_compositing
     alpha_qe <- alpha_q + alpha_e * ( 1 - alpha_q )
@@ -123,7 +123,8 @@ leg_mean_quarts <- function( alpha_q, alpha_e, x = '', col = 'black', cex = 0.7 
             alpha( col, alpha_e )
         ),
         cex = cex,
-        bty = 'n'
+        bty = 'n',
+        title = title
     )
 }
 

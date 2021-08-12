@@ -118,9 +118,6 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
 # calculate and store MAF distributions, useful not just for a plot but also for simulating data from real datasets
 time Rscript real-16-mafs.R --bfile $name
 
-# final plot gathers all three datasets into a single multipanel figure
-time Rscript real-15-plots-big.R --real
-
 ###########
 ### FES ###
 ###########
@@ -161,8 +158,6 @@ time Rscript real-09-figs.R --bfile $name --fes
 time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90 --final --fes
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes
-
-time Rscript real-15-plots-big.R --real --fes
 
 
 ###################
@@ -258,8 +253,6 @@ time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --fin
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
 
-time Rscript real-15-plots-big.R --real_sim
-
 ### FES ###
 for rep in {1..50}; do
     time Rscript sim-02-sim-trait.R --bfile $name -r $rep --fes
@@ -281,17 +274,16 @@ time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --fin
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes
 
-time Rscript real-15-plots-big.R --real_sim --fes
-
 
 ###############
 ### GLOBALS ###
 ###############
 
 # cross-dataset analyses, including all of: sim, real, and real-sim
+# this sequence also creates all of the main figures/tables in order of appearance
 
 # reports actual dimensions (n_ind, m_loci, K, and m_causal) used in all datasets
-# (validates every replicate too! for m_causal compares both "inv" and "rand"!)
+# (validates every replicate too! for m_causal compares both FES and RC!)
 # writes data/dimensions.txt
 time Rscript real-14-dimensions.R
 # 21s ideapad, 7s viiiaR5
@@ -305,26 +297,36 @@ time Rscript real-17-mafs-plot.R
 time Rscript all-01-kinship.R
 # 30s ideapad
 
+# a simple figure that illustrates the methods
+# (uses data from "Admix. Large sim." only)
+time Rscript sim-10-measures-fig.R 2
+# Inflation factor: pca-plink-pure: 2.96003533785624
+# Inflation factor: gcta: 0.87992175683473
+# Inflation factor: gcta: 0.984541944592377
+
 # main statistical evaluations between methods
 time Rscript real-13-stats.R
 
-# a comparison of RMSD and lambda across ALL datasets (including inv and rand traits)
+# final plot gathers all three datasets into a single multipanel figure
+time Rscript real-15-plots-big.R
+time Rscript real-15-plots-big.R --fes
+time Rscript real-15-plots-big.R --real
+time Rscript real-15-plots-big.R --real --fes
+time Rscript real-15-plots-big.R --real_sim
+time Rscript real-15-plots-big.R --real_sim --fes
+
+# calculages popkin and eigensoft eigenvectors, calculates TW stats, makes plot
+time Rscript all-02-eigen.R
+# 30m14.103s viiiaR5 first time
+
+# a comparison of RMSD and lambda across ALL datasets (including FES and RC traits)
 # this version that fits top half only (makes most sense for our goal of talking mostly about inflation)
 time Rscript real-11-inflation-across-datasets.R
 # model fit:
 # rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
 #         a         b 
-# 0.5666406 0.6150152 
+# 0.5663168 0.6155140 
 # threshold map (sigmoidal): lambda = 1.05, RMSD = 0.0085
 # Inverse threshold map (sigmoidal): RMSD = 0.01, lambda = 1.06
 # log-linear approx: log(lambda) = RMSD * 5.74
 # threshold map (log-linear): lambda = 1.05, RMSD = 0.0085
-
-# for troubleshooting some potential trait and min causal MAF issues
-time Rscript real-20-trait-normality.R
-# 12m25.216s ideapad
-# 6m30.113s viiiaR5
-
-# calculages popkin and eigensoft eigenvectors, calculates TW stats, makes plot
-time Rscript all-02-eigen.R
-# 30m14.103s viiiaR5 first time

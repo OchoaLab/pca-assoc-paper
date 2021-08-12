@@ -43,8 +43,8 @@ if ( is.na(name) )
 # final versions for papers
 # pure plink version is only PCA version, add LMM too
 method_to_label <- list(
-    'pca-plink-pure' = 'Fixed effects (PCA)',
-    gcta = 'Mixed effects (LMM)'
+    'pca-plink-pure' = 'PCA',
+    gcta = 'LMM'
 )
 name_base <- 'sum-'
 # hardcoded same order as method_to_label

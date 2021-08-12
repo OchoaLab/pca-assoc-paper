@@ -13,6 +13,7 @@ library(genio)
 file_simtrait <- 'simtrait.RData'
 file_bnpsd <- 'bnpsd.RData'
 rep_max <- 50
+verbose <- FALSE # for troubleshooting
 
 # directory name, needed in one mode (weird var name just stuck)
 dir_phen <- 'fes/'
@@ -44,6 +45,8 @@ reps <- 1 : rep_max
 for ( i in 1 : nrow( datasets ) ) {
     # copy down name
     name_dir <- datasets$name_dir[ i ]
+    if ( verbose )
+        message( name_dir ) 
     # enter dir
     setwd( name_dir )
     # decide if it's simulation or not, which decides where some genotype data ought to be
@@ -52,14 +55,14 @@ for ( i in 1 : nrow( datasets ) ) {
     # get data dimensions
     # for real datasets, the data is in this directory (not inside reps)
     if ( !is_sim ) {
-        #datasets$n_ind[ i ] <- count_lines( 'data.fam', verbose = FALSE )
-        datasets$m_loci[ i ] <- count_lines( 'data.bim', verbose = FALSE )
+        #datasets$n_ind[ i ] <- count_lines( 'data.fam', verbose = verbose )
+        datasets$m_loci[ i ] <- count_lines( 'data.bim', verbose = verbose )
         # for K, have to read the annotation tables
         # read full fam data (unfortunately annotations have additional pops, so need this to subset)
-        fam <- read_fam( 'data', verbose = FALSE )
+        fam <- read_fam( 'data', verbose = verbose )
         datasets$n_ind[ i ] <- nrow( fam )
         # read annotations
-        subpop_info <- read_tsv('pops-annot.txt', comment = '#')
+        subpop_info <- read_tsv('pops-annot.txt', comment = '#', show_col_types = FALSE)
         # map subpopulations using sub-subpopulations
         fam$superpop <- subpop_info$superpop[ match( fam$fam, subpop_info$pop ) ]
         # now report K, this one is a range
@@ -97,8 +100,8 @@ for ( i in 1 : nrow( datasets ) ) {
 
         # get dimensions for simulated data
         if ( is_sim ) {
-            n_ind[ rep ] <- count_lines( 'data.fam', verbose = FALSE )
-            m_loci[ rep ] <- count_lines( 'data.bim', verbose = FALSE )
+            n_ind[ rep ] <- count_lines( 'data.fam', verbose = verbose )
+            m_loci[ rep ] <- count_lines( 'data.bim', verbose = verbose )
         }
 
         # read RC trait first

@@ -90,12 +90,17 @@ for ( i in 1 : length(models) ) {
 # switch back to ordinary data location
 setwd( dir_orig )
 
+panel_letter_adj <- -0.5
+
 # start figure
+width <- fig_width() / 2
 fig_start(
     'measures-illustration',
-    width = 4,
-    height = 4.6,
-    mar_t = 2 # for panel letters
+    width = width,
+    height = width * 1.18,
+    mar_t = 2, # for panel letters
+    mar_l = 3.5, # more space in this case, everything is squished
+    mar_b = 3.5 
 )
 
 # create panels
@@ -109,21 +114,22 @@ plot(
     type = 'n',
     xlim = c(0, 1),
     ylim = c(0, 1),
-    xlab = 'Expected null p-value', # quantiles
-    ylab = 'Observed null p-value'
+    xlab = 'Expected null p-val.', # quantiles
+    ylab = 'Observed null p-val.'
 )
 # plot reference line in background
 abline( 0, 1, col = 'gray', lty = 2 )
 # add a nice panel letter
-panel_letter('A')
+panel_letter( 'A', adj = panel_letter_adj )
 # add a legend
 legend(
     'topleft',
-    title = 'Models',
+    title = 'Assoc. Models',
     legend = model_names,
     lty = 1,
     col = colors,
-    cex = 0.8
+    cex = 0.7,
+    bty = 'n'
 )
 
 srmsd <- vector( 'numeric', length(models) )
@@ -151,11 +157,12 @@ barplot(
     srmsd,
     names.arg = model_names,
     col = colors,
-    xlab = 'Models',
-    ylab = expression( bold( SRMSD[p] ) )
+    xlab = 'Assoc. Models',
+    ylab = expression( bold( SRMSD[p] ) ),
+    ylim = c( min( srmsd ), round( max( srmsd ), 1 ) ) # make axis nicer this way
 )
 # add a nice panel letter
-panel_letter('B')
+panel_letter( 'B', adj = panel_letter_adj )
 
 # third panel: AUC plot
 # in this case we don't start it until inside the loop (for first element only)
@@ -176,20 +183,18 @@ for ( i in rev( 1 : length(models) ) ) {
         main = '',
         add = add
     )
-    # add panel letter first time only (converse of `add`)
-    if ( !add )
-        panel_letter('C')
 }
+panel_letter( 'C', adj = panel_letter_adj )
 
 # last panel is just a bar plot
 barplot(
     aucpr,
     names.arg = model_names,
     col = colors,
-    xlab = 'Models',
+    xlab = 'Assoc. Models',
     ylab = expression( bold( AUC[PR] ) )
 )
 # add a nice panel letter
-panel_letter('D')
+panel_letter( 'D', adj = panel_letter_adj )
 
 fig_end()

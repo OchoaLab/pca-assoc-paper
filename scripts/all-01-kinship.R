@@ -29,8 +29,8 @@ labs <- list(
 )
 # hacked for now, could be more elegant and/or impose more consistency with `datasets`
 titles <- c(
-    'Large/small size sim.',
-    'Family structure sim.',
+    'Admix. Large/Small sim.',
+    'Admix. Family sim.',
     '',
     'Human Origins',
     'Human Origins sim.',
@@ -69,7 +69,7 @@ for ( name_real in names_real ) {
     kinship_real <- read_grm( 'popkin', verbose = FALSE )$kinship
 
     # read annotations
-    subpop_info <- read_tsv('pops-annot.txt', comment = '#')
+    subpop_info <- read_tsv( 'pops-annot.txt', comment = '#', show_col_types = FALSE )
 
     # also read tree from here (there's a copy in the next _sim dataset, but meh)
     load( 'tree.RData' )

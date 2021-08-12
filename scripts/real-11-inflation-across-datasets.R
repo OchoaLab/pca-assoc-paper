@@ -204,10 +204,13 @@ range_rmsd <- c( -max_srmsd, max_srmsd )
 xp <- exp( log_max_lambda * (-100 : 100) / 100 )
 
 # plot in base data dir
+width <- fig_width() / 2
 fig_start(
     name_out,
     mar_t = 1,
-    mar_r = 0.3
+    mar_r = 0.3,
+    width = width,
+    height = width
 )
 # try to change default y labeling
 par( lab = c(3, 5, 7) )
@@ -273,7 +276,7 @@ legend(
     text.col = datasets$col,
     pch = NA,
     bty = 'n',
-    cex = 0.5
+    cex = 0.7
 )
 # second legend just for fit
 legend(
@@ -287,7 +290,7 @@ legend(
     lty = c(NA, lty_fit_sigmoid, lty_fit_loglin),
     pch = c('.', NA, NA),
     bty = 'n',
-    cex = 0.5,
+    cex = 0.7,
     seg.len = 5
 )
 fig_end()

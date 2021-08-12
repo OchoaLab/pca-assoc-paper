@@ -145,21 +145,3 @@ time Rscript real-09-figs.R --bfile $name --fes
 time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --final --fes
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes
-
-
-###############
-### GLOBALS ###
-###############
-
-# analyses combining data from all 3 sims
-
-# a simple figure that illustrates the methods
-# (uses data from Admix. Large only)
-Rscript sim-10-measures-fig.R 3
-# Inflation factor: gcta: 0.87992175683473
-# Inflation factor: pca-plink-pure: 2.96003533785624
-# Inflation factor: gcta: 0.984541944592377
-
-# final plot gathers all three simulations into a single multipanel figure
-time Rscript real-15-plots-big.R
-time Rscript real-15-plots-big.R --fes

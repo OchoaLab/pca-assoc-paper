@@ -3,7 +3,6 @@
 
 # TODO:
 # - switch to `ochoalabtools` solution for fig dimensions
-# - get data from `datasets.txt`
 
 library(optparse)
 library(scales) # for transparency
@@ -18,11 +17,8 @@ source('plot-auc-rmsd.R')
 #################
 
 # full page size
-## genetics dimensions
-## width max 20cm = 7.87402 in
-## height max 25cm = 9.84252 in
-height_max <- 9.84252
-width_max <- 7.87402
+width_max <- fig_width()
+height_max <- width_max # square?
 # margin for panels with titles
 mar1 <- c(1.5, 3, 2.5, 0) + 0.2
 # margin for panels without titles
@@ -36,8 +32,8 @@ r_max <- 90
 pcs <- 0 : r_max # global needed
 # pure plink version is only PCA version, add LMM too
 method_to_label <- list(
-    'pca-plink-pure' = 'Fixed effects (PCA)',
-    gcta = 'Mixed effects (LMM)'
+    'pca-plink-pure' = 'PCA',
+    gcta = 'LMM'
 )
 # extract methods from table itself
 methods <- names( method_to_label ) # not from table, but from hardcoded map, always lists PCA first!
@@ -46,55 +42,27 @@ method_cols <- c(
     'red',
     'blue'
 )
-# names of datasets (paired list)
+# names of datasets
 # simulated datasets are default
-datasets <- tibble(
-    name_short = c(
-        'Large sample size sim.',
-        'Small sample size sim.',
-        'Family structure sim.'
-    ),
-    name_long = c(
-        'sim-n1000-k10-f0.1-s0.5-g1',
-        'sim-n100-k10-f0.1-s0.5-g1',
-        'sim-n1000-k10-f0.1-s0.5-g20'
-    )
+names_dir = c(
+    'sim-n1000-k10-f0.1-s0.5-g1',
+    'sim-n100-k10-f0.1-s0.5-g1',
+    'sim-n1000-k10-f0.1-s0.5-g20'
 )
-datasets_real <- tibble(
-    name_short = c(
-        'Human Origins',
-        'HGDP',
-        '1000 Genomes'
-    ),
-    name_long = c(
-        'HoPacAll_ld_prune_1000kb_0.3_maf-0.01',
-        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
-        'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'
-    )
+names_dir_real = c(
+    'HoPacAll_ld_prune_1000kb_0.3_maf-0.01',
+    'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
+    'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'
 )
-datasets_real_sim <- tibble(
-    name_short = c(
-        'Human Origins sim.',
-        'HGDP sim.',
-        '1000 Genomes sim.'
-    ),
-    name_long = c(
-        'HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim',
-        'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim',
-        'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim'
-    )
+names_dir_real_sim = c(
+    'HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim',
+    'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim',
+    'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim'
 )
 # output names
 name_out <- 'rmsd-auc-sim'
 name_out_real <- 'rmsd-auc-real'
 name_out_real_sim <- 'rmsd-auc-real-sim'
-
-# default legend position
-legend_pos <- 'topright'
-## # hack for small sample size simulation only
-## if (name == 'sim-n100-k10-f0.1-s0.5-g1')
-##     legend_pos <- 'bottomleft'
-
 
 ############
 ### ARGV ###
@@ -119,10 +87,10 @@ if ( opt$real ) {
     if ( opt$real_sim )
         stop( 'Cannot use "--real" and "--real_sim" at the same time!' )
     # proceed now
-    datasets <- datasets_real
+    names_dir <- names_dir_real
     name_out <- name_out_real
 } else if ( opt$real_sim ) {
-    datasets <- datasets_real_sim
+    names_dir <- names_dir_real_sim
     name_out <- name_out_real_sim
 }
 # get values
@@ -135,6 +103,12 @@ fes <- opt$fes
 
 # move to where the data is
 setwd( '../data/' )
+
+# get panel names from here
+datasets <- read_tsv( 'datasets.txt', col_types = 'cccii' )
+# subset and reorder as desired
+indexes <- match( names_dir, datasets$name_dir )
+datasets <- datasets[ indexes, ]
 
 # move in an additional level in this case
 dir_phen <- 'fes'
@@ -164,7 +138,7 @@ par( lab = c(10, 3, 7) )
 if ( fes )
     setwd( '..' )
 for ( index_dataset in 1 : nrow( datasets ) ) {
-    name <- datasets$name_long[ index_dataset ]
+    name <- datasets$name_dir[ index_dataset ]
     setwd( name )
     # move in one more level in this case
     if ( fes )
@@ -184,22 +158,25 @@ for ( index_dataset in 1 : nrow( datasets ) ) {
     # set margin for titles
     par( mar = mar1 )
     # main plot
-    lineplots_rmsd_auc_one_panel( data$rmsd, lab_rmsd, r_max, main = datasets$name_short[ index_dataset ] )
+    lineplots_rmsd_auc_one_panel( data$rmsd, lab_rmsd, r_max, main = datasets$name_paper[ index_dataset ] )
     # add panel letter
-    panel_letter( toupper( letters[ index_dataset ] ) )
-    
+    panel_letter( toupper( letters[ index_dataset ] ), adj = -0.05 )
+
     # add legend to first panel only
     if ( index_dataset == 1 ) {
         legend(
-            legend_pos,
+            'topright',
             unlist( method_to_label ),
             text.col = method_cols,
-            bty = 'n'
+            lty = 1,
+            col = method_cols,
+            bty = 'n',
+            title = 'Assoc. Model',
+            title.col = 'black',
+            inset = c(0.15, 0)
         )
         # add second legend explaining quartiles, etc
-        # NOTE: only small sample size sim has diff legend_pos == 'bottomleft'
-        legend_pos_quants <- 'right' # if ( legend_pos == 'topright' ) 'bottomright' else 'topright'
-        leg_mean_quarts( alpha_q, alpha_e, x = legend_pos_quants, cex = 1 )
+        leg_mean_quarts( alpha_q, alpha_e, x = 'topright', cex = 1, title = 'Distribution' )
     }
 
     # bottom panel: AUC
