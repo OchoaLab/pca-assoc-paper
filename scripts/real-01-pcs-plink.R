@@ -1,25 +1,17 @@
-# compute PCs using plink, figure out how they relate to PCs from my method (kinship_std) and GCTA's
+# compute PCs using plink, figure out how they relate to PCs from GCTA
 
 library(optparse)
-library(popkin) # for comparison plot only
-library(genio) # for read_eigenvec
-library(ochoalabtools)
-
-# load new functions from external scripts
-dir_orig <- getwd()
-setwd("../../scripts") # scripts of main GAS project
-source('gas_plink.R')
-source('paths.R')
-setwd( dir_orig ) # go back to where we were
+library(genbin) # binary wrappers
+#library(popkin) # for comparison plot only
+#library(genio) # for read_eigenvec
+#library(ochoalabtools)
 
 # number of PCs to explore
 n_pcs_max <- 90
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
-# plink: here there's no timing, so let's be as fast as possible (use all threads)
-threads <- 0
-# plink need a MAF threshold, otherwise their standard kinship (MOR version) behaves poorly
-maf <- 0.1
+# output for PCA holds number of PCs
+name_out <- paste0( name_in, '-plink-n_pcs_', n_pcs_max )
 
 ############
 ### ARGV ###
@@ -49,23 +41,11 @@ setwd( name )
 ### PLINK ###
 #############
 
-# this is presumably the approach most people use
-
-# unique name for this run
-name_out <- paste0( name_in, '-plink-n_pcs_', n_pcs_max )
-
 # this creates the PCA file
-gas_plink_pca(
-    plink2_bin,
-    name = name_in,
-    name_out = name_out,
-    n_pcs = n_pcs_max,
-    maf = maf,
-    threads = threads
-)
+plink_pca( name_in, name_out, n_pcs = n_pcs_max )
 
 # cleanup
-invisible( file.remove( paste0( name_out, '.log' ) ) )
+delete_files_log( name_out )
 
 ## # load the data for comparisons
 ## out <- read_eigenvec(

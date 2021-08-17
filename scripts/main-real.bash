@@ -30,6 +30,7 @@ ln -s "$DATA_DIR/$name.fam" data.fam
 
 # return to scripts dir
 cd ../../scripts/
+
 # preprocess with GCTA (makes GRM and max PCs)
 time Rscript real-00-preprocess-gcta.R --bfile $name
 # 0m36.076s ideapad HO
@@ -57,7 +58,6 @@ for rep in {1..50}; do
 done
 
 # create auxiliary PCA files from plink2 (redundant, will delete when done with this analysis)
-#time Rscript real-02-subset-eigenvec.R --bfile $name --std
 time Rscript real-02-subset-eigenvec.R --bfile $name --plink
 # PCA runs (with pure plink)
 for pcs in {0..90}; do
@@ -66,7 +66,6 @@ for pcs in {0..90}; do
     done
 done
 # removes redundant, auxiliary plink2 PCA files
-#time Rscript real-02-subset-eigenvec.R --bfile $name --clean --std
 time Rscript real-02-subset-eigenvec.R --bfile $name --clean --plink
 
 # create auxiliary GCTA PCA files (redundant, will delete when done with this analysis)

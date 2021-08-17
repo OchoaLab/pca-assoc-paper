@@ -3,13 +3,7 @@
 
 library(optparse)
 library(readr)
-
-# load new functions from external scripts
-dir_orig <- getwd()
-setwd("../../scripts") # scripts of main GAS project
-source('gas_plink.R')
-source('paths.R')
-setwd( dir_orig ) # go back to where we were
+library(genbin) # binary wrappers
 
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
@@ -104,7 +98,7 @@ if ( !opt$sim && m_causal_fac != 10 )
 
 file_covar <- paste0( name_in_lower, '-', name_pcs, '-n_pcs_', n_pcs, '.eigenvec' )
 # there's no covariates file to pass if we want zero PCs
-# gas_plink will handle this correctly
+# plink_glm will handle this correctly
 if ( n_pcs == 0 )
     file_covar <- NULL
 
@@ -127,24 +121,19 @@ if ( file.exists( file_out ) )
     stop( 'Output already exists, skipping: ', file_out )
 
 # actual run
-obj <- gas_plink(
-    plink2_bin,
-    name = name_in_lower,
+data <- plink_glm(
+    name_in_lower,
     name_phen = name_phen,
     name_out = name_out, # write outputs into current level, add number of PCs
     file_covar = file_covar,
     threads = threads
 )
 
-# all we care to preserve here are the p-values
-pvals <- obj$pvals
-# save into a file, simple human-readable format
-write_lines(
-    pvals,
-    file_out
-)
+# save p-values into a file, simple human-readable format
+write_lines( data$p, file_out )
 
 # clean up when we're done with plink
-# deletes GAS table and log only
-# files are in current level (matches earlier `name_out` option)
-delete_files_plink_gas( name_out )
+# deletes GLM table and log only
+# files are in current level (matches `name_out`)
+delete_files_plink_glm( name_out )
+delete_files_log( name_out )

@@ -4,7 +4,6 @@ library(popkin)
 library(genio)
 library(readr)
 library(ochoalabtools)
-source('paths.R') # for eigensoft paths
 
 # some other relevant file paths
 smartpca_par <- '../../scripts/eigensoft-smartpca-par.txt' # relative to each data/$name/
@@ -17,14 +16,15 @@ file_eigensoft_evec <- 'eigensoft.evec' # temporarily created
 file_eigensoft_log <- 'eigensoft.log' # temporarily created
 # p-value threshold (most things are either absurdly significant or very close to 1, so hopefully this doesn't matter that much)
 tw_cut <- 0.01
+twstats_tab <- '~/bin/EIG-7.2.1/POPGEN/twtable'
 
-# uses globals twstats_bin/tab from paths.R, tw_cut
+# uses globals twstats_tab, tw_cut
 calc_tw <- function( file_eval, file_tw ) {
     # run twstats (from eigensoft)
     # don't overwrite for rsync sake
     if ( !file.exists( file_tw ) ) {
         system2(
-            twstats_bin,
+            'twstats', # from path
             args = c(
                 '-t', twstats_tab,
                 '-i', file_eval,
@@ -81,7 +81,7 @@ for ( i in 1 : nrow( datasets ) ) {
     # this is slow, avoid repeating!
     if ( !file.exists( file_eigensoft_eval ) ) {
         system2(
-            smartpca_bin,
+            'smartpca', # from path
             args = c( '-p', smartpca_par_local ),
             stdout = 'eigensoft.log'
         )

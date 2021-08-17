@@ -1,18 +1,12 @@
 library(optparse)
-
-# load new functions from external scripts
-dir_orig <- getwd()
-setwd("../../scripts") # scripts of main GAS project
-source('gas_lmm_gcta.R')
-source('paths.R')
-setwd( dir_orig ) # go back to where we were
+library(genbin) # binary wrappers
 
 # number of PCs to explore
 n_pcs_max <- 90
-# not timing this, so use all threads
-threads <- 0
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
+# output for PCA holds number of PCs
+name_out <- paste0( name_in, '-n_pcs_', n_pcs_max )
 
 ############
 ### ARGV ###
@@ -38,12 +32,12 @@ if ( is.na(name) )
 setwd( '../data/' )
 setwd( name )
 
-message("GCTA (GRM)")
-gas_lmm_gcta_kin(gcta_bin, name_in, threads = threads)
-
-message("GCTA (PCA)")
-gas_lmm_gcta_pca(gcta_bin, name_in, threads = threads, n_pcs = n_pcs_max)
+# main steps!
+# GRM has same name as plink files
+gcta_grm( name_in )
+# eigenvec files have number of PCs suffixed to name
+gcta_pca( name_in, name_out, n_pcs = n_pcs_max )
 
 # cleanup
-invisible( file.remove( paste0( name_in, '.log' ) ) )
-invisible( file.remove( paste0( name_in, '-n_pcs_90.log' ) ) )
+delete_files_log( name_in )
+delete_files_log( name_out )

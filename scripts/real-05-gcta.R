@@ -2,13 +2,7 @@
 
 library(optparse)
 library(readr)
-
-# load new functions from external scripts
-dir_orig <- getwd()
-setwd("../../scripts") # scripts of main GAS project
-source('gas_lmm_gcta.R')
-source('paths.R')
-setwd( dir_orig ) # go back to where we were
+library(genbin) # binary wrappers
 
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
@@ -99,6 +93,13 @@ name_in_lower <- if ( opt$sim ) name_in else paste0( '../', name_in )
 if ( !opt$sim && m_causal_fac != 10 )
     name_in_lower <- paste0( '../', name_in_lower )
 
+# path to GCTA PCs
+file_covar <- paste0( name_in_lower, '-n_pcs_', n_pcs, '.eigenvec' )
+# there's no covariates file to pass if we want zero PCs
+# gcta_mlma will handle this correctly
+if ( n_pcs == 0 )
+    file_covar <- NULL
+
 # adjust paths if using fes model
 dir_phen <- '' # current dir
 # use subdir instead in this case
@@ -117,17 +118,16 @@ if ( file.exists( file_out ) )
     stop( 'Output already exists, skipping: ', file_out )
 
 # actual GWAS
-obj <- gas_lmm_gcta(
-    gcta_bin = gcta_bin,
-    name = name_in_lower, # genotypes, GRM, PCA are all in lower level (shared across reps)
+data <- gcta_mlma(
+    name_in_lower, # genotypes, GRM, PCA are all in lower level (shared across reps)
     name_phen = name_phen,
     name_out = name_out, # write outputs into current level, add number of PCs
-    threads = threads,
-    n_pcs = n_pcs
+    file_covar = file_covar,
+    threads = threads
 )
 
 # all we care to preserve here are the p-values
-pvals <- obj$pvals
+pvals <- data$p
 # save into a file, simple human-readable format
 # NOTE: if pvals is NULL (GCTA returns that sometimes, when there's no model convergence/ model is underdetermined) then write_lines writes an empty file, but later read_lines doesn't like this!
 # instead let's write the word NULL, so it's one non-empty line
@@ -137,6 +137,7 @@ write_lines(
 )
 
 # clean up when we're done with gcta
-# deletes GAS table only (mlma and log)
+# deletes mlma and log
 # files are in current level (matches earlier `name_out` option)
-delete_files_gcta( name_out )
+delete_files_gcta_mlma( name_out )
+delete_files_log( name_out )
