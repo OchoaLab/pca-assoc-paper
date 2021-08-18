@@ -104,7 +104,7 @@ plot_mean_quarts_lines <- function( stats, x, col, alpha_q, alpha_e ) {
 }
 
 # generic legend for quantiles data
-leg_mean_quarts <- function( alpha_q, alpha_e, x = '', col = 'black', cex = 0.7, title = NULL ) {
+leg_mean_quarts <- function( alpha_q, alpha_e, x = 'topright', col = 'black', cex = 1, title = 'Distribution' ) {
     # because the quartile area is always inside the extrema area, the combined alpha is this:
     # https://en.wikipedia.org/wiki/Alpha_compositing
     alpha_qe <- alpha_q + alpha_e * ( 1 - alpha_q )
@@ -125,6 +125,24 @@ leg_mean_quarts <- function( alpha_q, alpha_e, x = '', col = 'black', cex = 0.7,
         cex = cex,
         bty = 'n',
         title = title
+    )
+}
+
+# globals:
+# - method_to_label
+# - method_cols
+leg_methods <- function( inset_x = 0.15, cex = 1 ) {
+    legend(
+        'topright',
+        unlist( method_to_label ),
+        text.col = method_cols,
+        lty = 1,
+        col = method_cols,
+        cex = cex,
+        bty = 'n',
+        title = 'Assoc. Model',
+        title.col = 'black',
+        inset = c( inset_x, 0 )
     )
 }
 
@@ -231,20 +249,14 @@ lineplots_rmsd_auc <- function(
 
     # top panel: RMSD
     lineplots_rmsd_auc_one_panel( data_rmsd, lab_rmsd, r_max )
-    # add legend to top panel only
-    legend(
-        legend_pos,
-        unlist( method_to_label ),
-        text.col = method_cols,
-        bty = 'n'
-    )
+    
+    # add all legends to top panel
+    # in single-dataset version, legends just need to be a bit smaller and be shifted a bit
+    leg_methods( inset_x = 0.2, cex = 0.8 )
+    leg_mean_quarts( alpha_q, alpha_e, cex = 0.8 )
     
     # bottom panel: AUC
     lineplots_rmsd_auc_one_panel( data_auc, lab_auc, r_max, guide_max = TRUE )
-    # add second legend explaining quartiles, etc
-    # NOTE: only small sample size sim has diff legend_pos == 'bottomleft'
-    legend_pos_quants <- if ( legend_pos == 'topright' ) 'bottomright' else 'topright'
-    leg_mean_quarts( alpha_q, alpha_e, x = legend_pos_quants )
     
     # add outer margin label
     mtext(

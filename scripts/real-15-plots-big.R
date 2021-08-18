@@ -162,21 +162,10 @@ for ( index_dataset in 1 : nrow( datasets ) ) {
     # add panel letter
     panel_letter( toupper( letters[ index_dataset ] ), adj = -0.05 )
 
-    # add legend to first panel only
+    # add both legends to first panel only
     if ( index_dataset == 1 ) {
-        legend(
-            'topright',
-            unlist( method_to_label ),
-            text.col = method_cols,
-            lty = 1,
-            col = method_cols,
-            bty = 'n',
-            title = 'Assoc. Model',
-            title.col = 'black',
-            inset = c(0.15, 0)
-        )
-        # add second legend explaining quartiles, etc
-        leg_mean_quarts( alpha_q, alpha_e, x = 'topright', cex = 1, title = 'Distribution' )
+        leg_methods( )
+        leg_mean_quarts( alpha_q, alpha_e )
     }
 
     # bottom panel: AUC
