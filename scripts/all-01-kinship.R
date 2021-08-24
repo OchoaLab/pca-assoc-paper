@@ -43,9 +43,6 @@ titles <- c(
     '1000 Genomes sim.'
 )
 
-# DEBUG data range
-## message( 'Fam: ', max( data[[2]] ) )
-
 # for a special loop for each real dataset
 # rows get added in this order!
 names_real <- c(
@@ -154,7 +151,7 @@ ylab <- c( rep.int('', 9), "Individuals", "Individuals", "Kinship" )
 
 # get dimensions to stretch to full page fig retaining desired ratio
 wh <- fig_scale( 3/4, 'plos' )
-#message( 'Fig dimensions: ', toString( wh ) )
+
 fig_start(
     'kinship',
     width = wh[ 1 ],
@@ -186,3 +183,59 @@ plot_popkin(
 )
 
 fig_end()
+
+
+### subsets for slides ###
+
+
+# this one is bigger than original, since titles are big
+fig_start(
+    'kinship-admix-sims',
+    width = wh[ 1 ],
+    height = wh[ 2 ] * 3 / 8,
+    mar_t = 2,
+    mar_b = 0,
+    mar_l = 0
+)
+plot_popkin(
+    data[ 1:2 ],
+    titles = titles[ 1:2 ],
+    leg_width = 0.25,
+    panel_letters_adj = 0 # reduced margins here
+)
+fig_end()
+
+# covers real cases
+
+plot_kinship_real_sim_tree <- function( name, indexes ) {
+    fig_start(
+        paste0( 'kinship-real-sim-tree_', name ),
+        width = wh[ 1 ],
+        height = wh[ 2 ] * 1.1 / 4, # same as main figure but only one row
+        mar_t = 2
+    )
+    # shrink everything a little bit, titles and other things get too messed up
+    par( cex = 0.8 )
+    plot_popkin(
+        data[ indexes ],
+        titles = titles[ indexes ],
+        names_cex = names_cex[ indexes ], # in this case affects tree tips only
+        labs = labs[ indexes ],
+        labs_line = 0.2,
+        labs_las = 2,
+        labs_cex = labs_cex[ indexes ],
+        labs_lwd = 0.1,
+        ylab = ylab[ 10:12 ], # always use last row here
+        ylab_line = 3.1, # place below `labs_line` (above)
+        ylab_side = 1, # x-axis instead of y-axis
+        leg_width = 0.3,
+        leg_column = 3,
+        panel_letters_adj = -0.25, # have bigger margins here, can make more negative!
+        oma = c(1, 0, 0, 0) # move outer margin to bottom only (default is 1.5 for left only)
+    )
+    fig_end()
+}
+
+plot_kinship_real_sim_tree( 'ho', 4:6 )
+plot_kinship_real_sim_tree( 'hgdp', 7:9 )
+plot_kinship_real_sim_tree( 'tgp', 10:12 )
