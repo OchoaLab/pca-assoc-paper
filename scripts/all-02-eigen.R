@@ -154,6 +154,17 @@ varexpcum_eigensoft <- lapply( varexp_eigensoft, cumsum )
 ### STANDALONE FIGS ###
 #######################
 
+# uses global `datasets`
+plot_ranks <- function( tw_rank, cex_leg = 1 ) {
+    barplot(
+        unlist( tw_rank ),
+        ylab = 'Kinship Rank Est.',
+        las = 2,
+        cex.names = cex_leg, # reduce bar labels too
+        col = datasets$col,
+        density = datasets$density
+    )
+}
 
 # top PCs table across datasets, for simple barplots
 eigenvalues_mat <- function( ev, r = 10 ) {
@@ -214,24 +225,62 @@ plot_varexpcum <- function( varexpcum, cex_leg = 1 ) {
 cex_legs <- 0.8
 cex_legs2 <- 0.9 # actually last case looks better bigger
 
-# get half width
 width <- fig_width( )
+
+# use half width only
 # create square figure
+
 fig_start(
-    'eigensoft_varexpcum',
+    'eigen_twrank_popkin',
+    width = width/2,
+    height = width/2,
+    mar_b = 7 # need greater clearance for labels below bars here
+)
+plot_ranks( tw_rank_popkin, cex_leg = cex_legs )
+fig_end()
+
+fig_start(
+    'eigen_twrank_eigensoft',
+    width = width/2,
+    height = width/2,
+    mar_b = 7 # need greater clearance for labels below bars here
+)
+plot_ranks( tw_rank_eigensoft, cex_leg = cex_legs )
+fig_end()
+
+fig_start(
+    'eigen_varexpcum_eigensoft',
     width = width/2,
     height = width/2
 )
 plot_varexpcum( varexpcum_eigensoft, cex_leg = cex_legs * 3/4 )
 fig_end()
 
+# popkin version
+fig_start(
+    'eigen_varexpcum_popkin',
+    width = width/2,
+    height = width/2
+)
+plot_varexpcum( varexpcum_popkin, cex_leg = cex_legs * 3/4 )
+fig_end()
+
 # create wide figure
 fig_start(
-    'eigensoft_varexp10',
+    'eigen_varexp10_eigensoft',
     width = width,
     height = width/2
 )
-plot_varexp10( varexp_eigensoft, cex_leg = cex_legs2 * 3/4 )
+plot_varexp10( varexp_eigensoft, cex_leg = cex_legs2 )
+fig_end()
+
+# popkin version
+fig_start(
+    'eigen_varexp10_popkin',
+    width = width,
+    height = width/2
+)
+plot_varexp10( varexp_popkin, cex_leg = cex_legs2 )
 fig_end()
 
 
@@ -243,9 +292,6 @@ fig_end()
 # lower margin is bigger for first panel only
 mar1 <- c(7, 3, 2, 0) + 0.2
 mar2 <- c(3, 3, 2, 0) + 0.2
-
-# truncating extreme rank estimates
-rank_cut <- 160
 
 # get max width
 width <- fig_width()
@@ -265,18 +311,11 @@ layout(
 
 ### TWSTATS panel
 par( mar = mar1 )
-barplot(
-    unlist( tw_rank_popkin ),
-    ylab = 'Kinship Rank Est.',
-    las = 2,
-    cex.names = cex_legs, # reduce bar labels too
-    col = datasets$col,
-    density = datasets$density
-)
+plot_ranks( tw_rank_popkin, cex_leg = cex_legs )
 panel_letter('A', adj = -0.15 )
+par( mar = mar2 )
 
 ### VAR EXP total cumulative panel
-par( mar = mar2 )
 plot_varexpcum( varexpcum_popkin, cex_leg = cex_legs )
 panel_letter('B', adj = -0.15 )
 

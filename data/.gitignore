@@ -17,8 +17,9 @@ causal-maf-mins.pdf
 trait-normality.pdf
 fits/
 # files I'm just ignoring cause they were uninteresting tangents
-eigensoft_varexp10.pdf
-eigensoft_varexpcum.pdf
+eigen_twrank_eigensoft.pdf
+eigen_varexp10_eigensoft.pdf
+eigen_varexpcum_eigensoft.pdf
 eigensoft-tw.txt
 eigensoft.eval
 # and these were good but easy to recalculate
