@@ -117,7 +117,7 @@ PCA remains a popular and powerful approach for association studies \citep{wojci
 % LMM
 The other dominant approach for genetic association studies under population structure is the LMM, in which population structure is a random effect drawn from a covariance model parametrized by the kinship matrix.
 Unlike PCA, LMM does not assume that relatedness is low-dimensional, and explicitly models family structure via the kinship matrix.
-Interestingly, LMM and PCA share deep connections \citep{astle_population_2009, janss_inferences_2012, hoffman_correcting_2013}, which suggest that both models ought to perform similarly under certain conditions, especially when relatedness is low-dimensional.
+Interestingly, LMM and PCA share deep connections \citep{astle_population_2009, hoffman_correcting_2013}, which suggest that both models ought to perform similarly under certain conditions, especially when relatedness is low-dimensional.
 However, many previous simulation studies have found that LMM outperforms PCA \citep{
   zhao_arabidopsis_2007,
   astle_population_2009,
@@ -761,7 +761,7 @@ Our findings also suggest that other applications that employ PCA to control for
 \subsection{Models for genetic association studies}
 
 In this subsection we describe the complex trait model and kinship model that motivates both the PCA and LMM models for genetic association studies, followed by further details regarding the PCA and LMM approaches.
-The derivations of the PCA and LMM models from the general quantitative trait model are similar to previous presentations \citep{astle_population_2009, janss_inferences_2012, hoffman_correcting_2013}, but we emphasize the kinship model for random genotypes as being crucial for these connections, and make a clear distinction between the true kinship matrix and its most common estimator, which is biased \citep{ochoa_estimating_2021, ochoa_human}.
+The derivations of the PCA and LMM models from the general quantitative trait model are similar to previous presentations \citep{astle_population_2009, hoffman_correcting_2013}, but we emphasize the kinship model for random genotypes as being crucial for these connections, and make a clear distinction between the true kinship matrix and its most common estimator, which is biased \citep{ochoa_estimating_2021, ochoa_human}.
 
 \subsubsection{The complex trait model and PCA approximation}
 
@@ -946,16 +946,51 @@ $$
 $$
 The above random effect $\mathbf{s}$ satisfies those equations, where the variance scale equals $\sigma^2_s = || \boldsymbol{\beta}_S ||^2$.
 Thus, the PCA approach is the fixed model equivalent of the LMM under the additional approximation that only the top $r$ eigenvectors are used in PCA whereas the LMM uses all eigenvectors.
+A more explicit comparison follows in the next subsection.
 
 In practice, the key advantage of LMM over PCA is that it has fewer parameters to fit: ignoring the shared terms in \cref{eq:pca_gwas} and \cref{eq:lmm_gwas}, PCA has $r$ parameters to fit (each PC coefficient in the $\boldsymbol{\gamma}$ vector), whereas LMMs only fit one additional parameter, namely $\sigma^2_s$.
 Therefore, PCA is expected to overfit more substantially than LMM---and thus lose power---when $r$ is very large, and especially when the sample size (the number of individuals $n$) is very small.
 Statistical significance in LMMs is calculated via a likelihood ratio test, whose test statistic has a asymptotic $\chi^2$ distribution under the null hypothesis.
 
+\subsubsection{Connection between LMM and PCA models}
+
+The LMM of \cref{eq:lmm_gwas} can be written to resemble more greatly the PCA model of \cref{eq:pca_gwas} \citep{astle_population_2009, hoffman_correcting_2013}, as
+\begin{equation}
+  \label{eq:lmm_gwas_evd}
+  \mathbf{y}
+  =
+  \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{U} \boldsymbol{\gamma}_\text{LMM} + \boldsymbol{\epsilon}
+  , \quad\quad
+  \boldsymbol{\gamma}_\text{LMM} = \sigma_s \boldsymbol{\Lambda}^{1/2} \mathbf{r}
+  ,
+\end{equation}
+where $\mathbf{U}$ is the complete matrix of PCs (all $n$ of them), $\boldsymbol{\Lambda}$ is the diagonal matrix of eigenvalues of the kinship matrix such that its eigendecomposition is $\mathbf{\Phi}^T = \mathbf{U} \boldsymbol{\Lambda} \mathbf{U}^\intercal$, and $\mathbf{r} \sim \text{Normal}(\mathbf{0},\mathbf{I})$ is a standard normal random effect.
+The connection follows since $\mathbf{s} = \sigma_s \mathbf{U} \boldsymbol{\Lambda}^{1/2} \mathbf{r}$ satisfies
+$$
+\mathbf{s} \sim \text{Normal} \left( \mathbf{0}, \left( \sigma_s \mathbf{U} \boldsymbol{\Lambda}^{1/2} \right) \left( \sigma_s \mathbf{U} \boldsymbol{\Lambda}^{1/2} \right)^\intercal \right)
+= \text{Normal}( \mathbf{0}, \sigma_s^2 \mathbf{\Phi}^T ),
+$$
+which itself follows from the affine transformation property of multivariate normal distributions.
+Note that $\mathbf{U}$ also equals in the limit the right singular vectors of the standardized genotype matrix $\mathbf{X}_S = \mathbf{V}_S \mathbf{D}_S \mathbf{U}_S^\intercal$, which is how we originally motivated the PCA model, since
+$$
+\frac{1}{m} \mathbf{X}_S^\intercal \mathbf{X}_S
+%= \frac{1}{m} \mathbf{U}_S \mathbf{D}_S \mathbf{V}_S^\intercal \mathbf{V}_S \mathbf{D}_S \mathbf{U}_S^\intercal
+= \mathbf{U}_S \mathbf{\Lambda}_S \mathbf{U}_S^\intercal
+\toas
+\mathbf{U} \mathbf{\Lambda} \mathbf{U}^\intercal
+=
+\mathbf{\Phi}^T
+$$
+since $\mathbf{V}_S$ is orthonormal, and where $\mathbf{\Lambda}_S = \frac{1}{m} \mathbf{D}_S^2$.
+
+Therefore, when the kinship matrix is low-dimensional (when only a few eigenvalues are very large), the LMM fits the same low-dimensional space as PCA would with an appropriate number of PCs, except that the coefficients $\boldsymbol{\gamma}_\text{LMM}$ are constrained by the likelihood model, whereas the analogous PCA coefficients $\boldsymbol{\gamma}_r$ are unconstrained variables.
+On the other hand, when the kinship matrix is high-dimensional then the LMM can fit this space better than a corresponding PCA model with a small number of PCs, while PCA with a larger number of PCs will instead overfit the data.
+
 \subsubsection{LMM with PCs}
 
 An LMM variant we focus on testing in this work incorporates PCs as fixed covariates.
 Since PCs are the top eigenvectors of the same kinship matrix estimate used to draw the random effects, then the population structure is essentially modeled twice, which can lead to loss of power when the number of PCs is very large.
-However, some previous work has found the apparent redundancy of an LMM with PCs beneficial \citep{zhao_arabidopsis_2007, price_new_2010}.
+However, some previous work has found the apparent redundancy of an LMM with PCs beneficial \citep{price_new_2010}.
 Note that earlier LMM approaches estimated non-redundant kinship and fixed effects covariates: kinship matrices were estimated from pedigrees (thus excluding population structure), and population structure was modeled via admixture proportions rather than PCA \citep{yu_unified_2006, zhao_arabidopsis_2007}.
 
 
