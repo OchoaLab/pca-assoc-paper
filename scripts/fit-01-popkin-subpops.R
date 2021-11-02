@@ -1,5 +1,5 @@
 library(optparse)
-library(popkin)
+library(popkin) # avg_kinship_subpops, etc
 library(genio)
 library(readr)
 library(ochoalabtools)
@@ -42,7 +42,7 @@ data <- read_grm( 'popkin' )
 kinship <- data$kinship
 
 # read annotations
-subpop_info <- read_tsv('pops-annot.txt', comment = '#')
+subpop_info <- read_tsv( 'pops-annot.txt', comment = '#', show_col_types = FALSE )
 
 # map subpopulations using sub-subpopulations
 fam$superpop <- subpop_info$superpop[ match( fam$fam, subpop_info$pop ) ]
@@ -67,40 +67,7 @@ kinship <- inbr_diag( kinship )
 ### SUBPOP ###
 ##############
 
-# code adapted from Storey Lab (by Ochoa)
-
-avgSubpopsKinship <- function(kinship, ind2pop, pops) {
-    # make smaller kinship matrix averaging over populations
-    # Note :
-    # - ind2pop maps individuals in the order of kinship onto populations
-    # - pops is unique populations in the desired order!
-
-    # first a convenient cleanup: remove values in pops that are missing in ind2pop (that way we don't have to do it outside, we ensure agreement more generally)
-    pops <- pops[ pops %in% ind2pop ]
-    # initiate output matrix
-    K <- length( pops )
-    kinship_pops <- matrix( 0, nrow = K, ncol = K )
-    
-    # start averaging
-    for (i in 1:K) {
-        is <- ind2pop == pops[ i ] # booleans for individuals that are of this population
-        # note i=j case is included 
-        for (j in 1:i) {
-            js <- ind2pop == pops[ j ] # booleans for individuals that are of this population
-            phiij <- mean( kinship[ is, js ] ) # the mean value we want
-            kinship_pops[ i, j ] <- phiij # store both ways
-            kinship_pops[ j, i ] <- phiij # store both ways
-        }
-    }
-
-    # store names of populations on matrix
-    colnames(kinship_pops) <- pops
-    rownames(kinship_pops) <- pops
-
-    kinship_pops # return
-}
-
-kinship_pop <- avgSubpopsKinship( kinship, fam$fam, subpop_info$pop )
+kinship_pop <- avg_kinship_subpops( kinship, fam$fam, subpop_info$pop )
 
 # save this matrix for later
 write_grm( 'popkin_subpops', kinship_pop )
