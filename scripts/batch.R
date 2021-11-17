@@ -62,9 +62,6 @@ submit_rep_pcs <- function(
     
     # load plink module if needed
     if ( plink ) {
-        # first add --plink flag (same line)
-        commands <- paste0( commands, ' --plink' )
-        # then load plink module (separate lines)
         commands <- c(
             'module load Plink/2.00a3LM',
             commands,
