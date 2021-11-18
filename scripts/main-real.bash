@@ -34,28 +34,34 @@ cd ../../scripts/
 # preprocess with GCTA (makes GRM and max PCs)
 time Rscript real-00-preprocess-gcta.R --bfile $name
 # 0m36.076s ideapad HO
-# 1m51.228s ideapad HGDP
+# 6m17.134s/66m7.781s viiiaR5 HGDP
 # 2m3.016s ideapad TGP
 
 # get PCs using plink2
 time Rscript real-01-pcs-plink.R --bfile $name
 # 0m19.751s ideapad HO
-# 0m18.244s ideapad HGDP
+# 0m9.476s/0m47.619s viiiaR5 HGDP
 # 0m32.804s ideapad TGP
 
 # calculates kinship matrix with popkin, to get mean kinship to pass to simtrait
 time Rscript real-03-popkin.R --bfile $name
 # 4m28.038s ideapad HO
-# 3m57.744s ideapad HGDP
+# 2m25.247s viiiaR5 HGDP
 # 21m53.466s ideapad TGP
 
 # draws random traits
 # 0m2.166s ideapad HO (each rep)
 # 0m21.066s ideapad TGP (each rep)
 # 0m2.014s ideapad TGP thinned (each rep)
+# 0m9.504s viiiaR5 HGDP (each rep)
 for rep in {1..50}; do
     time Rscript real-04-simtrait.R --bfile $name -r $rep
 done
+
+# gather minimal data to send to cluster, including FES versions (not yet made in this script)
+# (tar -h: "Follow symlinks; archive and dump the files they point to.")
+# cd ../data/$name/
+# tar -chzf data.tgz data.{bed,bim,fam} data.grm.* data-n_pcs_90.eigenvec data-plink-n_pcs_90.eigenvec rep-*/data.phen rep-*/fes/data.phen 
 
 # create auxiliary PCA files from plink2 (redundant, will delete when done with this analysis)
 time Rscript real-02-subset-eigenvec.R --bfile $name --plink
@@ -85,11 +91,13 @@ time Rscript real-02-subset-eigenvec.R --bfile $name --clean
 time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90
 # all are plink + GCTA
 # 25m13.604s HO viiiaX6 6 threads
+# 39m51.574s/407m5.064s HGDP viiiaR5
 # 80m32.881s TGP labbyDuke 12 threads
 
 # read all individual summary tables (tiny files), gather into a master table
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
 # 0m42.030s viiiaX6 HO
+# 0m49.292s viiiaR5 HGDP
 # 0m24.390s labbyDuke TGP
 
 # creates final plot for paper!
@@ -97,17 +105,14 @@ time Rscript real-09-figs.R --bfile $name
 # 0m1.809s ideapad
 # # OBSOLETE for partial runs, to plot only complete reps (best for slowest test: TGP)
 # time Rscript real-09-figs.R --bfile $name --complete
-# # OBSOLETE compares PCAs only (for internal purposes only); Not redone after m_causal bug was found
-# time Rscript real-09-figs.R --bfile $name --pca
 
 # tests that p-value vectors have the right lengths of m_loci
 # to make sure nothing was corrupted due to scripts stopping unexpectedly or incomplete file transfers
 # (now test is peformed within real-07-auc-rmsd.R above too, but this can retest everything without recalculating expensive summary statistics).
 # --final requires that all files exist!
-time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90
 time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90 --final
 # 7m57.939s viiiaX6 HO
-# 12m26.386s labbyDuke HGDP
+# 9m17.899s viiiaR5 HGDP
 # 15m10.066s labbyDuke TGP
 
 # archive p-values and individual summary files (move out of space that gets synced between computers; these files take up loads of space and are no longer needed)
@@ -152,6 +157,7 @@ done
 time Rscript real-02-subset-eigenvec.R --bfile $name --dcc --clean
 
 time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90 --fes
+# 56m22.873s/342m28.028s viiiaR5 HGDP
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 --fes
 time Rscript real-09-figs.R --bfile $name --fes
 time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90 --final --fes
@@ -169,11 +175,11 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes
 
 # manually copied annotations file from Storey Lab project
 # for TGP
-cp ~/docs/ochoalab/storey/fst/simulations/all_phase3_filt-minimal/pops-annot.txt ../data/$name/
+cp ~/docs/ochoalab/fst-human/data/all_phase3_filt-minimal/pops-annot.txt ../data/$name/
 # for HGDP
-cp ~/docs/ochoalab/storey/fst/simulations/hgdp_wgs_autosomes/pops-annot.txt ../data/$name/
+cp ~/docs/ochoalab/fst-human/data/hgdp_wgs_autosomes/pops-annot.txt ../data/$name/
 # for HO
-cp ~/docs/ochoalab/storey/fst/simulations/ho16ep/pops-annot.txt ../data/$name/
+cp ~/docs/ochoalab/fst-human/data/HoPacAll/pops-annot.txt ../data/$name/
 
 # this script calculates subpopulations kinship matrix, which we'll fit tree to
 # also produces a nice plot that validates the estimate
@@ -245,7 +251,7 @@ time Rscript fit-10-plot-real-vs-sim.R --bfile $name
 time Rscript real-16-mafs.R --bfile $name --sim
 
 time Rscript real-07-auc-rmsd.R --sim --bfile $name -r 50 --n_pcs 90
-# 14m22.146s # ideapad 4 threads HGDP-sim-rand
+# 7m28.614s/38m52.149s viiiaR5 12 threads HGDP-sim-rc
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
 time Rscript real-09-figs.R --bfile $name
 time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --final
@@ -324,8 +330,8 @@ time Rscript real-11-inflation-across-datasets.R
 # model fit:
 # rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
 #         a         b 
-# 0.5663168 0.6155140 
+# 0.5661761 0.6157789 
 # threshold map (sigmoidal): lambda = 1.05, RMSD = 0.0085
 # Inverse threshold map (sigmoidal): RMSD = 0.01, lambda = 1.06
 # log-linear approx: log(lambda) = RMSD * 5.74
-# threshold map (log-linear): lambda = 1.05, RMSD = 0.0085
+# threshold map (log-linear): lambda = 1.05, RMSD = 0.00851
