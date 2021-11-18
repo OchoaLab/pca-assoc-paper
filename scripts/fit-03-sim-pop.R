@@ -45,7 +45,7 @@ setwd( name )
 fam <- read_fam( name_in )
 
 # read annotations
-subpop_info <- read_tsv('pops-annot.txt', comment = '#')
+subpop_info <- read_tsv( 'pops-annot.txt', comment = '#', show_col_types = FALSE )
 
 # map subpopulations using sub-subpopulations
 fam$superpop <- subpop_info$superpop[ match( fam$fam, subpop_info$pop ) ]

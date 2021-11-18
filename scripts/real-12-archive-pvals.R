@@ -51,19 +51,25 @@ dir_dest <- paste0( dir_dest, name )
 if ( !dir.exists( dir_dest ) )
     dir.create( dir_dest )
 
-dir_phen <- if ( fes ) '/fes' else ''
+dir_phen <- if ( fes ) 'fes' else NA
 
 for ( rep in 1 : rep_max ) {
     # move higher to the "reps" location
-    # this `dir_rep` includes `fes` bit
-    dir_rep <- paste0( 'rep-', rep, dir_phen )
+    dir_rep <- paste0( 'rep-', rep )
     setwd( dir_rep )
+    if ( fes )
+        setwd( dir_phen )
     
     # create the same dir in the destination, if needed
-    # NOTE: inherits `fes` bit from `dir_rep`
+    # do both levels as separate steps in case "fes" is run before "rc"
     dir_out <- paste0( dir_dest, '/', dir_rep )
     if ( !dir.exists( dir_out ) )
         dir.create( dir_out )
+    if ( fes ) {
+        dir_out <- paste0( dir_dest, '/', dir_rep, '/', dir_phen )
+        if ( !dir.exists( dir_out ) )
+            dir.create( dir_out )
+    }
     
     # start a big loop
     for ( method in methods ) {
@@ -74,9 +80,11 @@ for ( rep in 1 : rep_max ) {
 
                 if ( !file.exists( file_in ) )
                     # missing files are always fatal for this step
-                    stop( 'MISSING: ', 'rep-', rep, '/', file_in )
+                    stop( 'MISSING: rep-', rep, ', ', file_in )
                 # else move to destination
                 file_out <- paste0( dir_out, '/', file_in )
+                if ( file.exists( file_out ) )
+                    stop( 'Output exists: rep-', rep, ', ', file_out )
                 if ( !opt$test ) 
                     file.rename( file_in, file_out )
             }
@@ -90,4 +98,6 @@ for ( rep in 1 : rep_max ) {
         setwd( '..' )
 }
 
-print( warnings() )
+warns <- warnings()
+if (!is.null( warns ) )
+    print( warns )

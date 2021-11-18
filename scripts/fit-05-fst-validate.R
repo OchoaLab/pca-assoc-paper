@@ -39,7 +39,7 @@ setwd( '../data/' )
 
 # first load annotations
 setwd( name_real )
-subpop_info <- read_tsv('pops-annot.txt', comment = '#')
+subpop_info <- read_tsv( 'pops-annot.txt', comment = '#', show_col_types = FALSE )
 
 # now to where the simulated data is
 setwd( '..' )

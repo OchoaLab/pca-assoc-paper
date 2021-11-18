@@ -47,7 +47,7 @@ fam <- read_fam( name_in )
 kinship_real <- read_grm( 'popkin' )$kinship
 
 # read annotations
-subpop_info <- read_tsv('pops-annot.txt', comment = '#')
+subpop_info <- read_tsv( 'pops-annot.txt', comment = '#', show_col_types = FALSE )
 
 # now switch dirs to simulated data
 setwd( '..' )
