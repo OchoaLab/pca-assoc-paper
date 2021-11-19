@@ -24,8 +24,6 @@ name_out <- 'data'
 option_list = list(
     make_option("--bfile", type = "character", default = NA, 
                 help = "Base name for input plink files (.BED/BIM/FAM)", metavar = "character"),
-    make_option(c("-m", "--m_loci"), type = "integer", default = 100000, 
-                help = "number of loci", metavar = "int"),
     make_option(c("-r", "--rep"), type = "integer", default = 1,
                 help = "Replicate number", metavar = "int"),
     make_option("--maf_real", action = "store_true", default = FALSE, 
@@ -39,7 +37,6 @@ opt <- parse_args(opt_parser)
 
 # get values
 name <- opt$bfile
-m_loci <- opt$m_loci
 rep <- opt$rep
 maf_real <- opt$maf_real
 maf_min <- opt$maf_min
@@ -54,28 +51,18 @@ if ( is.na(name) )
 
 # directory above must already exist
 setwd( '../data/' )
-
-p_anc_distr <- NULL
-if ( maf_real ) {
-    # deduce original file path
-    name_real <- sub( '_sim$', '', name )
-    setwd( name_real )
-    
-    # load MAF
-    load( 'maf.RData' )
-    # loads: maf
-
-    # go back down so we can find the simulated path
-    setwd( '..' )
-}
-
 setwd( name )
 
 # load precalculated bnpsd data from RData file
 load( 'bnpsd.RData' )
-# loads: admix_proportions, tree_subpops, fam
+# loads: admix_proportions, tree_subpops, fam, m_loci
 
-if (maf_real) {
+p_anc_distr <- NULL
+if ( maf_real ) {
+    # load MAF (copy of real MAF but in local dir)
+    load( 'maf-real.RData' )
+    # loads: maf
+    
     # need mean kinship of this simulation, which has been calculated already
     if ( name == 'HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim' ) {
         kinship_mean <- as.numeric( read_lines( 'kinship_mean.txt' ) )

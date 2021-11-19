@@ -43,6 +43,8 @@ setwd( name )
 
 # load FAM table, for subpopulation labels
 fam <- read_fam( name_in )
+# get number of loci too, for simulating the same number
+m_loci <- count_lines( name_in, 'bim' )
 
 # read annotations
 subpop_info <- read_tsv( 'pops-annot.txt', comment = '#', show_col_types = FALSE )
@@ -105,7 +107,7 @@ write_lines( fst_tree, 'fst.txt' )
 
 # save bnpsd data to an RData file
 # here add copy of real `fam` table, for checks
-save( admix_proportions, tree_subpops, fam, file = 'bnpsd.RData' )
+save( admix_proportions, tree_subpops, fam, m_loci, file = 'bnpsd.RData' )
 
 ## # try things with this info
 ## # compare to popkin
@@ -130,3 +132,4 @@ save( admix_proportions, tree_subpops, fam, file = 'bnpsd.RData' )
 # - (these are probably all small differences, but might as well get it right)
 kinship_mean <- mean( coanc_to_kinship( coanc_admix( admix_proportions, coanc_est ) ) )
 write_lines( kinship_mean, 'kinship_mean.txt' )
+

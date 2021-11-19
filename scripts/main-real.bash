@@ -194,34 +194,42 @@ time Rscript fit-02-tree.R --bfile $name
 # also calculates FST for paper table and kinship_mean for undiff_af
 time Rscript fit-03-sim-pop.R --bfile $name
 
+# for extra convenience, make a "copy" of the real MAF file into the simulations dir (better for cluster work)
+ln -s ../$name/maf.RData ../data/$name"_sim"/maf-real.RData 
+
 # from here on, the real data name needs a '_sim' suffix
 # the rest of the pipeline is the same as for the regular simulations
 name=$name"_sim"
 
-# OPTIONAL experiments to help me decide how to fit this all
-# can skip: ultimately does not produce required outputs, only influenced choices hardcoded into fit-04-draw-geno.R now
-time Rscript fit-06-bigger-fitting.R --bfile $name
-# 2m23.877s viiiaR5 HGDP
-# 6m25.336s viiiaR5 HO
-time Rscript fit-06-bigger-fitting.R --bfile $name --beta
-# 3m23.708s viiiaR5 HGDP
-# 20m50.410s viiiaR5 HO
-time Rscript fit-06-bigger-fitting.R --bfile $name --distr
-# 6m54.920s viiiaR5 TGP
-# 1m41.267s viiiaR5 HGDP
-# 6m45.279s viiiaR5 HO
-time Rscript fit-06-bigger-fitting.R --bfile $name --kin
-# 2m3.379s viiiaR5 HGDP
-# 8m2.776s viiiaR5 TGP
-# 8m9.043s viiiaR5 HO
-# and plotter code (after all three are done)
-time Rscript fit-07-bigger-fitting-plot.R --bfile $name
-# runs with final m (default is smaller) to have more accurate error measurements (way slower though)
-# didn't run for HO (all previous signs suggested it wasn't needed, though ultimately these weren't needed either)
-time Rscript fit-06-bigger-fitting.R --bfile $name --kin -m 100000
-# 19m41.688s viiiaR5 HGDP
-# 72m39.955s viiiaR5 TGP
-time Rscript fit-07-bigger-fitting-plot.R --bfile $name -m 100000
+# # OPTIONAL experiments to help me decide how to fit this all
+# # can skip: ultimately does not produce required outputs, only influenced choices hardcoded into fit-04-draw-geno.R now
+# time Rscript fit-06-bigger-fitting.R --bfile $name
+# # 2m23.877s viiiaR5 HGDP
+# # 6m25.336s viiiaR5 HO
+# time Rscript fit-06-bigger-fitting.R --bfile $name --beta
+# # 3m23.708s viiiaR5 HGDP
+# # 20m50.410s viiiaR5 HO
+# time Rscript fit-06-bigger-fitting.R --bfile $name --distr
+# # 6m54.920s viiiaR5 TGP
+# # 1m41.267s viiiaR5 HGDP
+# # 6m45.279s viiiaR5 HO
+# time Rscript fit-06-bigger-fitting.R --bfile $name --kin
+# # 2m3.379s viiiaR5 HGDP
+# # 8m2.776s viiiaR5 TGP
+# # 8m9.043s viiiaR5 HO
+# # and plotter code (after all three are done)
+# time Rscript fit-07-bigger-fitting-plot.R --bfile $name
+# # runs with final m (default is smaller) to have more accurate error measurements (way slower though)
+# # didn't run for HO (all previous signs suggested it wasn't needed, though ultimately these weren't needed either)
+# time Rscript fit-06-bigger-fitting.R --bfile $name --kin -m 100000
+# # 19m41.688s viiiaR5 HGDP
+# # 72m39.955s viiiaR5 TGP
+# time Rscript fit-07-bigger-fitting-plot.R --bfile $name -m 100000
+
+# draw genotypes on DCC
+# this is example using "arrays" for replicates
+# NOTE: HGDP is hardcoded here
+sbatch -p biostat -a 1-50 real-sim-draw-geno.q
 
 # actually simulate data
 for rep in {1..50}; do
