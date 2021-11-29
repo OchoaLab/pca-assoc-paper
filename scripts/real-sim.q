@@ -1,15 +1,20 @@
 #!/bin/bash
+#SBATCH -p ochoalab --account=ochoalab
 #SBATCH --job-name=real-sim-%a
 #SBATCH --output=real-sim-%a.out
-#SBATCH --mem=32G
+#SBATCH --mem=64G
 #SBATCH --ntasks-per-node=1
 ##SBATCH --mail-user=alejandro.ochoa@duke.edu
 ##SBATCH --mail-type=END,FAIL
 
+# NOTE: 32G sufficed for HO and HGDP, but increased for TGP
+
 module load R/4.0.0
 module load Plink/2.00a3LM
 
-name=hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim
+#name=hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim
+#name=HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim
+name=tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_sim
 rep=$SLURM_ARRAY_TASK_ID
 time Rscript fit-04-draw-geno.R --bfile $name -r $rep --maf_real
 time Rscript sim-02-sim-trait.R --bfile $name -r $rep

@@ -2,18 +2,23 @@ library(ochoalabtools)
 
 # slurm job submission script for DCC
 
+# using biostats server
+#account <- NA; partition <- 'biostat'
+# using ochoalab server
+account <- 'ochoalab'; partition <- 'ochoalab'
+
 # shared items for all runs
 plink <- TRUE # FALSE
 fes <- FALSE # TRUE
 #bfile <- 'sim-n100-k10-f0.1-s0.5-g1'; short <- 's'
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short <- 'l'
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'; short <- 'f'
-#bfile <- 'HoPacAll_ld_prune_1000kb_0.3'; short <- 'h'
+#bfile <- 'HoPacAll_ld_prune_1000kb_0.3_maf-0.01'; short <- 'h'
 #bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01'; short <- 'd'
-#bfile <- 'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'; short <- 'k'
-#bfile <- 'HoPacAll_ld_prune_1000kb_0.3_sim'; short <- 'H'
-bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim'; short <- 'D'
-#bfile <- 'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim'; short <- 'K'
+#bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01'; short <- 'k'
+#bfile <- 'HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim'; short <- 'H'
+#bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim'; short <- 'D'
+bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_sim'; short <- 'K'
 
 # needed to make sure each process gets enough memory if all my jobs saturate the machines
 # (didn't have to change last time, but before TGP was thinned I needed 4 threads for GCTA runs)
@@ -76,6 +81,8 @@ submit_rep_pcs <- function( rep ) {
         name,
         mem = mem,
    	threads = threads,
+        account = account,
+        partition = partition,
         array = '0-90' # number of PCs hardcoded here
     )
 
