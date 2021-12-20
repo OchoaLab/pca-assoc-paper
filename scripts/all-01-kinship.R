@@ -48,7 +48,7 @@ titles <- c(
 names_real <- c(
     'HoPacAll_ld_prune_1000kb_0.3_maf-0.01',
     'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
-    'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'
+    'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01'
 )
 
 for ( name_real in names_real ) {

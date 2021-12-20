@@ -44,21 +44,17 @@ method_cols <- c(
 )
 # names of datasets
 # simulated datasets are default
-names_dir = c(
+names_dir <- c(
     'sim-n1000-k10-f0.1-s0.5-g1',
     'sim-n100-k10-f0.1-s0.5-g1',
     'sim-n1000-k10-f0.1-s0.5-g20'
 )
-names_dir_real = c(
+names_dir_real <- c(
     'HoPacAll_ld_prune_1000kb_0.3_maf-0.01',
     'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
-    'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01'
+    'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01'
 )
-names_dir_real_sim = c(
-    'HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim',
-    'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim',
-    'all_phase3_filt-minimal_ld_prune_1000kb_0.3_maf-0.01_sim'
-)
+names_dir_real_sim <- paste0( names_dir_real, '_sim' )
 # output names
 name_out <- 'rmsd-auc-sim'
 name_out_real <- 'rmsd-auc-real'
