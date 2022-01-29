@@ -3,6 +3,7 @@
 *.eigenval
 *.eigenvec
 *.grm.*
+*.king.*
 */rep-*/
 bad/
 sum-num-reps.pdf

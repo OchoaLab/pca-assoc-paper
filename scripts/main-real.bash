@@ -28,6 +28,14 @@ ln -s "$DATA_DIR/$name.bed" data.bed
 ln -s "$DATA_DIR/$name.bim" data.bim
 ln -s "$DATA_DIR/$name.fam" data.fam
 
+# estimate local kinship with KING-robust
+time plink2 --bfile data --make-king triangle bin4 --out data
+# 0m2.411s/0m16.069s HGDP
+# 0m3.979s/0m32.770s HO
+# 0m15.863s/2m4.843s TGP
+# cleanup
+rm data.log 
+
 # return to scripts dir
 cd ../../scripts/
 
@@ -258,6 +266,14 @@ time Rscript fit-10-plot-real-vs-sim.R --bfile $name
 # get MAFs for comparison plot too (only needs rep-1)
 time Rscript real-16-mafs.R --bfile $name --sim
 
+# estimate local kinship with KING-robust, rep-1 only
+cd ../data/$name/rep-1
+time plink2 --bfile data --make-king triangle bin4 --out data
+# cleanup
+rm data.log 
+# return to scripts dir
+cd ../../../scripts/
+
 time Rscript real-07-auc-rmsd.R --sim --bfile $name -r 50 --n_pcs 90
 # 7m28.614s/38m52.149s viiiaR5 12 threads HGDP-sim
 # 39m0.437s/408m46.361s viiiaR5 HGDP-sim full-m
@@ -346,3 +362,6 @@ time Rscript real-11-inflation-across-datasets.R
 # Inverse threshold map (sigmoidal): RMSD = 0.01, lambda = 1.06
 # log-linear approx: log(lambda) = RMSD * 5.72
 # threshold map (log-linear): lambda = 1.05, RMSD = 0.00853
+
+# look at kinship distributions in real and simulated datasets
+time Rscript all-03-king.R

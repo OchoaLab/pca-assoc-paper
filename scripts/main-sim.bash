@@ -81,6 +81,14 @@ for rep in {1..50}; do
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink --clean
 done
 
+# estimate local kinship with KING-robust, rep-1 only
+cd ../data/$name/rep-1
+time plink2 --bfile data --make-king triangle bin4 --out data
+# cleanup
+rm data.log 
+# return to scripts dir
+cd ../../../scripts/
+
 # for MAF comparisons plot (only needs rep-1)
 time Rscript real-16-mafs.R --bfile $name --sim
 # get popkin estimates for an overview plot only (also rep-1/ only)
