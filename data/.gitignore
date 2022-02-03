@@ -26,3 +26,6 @@ eigensoft.eval
 # and these were good but easy to recalculate
 popkin-tw.txt
 popkin.eval
+# variants of king-robust distributions with log-y, which muddle interpretability
+king_log-y.pdf
+king_log-xy.pdf

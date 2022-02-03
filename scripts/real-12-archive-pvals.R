@@ -23,6 +23,10 @@ option_list = list(
                 help = "Max number of PCs", metavar = "int"),
     make_option(c("-r", "--rep"), type = "integer", default = 50,
                 help = "Max replicates", metavar = "int"),
+    make_option(c("-s", "--single_pc"), action = "store_true", default = FALSE,
+                help = "Process a single PC (the value of `--n_pcs`) rather than the default of the full range (zero to the value of `--n_pcs`)"),
+    make_option(c("-m", "--method"), type = "character", default = NA, 
+                help = "Method to process (pca or lmm; default both)", metavar = "character"),
     make_option(c("-t", "--test"), action = "store_true", default = FALSE, 
                 help = "Test run (makes sure no files are missing, but doesn't actually move anything.  However, output directories are created.)"),
     make_option("--fes", action = "store_true", default = FALSE, 
@@ -41,6 +45,19 @@ fes <- opt$fes
 # stop if name is missing
 if ( is.na(name) )
     stop('`--bfile` terminal option is required!')
+
+# decide on range of PCs to process
+pcs_vec <- if ( opt$single_pc ) n_pcs_max else 0 : n_pcs_max
+
+# narrow down methods too if requested
+if ( !is.na( opt$method ) ) {
+    if ( opt$method == 'pca' ) {
+        methods <- methods[1] # PCA is first one in original list (but actual name is more complicated)
+    } else if ( opt$method == 'lmm' ) {
+        methods <- methods[2] # LMM is second one in original list (but actual name is more complicated)
+    } else
+        stop( 'Invalid `method` (must be "pca", "lmm", or not specified for both): ', method )
+}
 
 # move to where the data is
 setwd( '../data/' )
@@ -73,7 +90,7 @@ for ( rep in 1 : rep_max ) {
     
     # start a big loop
     for ( method in methods ) {
-        for ( n_pcs in 0 : n_pcs_max ) {
+        for ( n_pcs in pcs_vec ) {
             # files to move
             for ( base in bases ) {
                 file_in <- paste0( base, '_', method, '_', n_pcs, '.txt.gz' )

@@ -8,6 +8,9 @@ lab_auc <- expression( bold( AUC[PR] ) )
 alpha_q <- 0.4
 alpha_e <- 0.2
 
+# rule-of-thumb sRMSD cut
+srmsd_cut <- 0.01
+
 # reorganizes tibble into lists
 # globals:
 # - methods, pcs
@@ -208,7 +211,6 @@ lineplots_rmsd_auc_one_panel <- function( data, lab, r_max, guide_max = FALSE, m
         # assumptions: `guide_max = TRUE` only for AUC plots, so it's FALSE for RMSD plots (here)
         # add area to mark acceptably low SRMSDs
         # NOTE: `x` overflows from `c(0, 90)` (from -10 to 100) because we want area to extend like it's just in the background (looks better, contrasts with data)
-        srmsd_cut <- 0.01
         polygon(
             c(-10, 100, 100, -10),
             c( srmsd_cut, srmsd_cut, -srmsd_cut, -srmsd_cut ),

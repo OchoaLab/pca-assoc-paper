@@ -34,7 +34,27 @@ time plink2 --bfile data --make-king triangle bin4 --out data
 # 0m3.979s/0m32.770s HO
 # 0m15.863s/2m4.843s TGP
 # cleanup
-rm data.log 
+rm data.log
+
+# now create kinship-filtered data
+time plink2 --bfile data --king-cutoff data 0.02209709 --make-bed --out data-king-cutoff
+# 0m2.242s HGDP
+# 0m1.306s HO
+# 0m4.910s TGP
+# cleanup
+rm data-king-cutoff.king.cutoff.{in,out}.id data-king-cutoff.log
+# make new folder with this filtered data
+name_king=$name'_king-cutoff-4'
+mkdir ../$name_king
+mv data-king-cutoff.bed ../$name_king/data.bed
+mv data-king-cutoff.bim ../$name_king/data.bim
+mv data-king-cutoff.fam ../$name_king/data.fam
+cd ../$name_king
+# reapply MAF filter, important for consistency of simulated traits, treatment of fixed loci, etc!
+time plink2 --bfile data --maf 0.01 --make-bed --out data2
+rm data2.log # cleanup
+rename data2 data data2.* # replace files
+
 
 # return to scripts dir
 cd ../../scripts/
@@ -307,6 +327,47 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes -t # t
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes
 
 
+
+###################
+### KING-cutoff ###
+###################
+
+# limited test does only one PC value per method, FES only, real only (no real-sim/tree)
+
+# some constants
+pcs_pca=20
+pcs_lmm=0
+
+# this was saved earlier, ignores "_sim" suffix of last $name
+name=$name_king
+# some minimal work to get AUCs and RMSDs
+# will resimulate traits, meh, though we could have subsetted the original data in theory
+time Rscript real-00-preprocess-gcta.R --bfile $name
+time Rscript real-01-pcs-plink.R --bfile $name
+time Rscript real-03-popkin.R --bfile $name
+for rep in {1..50}; do
+    time Rscript real-04-simtrait.R --bfile $name -r $rep --fes
+done
+# a bit overkill making all PCs, but faster than rewriting the code for this special case
+time Rscript real-02-subset-eigenvec.R --bfile $name --plink
+for rep in {1..50}; do
+    time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs_pca --fes
+done
+time Rscript real-02-subset-eigenvec.R --bfile $name --clean --plink
+# no PCS for GCTA here only
+for rep in {1..50}; do
+    time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs_lmm --fes
+done
+# gather results into a single table (again overkill but meh)
+time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs $pcs_pca --fes
+time Rscript real-08-table.R --bfile $name -r 50 --n_pcs $pcs_pca --fes
+time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes # NOTE not --final
+# note extra flags for partial data
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes -s -m pca -t # test first!
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes -s -m pca
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_lmm --fes -s -m lmm -t # test first!
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_lmm --fes -s -m lmm
+
 ###############
 ### GLOBALS ###
 ###############
@@ -365,3 +426,9 @@ time Rscript real-11-inflation-across-datasets.R
 
 # look at kinship distributions in real and simulated datasets
 time Rscript all-03-king.R
+
+# calculate dimensions table for this subset separately
+time Rscript king-00-dimensions.R
+
+# make AUC/RMSD plot and stats tests for the limited king-cutoff test
+time Rscript king-01-rmsd-auc-plot.R

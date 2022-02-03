@@ -58,25 +58,36 @@ kin_cum <- function( kinship ) {
 cumulatives <- lapply( kinships, kin_cum )
 
 plot_king <- function( cumulatives, log = 'y' ) {
+    # special params if it's log-x (includes 'xy')
+    is_logx <- grepl( 'x', log )
+    
     # figure out shared ranges
     # x-axis is in linear scale, but y-axis in log potentially (don't include zero)
+    # in linear y it's 1 that is boring... so take that out too
     x_max <- max( sapply( cumulatives, function( x ) max( x$x ) ) )
     y_min <- min( sapply( cumulatives, function( x ) min( x$y ) ) )
-
+    y_max <- max( sapply( cumulatives, function( x ) max( x$y[ x$y < 1 ] ) ) )
+    # if x-axis is in log scale, exclude zero from min
+    x_min <- 0
+    if ( is_logx )
+        x_min <- 1e-4 # smaller values are observed but they are rare
+        #x_min <- min( sapply( cumulatives, function( x ) min( x$x[ x$x > 0 ] ) ) )
+    
     width <- fig_width()
     fig_start(
-        'king',
+        paste0( 'king_log-', log ),
         width = width,
         height = width / 2,
-        mar_t = 0.5
+        mar_t = 0.5,
+        mar_r = if ( is_logx ) 0.5 else 0
     )
 
     # create blank plot
     plot(
         NA,
         log = log,
-        xlim = c( 0, x_max ),
-        ylim = c( y_min, 1 ),
+        xlim = c( x_min, x_max ),
+        ylim = c( y_min, y_max ),
         xlab = 'Kinship estimate (KING-robust)',
         ylab = 'Cumulative distribution'
     )
@@ -94,30 +105,22 @@ plot_king <- function( cumulatives, log = 'y' ) {
 
     # add legend
     legend(
-        'topright',
+        if ( log == 'x' ) 'right' else if ( is_logx ) 'bottomleft' else 'topright',
         datasets$name_paper,
         col = datasets$col,
         lty = datasets$lty,
         cex = 0.8
     )
+
+    # add reference line for 4th degree threshold
+    x <- 2^(-11/2)
+    abline( v = x, lty = 2, col = 'gray' )
+    text( x = x, y = y_max, labels = '4th degree threshold', col = 'gray', adj = - 0.05 )
+    
     fig_end()
 }
 
-plot_king( cumulatives )
-#plot_king( cumulatives, log = '' )
-
-# follow up of strange samples
-# HO has the largest values, some exceeding sib and parent relatedness
-kinship_ho <- kinships[[ 'Human Origins' ]]
-xy <- arrayInd( which.max( kinship_ho ), dim( kinship_ho ) )
-kinship_ho[ xy[1], xy[2] ]
-# [1] 0.3989481 # matches plot
-ids <- colnames( kinship_ho )
-ids[ as.numeric( xy ) ]
-# [1] "NAD96" "NAD95"
-
-# on terminal I find this annotation:
-## grep NAD95 data.fam 
-## grep NAD96 data.fam 
-## Chipewyan	NAD95	0	0	2	1
-## Chipewyan	NAD96	0	0	2	1
+# tried several versions
+plot_king( cumulatives, log ='x' )
+## plot_king( cumulatives, log ='y' )
+## plot_king( cumulatives, log = 'xy' )
