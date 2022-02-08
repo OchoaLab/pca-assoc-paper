@@ -70,15 +70,15 @@ $^*$ Corresponding author: \texttt{alejandro.ochoa@duke.edu}
 
 \begin{abstract}
   Modern genetic association studies require modeling population structure and family relatedness in order to calculate correct association statistics.
-  Principal Components Analysis (PCA) is an efficient, flexible, and one of the most common approaches for modeling this population structure, but nowadays the Linear Mixed-Effects Model (LMM) is believed by many to be a superior association model.
+  Principal Components Analysis (PCA) is an efficient, flexible, and one of the most common models for population structure, but nowadays the Linear Mixed-Effects Model (LMM) is believed by many to be a superior association model.
+  % might change depending on lit search
   Remarkably, previous PCA evaluations have been limited, for example, by not varying the number of principal components (PCs), by simulating unrealistically simple population structures, and not using real genotype data.
   The use of LMMs with PCs has also been proposed, but evidence of effectiveness is lacking.
-  In this work, we thoroughly evaluate both PCA and LMM with varying number of PCs in various realistic genotype and complex trait simulation scenarios, including admixture together with family structure, large real multiethnic human datasets (1000 Genomes Project, the Human Genome Diversity Panel, and Human Origins), and simulations from trees fit to each of the real datasets.
-  We find that LMM without PCs performs best in all cases.
-  Moreover, PCA is vastly outperformed by LMM in the family simulation and in all of the real human datasets.
-  The considerably larger gaps in PCA to LMM performance for the real human datasets compared to the corresponding tree simulations suggests that they have high-dimensional, family-like structure (beyond the relatedness explained by subpopulations) that PCA is not modeling adequately because of its low-dimensional assumption.
-  In other words, while it's known that PCA fails on family data, it was not previously known the extent to which family relatedness is present in large human population studies that endeavored to exclude close relatives, which is enough to confound association by PCA.
-  Overall, this work better characterizes the limitations of principal components in modeling the complex relatedness structures present in simulated and real multiethnic human data.
+  In this work, we thoroughly evaluate PCA and LMM both with varying number of PCs in various realistic genotype and complex trait simulation scenarios, including admixture together with family structure, large real multiethnic human datasets (1000 Genomes Project, the Human Genome Diversity Panel, and Human Origins), and simulations from trees fit to each real dataset.
+  We find that LMM without PCs performs best in all cases, with the largest effects in the family simulation and all of the real human datasets.
+  We determined that the large gaps in PCA to LMM performance on the real human datasets is due to the high-dimensional family structure from large numbers of distant relatives, and not from the smaller number of highly related individuals present.
+  While it was known that PCA fails on family data, here we report a strong effect on association of cryptic family relatedness in several human datasets that focused on capturing genetic diversity.
+  Overall, this work better characterizes the limitations of principal components compared to mixed effects models in modeling the complex relatedness structures present in simulated and real multiethnic human data.
 
   % used for ASHG abstract
   %\textbf{Keywords:} genetic association, statistical genetics, population structure, complex traits, genetic diversity.
@@ -103,19 +103,18 @@ Therefore, many specialized approaches have been developed for genetic associati
 Here we focus on extensively evaluating the two most popular association models: principal components analysis (PCA) and linear mixed-effects models (LMM).
 
 % PCA
-Overall, many approaches for conducting genetic association studies with structured populations involve modeling the population structure via covariates.
-Such covariates may be inferred ancestry proportions \citep{pritchard_association_2000} or transformations of these.
-PCA represents the most common of these variants nowadays, in which the top eigenvectors of the kinship matrix are used to model the population structure \citep{zhang_semiparametric_2003, price_principal_2006, bouaziz_accounting_2011}.
-These top eigenvectors are commonly referred to as Principal Components (PCs) in the genetics literature (the convention we adopt here; \cite{patterson_population_2006}), but it is worth noting that in other fields the PCs would instead denote the projections of the data (genotypes) onto the eigenvectors \citep{jolliffe_principal_2002}.
+Many association models for structured populations are generalized linear models that incorporate this structure via covariates, which have included inferred ancestry or admixture proportions \citep{pritchard_association_2000} or transformations of these.
+PCA represents the most common of these variants nowadays, in which the top eigenvectors of the population kinship matrix are used to model the population structure \citep{zhang_semiparametric_2003, price_principal_2006, bouaziz_accounting_2011}.
+These top eigenvectors are commonly referred to as Principal Components (PCs) in the genetics literature (the convention we adopt here; \cite{patterson_population_2006}), but it is worth noting that in other fields the PCs would instead denote the projections of the loci onto the eigenvectors \citep{jolliffe_principal_2002}.
 PCs map to ancestry (\textit{e.g.}, \cite{alexander_fast_2009, zhou_strong_2016}), and they work as well as ancestry in association studies but are estimated more easily \citep{patterson_population_2006, zhao_arabidopsis_2007, alexander_fast_2009, bouaziz_accounting_2011}.
 An additional strength of PCA is its simplicity, which as covariates can be readily integrated into more complex models, such as haplotype association \citep{xu_detecting_2014} and polygenic models \citep{qian_fast_2020}.
 However, PCA fundamentally assumes that relatedness is low-dimensional, which may limit its accuracy in some cases.
 PCA is known to be inadequate for data containing family structure \citep{patterson_population_2006, thornton_roadtrips:_2010, price_new_2010}, which is called ``cryptic relatedness'' when it is unknown to the researchers, but no other specific troublesome relatedness scenarios have been confidently identified.
 Recent work has focused on developing variants of the PCA algorithm that scale better for large datasets \citep{lee_sparse_2012, abraham_fast_2014, galinsky_fast_2016, abraham_flashpca2:_2017, agrawal_scalable_2020}.
-PCA remains a popular and powerful approach for association studies. % \citep{wojcik_genetic_2019}. bad ref
+PCA remains a popular and powerful approach for association studies.
 
 % LMM
-The other dominant approach for genetic association studies under population structure is the LMM, in which population structure is a random effect drawn from a covariance model parametrized by the kinship matrix.
+The other dominant association model for structured populations is the LMM, in which this structure is a random effect drawn from a covariance model parametrized by the kinship matrix.
 Unlike PCA, LMM does not assume that relatedness is low-dimensional, and explicitly models family structure via the kinship matrix.
 The LMM model assumes a quantitative and polygenic (complex) trait.
 % TODO: jumps into LMM-PCA comparisons too quickly, those fit better in the next paragraph.
@@ -223,7 +222,7 @@ For that reason, much effort has been devoted to improving the runtime and scala
 
 % previous PCA evaluations
 % TODO: focus on comparisons to (modern) LMMs (comparisons to structured assoc, etc, are irrelevant to family structure focus).
-The PCA approach has been compared to other approaches previously, particularly to LMMs.
+PCA has been compared to other association models, particularly to LMMs.
 However, all of these studies have important limitations, for the most part due to PCA being treated as a competitor rather than a model worthy of exploring more fully.
 For example, although there are methods for selecting the numbers of PCs \citep{patterson_population_2006}, most evaluations either admit to selecting 10 because it has long been the default and it performs well enough, regardless of the dataset in question \citep{epstein_simple_2007, li_improved_2008, astle_population_2009, li_correcting_2010, wu_comparison_2011}, or otherwise test only one number of PCs, often without justification \citep{zhang_semiparametric_2003, kimmel_randomization_2007, zhao_arabidopsis_2007, zhang_comparison_2008, price_new_2010, bouaziz_accounting_2011, hoffman_correcting_2013, tucker_improving_2014, yang_advantages_2014, song_testing_2015, sul_population_2018}.
 Conversely, only a few studies consider a (small) set of numbers of PCs, where they show remarkable robustness to this choice \citep{price_principal_2006, kang_variance_2010, wojcik_genetic_2019}.
@@ -245,20 +244,19 @@ In this work, we study the performance of the PCA and LMM association models, ch
 Our evaluation is based on six genotype simulations and three real genotype datasets.
 The first three simulations consist of an admixture model with $K = 10$ ancestral subpopulations, but which differ in sample size and whether they also feature family structure or not.
 The real datasets are the 1000 Genomes Project \citep{the_1000_genomes_project_consortium_map_2010, 1000_genomes_project_consortium_integrated_2012}, the Human Genome Diversity Panel (HGDP) \citep{cann_human_2002, rosenberg_genetic_2002, bergstrom_insights_2020}, and Human Origins \citep{patterson_ancient_2012, lazaridis_ancient_2014, lazaridis_genomic_2016, skoglund_genomic_2016}.
-Both 1000 Genomes and HGDP are whole-genome sequencing datasets, whereas Human Origins is based on a genotyping array.
-Human Origins features the greatest geographical coverage, HGDP is in an intermediate position, and 1000 Genomes features the fewest sampled locations.
 The last three simulations aim to approximately match each of the real datasets by fitting trees and ancestral allele frequency distirbutions, to determine whether those features alone recapitulate the observations on the real data or not.
 In all cases we simulate from two trait models: one with fixed effect sizes (regression coefficients roughly inverse to allele frequency) that approximates estimates in real data \citep{park_distribution_2011} and corresponds to high pleiotropy and strong balancing selection \citep{simons_population_2018}, which are appropriate assumptions for diseases; and one with random coefficients (independent of allele frequency) that corresponds to neutral traits \citep{simons_population_2018}.
-Our evaluation directly measures the uniformity of null p-values (required for accurate type-I error and FDR control; \cite{storey_positive_2003, storey_statistical_2003}) and predictive power by calculating the area under precision-recall curves.
+Our evaluation directly measures the uniformity of null p-values (required for accurate type-I error and FDR control; \cite{storey_positive_2003, storey_statistical_2003}) and classification performance (a robust alternative to power for miscalibrated models) via the area under precision-recall curves \citep{grau_prroc:_2015}.
 Across all tests LMM without PCs consistently performs best.
-However, in our admixture simulations PCA matches LMM performance when enough PCs are used and there are no close relatives in the study.
+However, in our admixture simulations PCA nearly matches LMM performance when enough PCs are used and there are no close relatives in the study.
 In reasonably large studies PCA is robust to including far beyond the optimal number of PCs.
-However, for smaller studies (100 individuals) there is a pronounced loss of power when the number of PCs exceeds the optimal choice.
-LMMs greatly outperforms PCA in the admixed family simulation, as expected \citep{patterson_population_2006, price_new_2010}.
+For smaller studies (100 individuals) there is a pronounced loss of power when the number of PCs exceeds the optimal choice.
+However, LMMs greatly outperforms PCA in the admixed family simulation, as expected \citep{patterson_population_2006, price_new_2010}.
 Remarkably, LMM outperforms PCA in all of the real datasets by vast margins.
-The final three simulations approximately recapitulate both the complex tree-branching structure and skewed minor allele frequency distributions of the real human data, but recapitulate only part of the gap in PCA to LMM performance, suggesting that additional family-like structure in the real data is the source of the difference in performance.
-All together, we find that LMMs without PCs are generally preferable, and provide novel simulation and evaluation approaches to measure the performance of these and other genetic association approaches.
-
+The final three simulations approximately recapitulate both the complex tree-branching structure and skewed minor allele frequency distributions of the real human data, but recapitulate a small fraction of the gap in PCA to LMM performance, suggesting that additional family-like structure in the real data is the source of the difference in performance.
+We confirmed the presence of family structure using the KING-robust estimator \citep{manichaikul_robust_2010}, revealing a small number of highly related individuals greatly outnumbered by more distantly related individuals.
+Removing up to 4th degree relatives shows equally poor PCA performance as in the full datasets.
+All together, we find that LMMs without PCs are generally preferable, and present novel simulation and evaluation approaches to measure the performance of these and other genetic association approaches.
 
 \section{Results}
 
@@ -267,11 +265,9 @@ Then we summarize the evaluation methods and present the results.
 
 \subsection{Overview of genotype simulations and real datasets}
 
-We simulated genotypes from six population structure scenarios to cover various features of interest.
-We also utilized three real genotype datasets.
+We utilized three real genotype datasets and simulated genotypes from six population structure scenarios to cover various features of interest (\cref{tab:human_sum}).
 We will introduce them here in sets of three, as they appear in the rest of our results.
-All simulated and real genotype datasets are summarized in \cref{tab:human_sum}.
-The population structures are also conveniently visualized in \cref{fig:kinship} using \texttt{popkin} to estimate kinship matrices without bias \citep{ochoa_estimating_2021}.
+The population structures are also conveniently visualized in \cref{fig:kinship} using \texttt{popkin} to estimate population kinship matrices (which capture both family and population relatedness) without bias \citep{ochoa_estimating_2021}.
 
 \begin{table}[hb!]
   \centering
@@ -289,7 +285,7 @@ The population structures are also conveniently visualized in \cref{fig:kinship}
   late after last line = \\\bottomrule
   ]{../data/dimensions.txt}{}{\csvlinetotablerow}
   \begin{flushleft} 
-    \textsuperscript{a}For admixed family, ignores the increase in dimensionality due to 20 generation pedigree structure.
+    \textsuperscript{a}For admixed family, ignores dimensionality of 20 generation pedigree structure.
     For real datasets, lower range is continental subpopulations, upper range is number of fine-grained subpopulations.\\
     \textsuperscript{b}$m_1 = n / 10$ in all cases to balance power across dataset.\\
     \textsuperscript{c}Model parameter for simulations, estimated value on real datasets.
@@ -302,8 +298,8 @@ The population structures are also conveniently visualized in \cref{fig:kinship}
   \caption{
     {\bf Population structures of simulated and real human genotype datasets.}
     First two columns are population kinship matrices estimated with \texttt{popkin}: 
-    Every individual is placed along both x- and y-axes, and the population kinship value of every pair of individuals is visualized as color, where lighter is values closer to zero, and darker red are higher values.
-    Diagonal is inbreeding values.
+    Every individual is placed along both x- and y-axes, kinship represented with color (lighter is closer to zero, darker red are higher values).
+    Diagonal shows inbreeding values.
     Individuals are divided into continental subpopulations in real datasets.
     \textbf{A.}
     Admixture scenario, shared by Large and Small simulations.
@@ -321,7 +317,7 @@ The population structures are also conveniently visualized in \cref{fig:kinship}
     \textbf{F,I,L.}
     Trees between subpopulations fit to real data, used to draw genotypes in simulations.
     \textbf{E,H,K.}
-    Simulations from trees fit to the real data recapitulate well the covariance structure (population kinship) at the subpopulation level.
+    Simulations from trees fit to the real data recapitulate structure at the subpopulation level.
   }
   \label{fig:kinship}
 \end{FPfigure}
@@ -329,40 +325,33 @@ The population structures are also conveniently visualized in \cref{fig:kinship}
 
 % SIM
 The first set of three simulated genotypes are based on an admixture model from $K=10$ subpopulations (\cref{fig:kinship}A) \citep{ochoa_estimating_2021, gopalan_scaling_2016, cabreros_likelihood-free_2019}.
-The ``large'' version of this simulation, with 1000 individuals, illustrates the asymptotic performance of the association models (in this sense, it is merely large enough).
-In contrast, the ``small'' sample size simulation, with just 100 individuals, illustrates cases of overfitting when using large numbers of PCs.
-For PCA, the theoretically ideal choice for the number of PCs in this simulation is $K-1 = 9$ (the rank of the population structure, $K$, minus the rank of the intercept term, $1$).
-The third starts from an admixed founder population and simulates a 20-generation random pedigree with assortative mating, resulting in a very complex joint family and ancestry structure in the last generation (\cref{fig:kinship}B).
+The ``large'' version of this simulation, with 1000 individuals, illustrates the asymptotic performance of the association models.
+In contrast, the ``small'' simulation has just 100 individuals and displays overfitting for large numbers of PCs.
+For PCA, the theoretically ideal number of PCs in this simulation is $K-1 = 9$ (the rank of the population structure, $K$, minus the rank of the intercept term, $1$).
+The third simulation starts from an admixed founder population and draws a 20-generation random pedigree with assortative mating, resulting in a very complex joint family and ancestry structure in the last generation (\cref{fig:kinship}B).
 
 % REAL
 The second set of three are the real human datasets: Human Origins (\cref{fig:kinship}D), HGDP (\cref{fig:kinship}G), and 1000 Genomes (\cref{fig:kinship}J).
 All of these represent global human diversity, some in greater resolution than others, making them of great interest as representatives of proposed multiethnic studies.
+%Both 1000 Genomes and HGDP are whole-genome sequencing datasets, whereas Human Origins is based on a genotyping array.
+%Human Origins features the greatest geographical coverage, HGDP is in an intermediate position, and 1000 Genomes features the fewest sampled locations.
 These three datasets had loci filtered to avoid linkage disequilibrium, which both simplified our evaluation and reduced dataset sizes enough to make our large-scale evaluations feasible.
-Lastly, since real data are enriched for extremely rare variants for which PCA and LMM have no power to detect associations, loci with minor allele frequency under 0.01 were removed.
-Still, all real dataset remain enriched for lower-than-uniform minor allele frequencies (\cref{fig:kinship}C).
+All real dataset are enriched for lower-than-uniform minor allele frequencies, even after excluding rare variants (MAF < 1\%; \cref{fig:kinship}C).
 
 % REAL-SIM
 The last set of three are tree-based simulations based on each of the real human datasets.
-In each case, a tree was fit to the kinship matrix of each dataset averaged over subpopulations (\cref{fig:kinship}F,I,L), and this tree was used to draw genotypes.
+A tree was fit to each kinship matrix averaged over subpopulations (\cref{fig:kinship}F,I,L), and this tree was used to draw genotypes.
 The empirical allele frequency distribution of each dataset was transformed to serve as the ancestral allele frequency distribution of the corresponding simulation, to mimic the skew for smaller minor allele frequencies observed in the real datasets (\cref{fig:kinship}C).
-Overall, although these simulations do not match the real data exactly (real admixture is not fit well by these trees), fits are remarkably good (\cref{fig:kinship}E,H,K), resulting in data of comparable covariance structure and scale of differentiation.
-By design, these subpopulation tree simulations exclude both admixture and relatedness more fine-grained than the subpopulation level.
-In particular, the potential family structure present in the real dataset is absent in these simulations.
-
-% REPLICATES
-Replicates consisted of as much newly-drawn data as possible.
-For the simulated genotype datasets, each replicate drew a new genotype matrix (from the same structure model of the scenario).
-The admixed family simulation additionally drew a new random pedigree for each replicate.
-For each real dataset, the given genotype matrix is used in every replicate.
+Overall, fits to the real data result in comparable covariance structures and scale of differentiation (\cref{fig:kinship}E,H,K).
+By design, these tree simulations exclude relatedness more fine-grained than the subpopulation level, particularly any family structure present in the real dataset.
 
 \subsection{Overview of trait simulation models}
 
 We performed all of our tests using two additive quantitative trait models, which we call \textit{fixed effect sizes} and \textit{random coefficients}, respectively.
-Starting from a given real or simulated genome, both trait simulations pick a given number of random loci to serve as causal loci, but their coefficients (in the assumed linear model) are constructed in two different ways.
-Complete simulation details are found in the Methods.
+Starting from a given real or simulated genome, both trait simulations pick a given number of random loci to serve as causal loci, but their coefficients are constructed in two different ways.
 
-The \textit{fixed effect sizes} simulation selects coefficients $\beta_i$ such that the effect size $2 \beta_i^2 \pit ( 1 - \pit )$ have the same value at every locus $i$, where \pit is the ancestral allele frequency of the simulation.
-This corresponds with a rough inverse relationship between coefficient and minor allele frequency, which arises under one evolutionary extreme of strong balancing selection \citep{simons_population_2018} and has been observed to hold roughly in meta-analysis across several diseases \citep{park_distribution_2011}.
+The \textit{fixed effect sizes} simulation selects coefficients $\beta_i$ such that the effect size $2 \beta_i^2 \pit ( 1 - \pit )$ have the same value at every locus $i$, where \pit is the ancestral allele frequency of the simulation ($T$ denotes the ancestral population).
+This corresponds with a rough inverse relationship between coefficient and minor allele frequency, which arises under evolutionary extremes of strong purifying [TODO add ref] and balancing selection \citep{simons_population_2018} and has been observed to hold roughly in meta-analysis across several diseases \citep{park_distribution_2011}.
 For these reasons, the results presented in the main figures focus on this trait model, as it more closely resembles disease data.
 % TODO: add more selection refs? (see gwas/power/unread)
 % TODO: purifying vs balancing selection
@@ -377,12 +366,11 @@ Effect size distributions in this simulation are wider, which reduces associatio
 Since our quantitative traits are simulated, true causal loci are known, permitting exact identification of true positives, false positives, and false negatives.
 We employ two complementary summary measures:
 (1) $\rmsd$ (p-value signed root mean square deviation) measures null p-value uniformity and relates to the accuracy of type-I error control across thresholds (closer to zero is better), and
-(2) $\auc$ (precision-recall area under the curve) measures predictive power (higher is better).
+(2) $\auc$ (precision-recall area under the curve) measures causal locus classification performance (higher is better; \cref{fig:measures_illustration}).
 The $\auc$ has been used previously to evaluate association models \citep{rakitsch_lasso_2013}.
-The $\rmsd$ and $\auc$ measures are fully described in the Methods and illustrated in \cref{fig:measures_illustration}.
-The $\rmsd$ measure is a more robust alternative to the common inflation factor and type-I error measures; a detailed comparison is presented at the end of the results, where we found that $\rmsd > 0.01$ corresponds to an inflation factor $> 1.06$, and thus evidence of inflation.
-The $\auc$ measure is a more robust alternative to statistical power calculations, which are not meaningful when p-values are not accurate (as is often the case in this investigation).
-Reducing the complexity of null p-value distributions and precision-recall curves to two scalars is crucial for our extensive evaluations, which consider 0-90 numbers of PCs and 50 replicates for each case.
+$\rmsd$ is a more robust alternative to the common inflation factor and type-I error measures; a detailed comparison is presented at the end of the results, where we found that $\rmsd > 0.01$ corresponds to an inflation factor $> 1.06$, and thus evidence of inflation.
+$\auc$ is a more robust alternative to statistical power calculations, which are not meaningful when p-values are not accurate (as is often the case in this investigation).
+Reducing the complexity of null p-value distributions and precision-recall curves to two scalars is crucial for our extensive evaluations, which consider 0-90 numbers of PCs and 50 replicates.
 
 \begin{figure}[bp!]
   \centering
@@ -398,9 +386,9 @@ Reducing the complexity of null p-value distributions and precision-recall curve
     \textbf{B.}
     The $\rmsd$ (p-value Signed Root Mean Square Deviation) summarizes null p-value accuracy using a scaled Euclidean distance between the observed null p-values and their uniform expectation, with a negative sign if the median is larger than expected (closer to zero is better).
     \textbf{C.}
-    Precision-Recall plot assesses classification prediction performance across significance thresholds, without assuming that p-values are accurate (only locus ranks matter; higher is better).
+    Precision-Recall plot assesses causal locus classification performance across significance thresholds, without assuming that p-values are accurate (only locus ranks matter; higher is better).
     \textbf{D.}
-    The $\auc$ (Precision-Recall Area Under the Curve) summarizes predictive performance (higher is better).
+    The $\auc$ (Precision-Recall Area Under the Curve) summarizes classification performance (higher is better).
   }
   \label{fig:measures_illustration}
 \end{figure}
@@ -409,7 +397,16 @@ Reducing the complexity of null p-value distributions and precision-recall curve
 The overall goal is to characterize the performance of two association models: PCA and LMM.
 Each of PCA and LMM was evaluated in each dataset while including a number $r$ of PCs as fixed covariates, in both cases varying $r$ between 0 and 90.
 We determined which value of $r$ was optimal (in terms of $\rmsd$ and $\auc$ separately) for each of PCA and LMM separately, in each dataset, and lastly compared overall performance per dataset across the best PCA and LMM cases (with their optimal $r$ values).
-Our overall statistical evaluation is presented in \cref{tab:human_sum_pcs} and will be summarized first, followed by detailed evaluations in each datasets in the rest of the results.
+Our overall statistical evaluation will be summarized first, followed by detailed evaluations in each datasets in the rest of the results.
+
+We first describe the results for null p-value uniformity ($|\rmsd|$; \cref{tab:human_sum_pcs}).
+Only here the sign of $\rmsd$ was ignored, so smaller is better and Wilcoxon paired 1-tailed tests were used to determine whether a suboptimal distribution was significantly different.
+For PCA, the optimal number of PCs $r$ is typically large across all datasets (up to $r=90$, which was the largest value tested), but we found that much smaller ``min'' $r$ values often performed as well (numbers in parentheses in \cref{tab:human_sum_pcs} are the smallest $r$ whose $|\rmsd|$ distributions were not significantly different from the distribution of the $r$ with the smallest mean $|\rmsd|$).
+However, even the min $r$ values for PCA tended to be large on the family simulations and the real datasets, compared to the admixture and tree simulations.
+In most cases both the best $r$ and the min $r$ had a mean $|\rmsd| < 0.01$ (marked with asterisks), whose null p-value distributions effectively uniform.
+Mean $|\rmsd| > 0.01$ cases for PCA were most common on the family simulation and real datasets.
+In contrast, for LMM $r=0$ (no PCs) was always the optimal choice (always resulted in the minimum mean $|\rmsd|$), and in those cases we also always had mean $|\rmsd| < 0.01$.
+Lastly, comparing the $|\rmsd|$ distributions between PCA and LMM, each with their best $r$, resulted in LMM besting often or in statistical ties, whereas PCA was best in the Human Origins simulations only.
 
 \begin{table}[hb!]
   \centering
@@ -439,37 +436,28 @@ Our overall statistical evaluation is presented in \cref{tab:human_sum_pcs} and 
   \end{flushleft}
 \end{table}
 
-We first describe the results for null p-value uniformity ($|\rmsd|$; \cref{tab:human_sum_pcs}).
-Only here the sign of $\rmsd$ was ignored, so smaller is better and Wilcoxon paired 1-tailed tests were used to determine whether a suboptimal distribution was significantly different.
-For PCA, the optimal number of PCs $r$ is typically very large across all datasets (up to $r=90$, which was the largest value tested), but we found that much smaller ``min'' $r$ values often performed as well (numbers in parentheses in \cref{tab:human_sum_pcs} are the smallest $r$ whose $|\rmsd|$ distributions were not significantly different from the distribution of the $r$ with the smallest mean $|\rmsd|$).
-However, even the min $r$ values for PCA tended to be large on the family simulations and the real datasets, compared to the admixture and tree simulations.
-In most cases both the best $r$ and the min $r$ had a mean $|\rmsd| < 0.01$ (marked with asterisks), indicating small enough effect sizes to consider those null p-value distributions effectively uniform.
-Mean $|\rmsd| > 0.01$ cases for PCA also tended to be observed on the family simulations and real datasets.
-In contrast, for LMM $r=0$ (no PCs) was always the optimal choice (always resulted in the minimum mean $|\rmsd|$), and in those cases we also always had mean $|\rmsd| < 0.01$.
-Lastly, we compared the $|\rmsd|$ distributions between PCA and LMM, each with their best $r$, resulting in LMM besting often or in statistical ties, whereas PCA was best in the Human Origins simulations only.
-
-Next we turn to the predictive power evaluations ($\auc$; \cref{tab:human_sum_pcs}).
+Next we turn to classification performance ($\auc$; \cref{tab:human_sum_pcs}).
 For PCA, the best $r$ for $\auc$ was always smaller than the best $r$ for $|\rmsd|$, and also for the respective ``min'' $r$ comparisons (smallest $r$ which is not significantly different in $\auc$ distribution from the best $r$).
-So for PCA there is often a tradeoff between the desire for accurate p-values versus maximizing power.
+Thus, for PCA there is often a tradeoff between accurate p-values versus classification performance.
 For LMM there is no such tradeoff, as $r=0$ (no PCs) resulted in $\auc$ distributions not significantly different from the best $r$ in all tests except one (in the 1000 Genomes simulation with the random coefficients trait model, the min $r$ was 1).
 Lastly, LMM with its best $r$ always had significantly greater $\auc$ distributions than PCA with its best $r$.
 
 \subsection{Evaluations in admixture simulations}
 
 Now we look more closely at the results of every individual evaluation.
-The measured $\rmsd$ and $\auc$ distributions, for each PCA and LMM and for each value of the number of PCs $r$, for the first three admixture simulations and the \textit{fixed effect size} trait simulation, are in \cref{fig:rmsd-auc-sim}.
+The $\rmsd$ and $\auc$ distributions for the first three admixture simulations and the \textit{fixed effect size} trait simulation are in \cref{fig:rmsd-auc-sim}.
 We repeated the evaluation with traits simulated from the \textit{random coefficients} model as well, which gave qualitatively similar results (\cref{fig:rmsd-auc-sim-rc}).
 
-The large admixture simulation has $n = 1,000$ individuals, and differs from previous admixture evaluations in featuring a larger number of ancestral populations ($K=10$) and more differentiation ($\Fst = 0.1$ for the admixed individuals).
+The large admixture simulation differs from previous admixture evaluations in featuring a larger number of ancestral populations ($K=10$) and more differentiation ($\Fst = 0.1$ for the admixed individuals).
 Admixture is structured over a one-dimensional geography \citep{ochoa_estimating_2021}.
 The $\rmsd$ of PCA is largest when $r=0$ (no PCs) and decreases rapidly to zero at $r=3$, where it stays for up to $r=90$ (\cref{fig:rmsd-auc-sim}A).
-Thus, PCA gives effectively accurate p-values for all $r \ge 3$, which is surprisingly smaller than the theoretical optimum we expected for this simulation of $r = K - 1 = 9$.
-In contrast, the $\rmsd$ distribution for LMM starts near zero for $r=0$, and as $r$ increases moves away from zero in the negative direction (null test statistics are deflated rather than inflated, so p-values become conservative).
+Thus, PCA gives effectively accurate p-values for all $r \ge 3$, which is surprisingly smaller than the theoretical optimum for this simulation of $r = K - 1 = 9$.
+In contrast, the $\rmsd$ distribution for LMM starts near zero for $r=0$, and as $r$ increases moves away from zero in the negative direction (null test statistics are deflated, so p-values become conservative).
 The $\auc$ distribution of PCA is similarly worst at $r=0$, increases rapidly and peaks at $r = 3$, then decreases slowly for $r > 3$.
 Similarly, the $\auc$ distribution for LMM starts near its maximum at $r=0$, and decreases overall for larger $r$.
-Although the $\auc$ distributions for LMM and PCA overlap considerably for each $r$, LMM with $r=0$ has significantly greater $\auc$ values than PCA with $r=3$ (\cref{tab:human_sum_pcs}).
+Although the $\auc$ distributions for LMM and PCA overlap considerably at each $r$, LMM with $r=0$ has significantly greater $\auc$ values than PCA with $r=3$ (\cref{tab:human_sum_pcs}).
 However, qualitatively PCA closely matches LMM in performance in this simulation.
-It is also remarkable how robust both LMM and PCA are to greatly mispecifying $r$.
+Both LMM and PCA are robust to extreme values of $r$.
 
 \begin{figure}[bp!]
   \centering
@@ -478,14 +466,14 @@ It is also remarkable how robust both LMM and PCA are to greatly mispecifying $r
     {\small 
       {\bf Evaluations in admixture simulations.}
       Traits simulated from \textit{fixed effect sizes} model.
-      PCA and LMM approaches are tested under varying number of PCs ($r \in \{0, ..., 90\}$ on x-axis), with the distributions (y-axis) of $\rmsd$ (top subpanel) and $\auc$ (bottom subpanel) for 50 replicates.
+      PCA and LMM approaches are tested with varying number of PCs ($r \in \{0, ..., 90\}$ on x-axis), with the distributions (y-axis) of $\rmsd$ (top subpanel) and $\auc$ (bottom subpanel) for 50 replicates.
       Best performance is zero $\rmsd$ and large $\auc$.
       Zero values and maximum median $\auc$ values are marked with horizontal gray dashed lines, and the $|\rmsd| < 0.01$ band is marked with a light gray area.
       LMM always performs best when $r=0$, and PCA performs best when $r$ is between 1-4.
       \textbf{A.}
       The large simulation has $n = 1,000$ individuals.
       \textbf{B.}
-      The small simulation has $n = 100$ individuals, helps illustrate overfitting for large $r$.
+      The small simulation has $n = 100$ individuals, shows overfitting for large $r$.
       \textbf{C.}
       The family simulation has $n = 1,000$ individuals from a family with admixed founders and large numbers of pairs of sibling, first/second cousins, etc, from a realistic random 20-generation pedigree.
       Here PCA performs poorly compared to LMM: $\rmsd > 0$ for all $r$, and a large gap in $\auc$.
@@ -496,29 +484,30 @@ It is also remarkable how robust both LMM and PCA are to greatly mispecifying $r
 
 The previous robustness to large $r$ led us to consider smaller sample sizes.
 Our expectation is that a model with large numbers of parameters $r$ should overfit more as $r$ increases, and particularly as $r$ approaches the sample size $n$ (number of individuals).
-Rather than increase $r$ beyond 90, which is not done in practice, we reduce to $n = 100$ individuals, which is small for typical association studies but may occur in studies of rare diseases, for pilot studies, or be due to low budgets or other constraints.
-To compensate for the loss of power due to reducing $n$, we also reduce the number of causal loci from 100 before to $m_1 = 10$, (in all cases a fixed ratio of $n / m_1 = 10$) which increases the magnitude of each individual causal coefficient per locus.
-As expected, here we found rapid decreases in performance for both PCA and LMM as $r$ increases, with optimal performance attained near $r=1$ for PCA and $r=0$ for LMM (\cref{fig:rmsd-auc-sim}B).
-However, the shift to negative $\rmsd$ values for LMM as $r$ increases is much greater in this case.
-The evaluation declares LMM with $r=0$ significantly better than PCA ($r=1$ to 4) in both metrics (\cref{tab:human_sum_pcs}), although qualitatively there is a negligible difference between the two models.
+Rather than increase $r$ beyond 90, which is not done in practice, we reduce individuals to $n = 100$, which is small for typical association studies but may occur in studies of rare diseases, pilot studies, or other constraints.
+To compensate for the loss of power due to reducing $n$, we also reduce the number of causal loci from 100 before to $m_1 = 10$, (in all cases a fixed ratio of $n / m_1 = 10$) which increases the locus effect sizes.
+As expected, we found a large decrease in performance for both PCA and LMM as $r$ increases, with optimal performance attained near $r=1$ for PCA and $r=0$ for LMM (\cref{fig:rmsd-auc-sim}B).
+LMM attains much larger negative $\rmsd$ values than in our other evaluations.
+While LMM with $r=0$ is significantly better than PCA ($r=1$ to 4) in both metrics (\cref{tab:human_sum_pcs}), qualitatively the difference is negligible.
 
 The last of the first three simulations adds a 20-generation random family to our admixture simulation.
 Previous work has reported, in limited settings, that PCA performs poorly in the presence of family structure, so it is important to establish the detailed behavior of PCA and LMM in this setting as $r$ is varied for both.
-Since the LMM is formulated in terms of kinship matrices, it is expected to perform better here.
+Since LMM is formulated in terms of kinship, it is expected to perform better here.
 Only the last generation is studied for association, which contains numerous siblings, first cousins, etc.
 The initial population structure due to admixture is preserved across the generations by strongly biasing mating pairs for proximity over the one-dimensional geography, which results in an indirect ancestry-biased assortative mating (see Methods).
 Our evaluation reveals a sizable gap in both metrics between LMM and PCA across all values of $r$ (\cref{fig:rmsd-auc-sim}C).
-Thus, although LMM again performs best with $r=0$ and achieves mean $|\rmsd| < 0.01$, PCA does not achieve zero $\rmsd$ at any $r$ value (all p-values are strongly anti-conservative), and the best mean $\auc$ value across $r$ for PCA is worse than the worst mean $\auc$ value for LMM.
-Thus, LMM is conclusively superior to PCA, and the only adequate model, when there is family structure.
+LMM again performs best with $r=0$ and achieves mean $|\rmsd| < 0.01$.
+However, PCA does not achieve zero $\rmsd$ at any $r$ value (all p-values are strongly anti-conservative), and the best mean $\auc$ value across $r$ for PCA is worse than the worst mean $\auc$ value for LMM.
+Thus, LMM is conclusively superior to PCA, and the only calibrated model, when there is family structure.
 
 \subsection{Evaluations in real human genotype datasets}
 
-We were next interested in recapitulating our previous results using real human genotype data, which will give the most relevant results in practice, and which differs from our simulations in many ways, including marginal allele frequency distributions, potentially more complex population structures with greater differentiation, correlated and more numerous ancestral subpopulations, as well as the potential presence of cryptic family relatedness.
-We chose three non-redundant datasets that span global human diversity and include both array and WGS genotyping technologies.
+Next we repeat our evaluations with real human genotype data, which differs from our simulations in allele frequency distributions and more complex population structures with greater differentiation, numerous correlated subpopulations, and potential cryptic family relatedness.
+We chose three datasets that span global human diversity and include both array and WGS genotyping platforms.
 Loci in high linkage disequilibrium were removed to simplify our evaluation, and traits were simulated from these genotypes and each of the two trait models: fixed effect sizes (\cref{fig:rmsd-auc-real}) and random coefficients (\cref{fig:rmsd-auc-real-rc}).
 
 Among the real datasets, Human Origins has the greatest number and diversity of subpopulations.
-The $\rmsd$ and $\auc$ distributions in this dataset and the fixed effect sizes trait model (\cref{fig:rmsd-auc-real}A) most resemble those from the family simulation (\cref{fig:rmsd-auc-sim}C), which is surprising since close relatives are excluded from this data.
+The $\rmsd$ and $\auc$ distributions in this dataset and the fixed effect sizes trait model (\cref{fig:rmsd-auc-real}A) most resemble those from the family simulation (\cref{fig:rmsd-auc-sim}C).
 In particular, while LMM with $r=0$ again performed optimally (both metrics) and satisfies mean $|\rmsd| < 0.01$, PCA maintained mean $\rmsd > 0$ for all $r$ values and its $\auc$ values were all strictly smaller than even the worst $\auc$ values of LMM at any $r$.
 
 \begin{figure}[bp!]
@@ -541,14 +530,14 @@ In particular, while LMM with $r=0$ again performed optimally (both metrics) and
   \label{fig:rmsd-auc-real}
 \end{figure}
 
-The HGDP dataset has the fewest individuals among real datasets, which are a subset of Human Origins individuals that was recently genotyped with WGS, so it contains many more loci and has more rarer variants.
+The HGDP dataset has the fewest individuals among real datasets, but compared to Human Origins it contains many more loci and more low-frequency variants.
 The $\rmsd$ and $\auc$ distributions (\cref{fig:rmsd-auc-real}B) are intermediate between the admixture and family simulations.
 In particular, here both LMM ($r=0$) and PCA ($r \ge 31$) achieve mean $|\rmsd| < 0.01$, so null p-values will be accurate in both association models.
 However, there is a sizable mean $\auc$ gap between LMM, which performed best across all values of $r$, and PCA.
 Maximum $\auc$ values were lowest in HGDP compared to the two other human datasets.
 
-1000 Genomes has the fewest subpopulations, but an intermediate number of individuals, compared to the other two real datasets, and like HGDP is also WGS.
-Thus, although this dataset is expected to have the simplest population structure among the real datasets, we were surprised to find $\rmsd$ and $\auc$ distributions (\cref{fig:rmsd-auc-real}C) that again resemble those of our earlier family simulation, with mean $|\rmsd| < 0.01$ for LMM only and large $\auc$ gaps between LMM and PCA.
+1000 Genomes has the fewest subpopulations but a large number of individuals, and like HGDP is also WGS.
+Thus, although this dataset is expected to have the simplest population structure among the real datasets, we find $\rmsd$ and $\auc$ distributions (\cref{fig:rmsd-auc-real}C) that again resemble those of our earlier family simulation, with mean $|\rmsd| < 0.01$ for LMM only and large $\auc$ gaps between LMM and PCA.
 
 The previous results for the real datasets focused on traits drawn from the fixed effect sizes (FES) model.
 In this case the results are qualitatively very different for traits drawn from the random coefficients (RC) model (\cref{fig:rmsd-auc-real-rc}).
@@ -560,14 +549,14 @@ Nevertheless, our overall statistical evaluations declare LMM with $r=0$ superio
 \subsection{Evaluations in tree simulations fit to human data}
 
 To better understand what features of the real datasets lead to the large differences in performance between LMM and PCA, we performed additional simulations.
-In particular, human subpopulations are related roughly by a tree, which induces the strongest correlations by magnitude (\cref{fig:kinship}), so we wanted to determine if this tree structure alone could recapitulate our previous results.
+In particular, human subpopulations are related roughly by a tree, which induces the strongest correlations (\cref{fig:kinship}), so we wanted to determine if this tree structure alone could recapitulate our previous results.
 Thus, we fit trees to each human dataset and verified that the kinship matrices of the simulations were a rough match to those of the real datasets, as desired.
-The second feature included in these simulations (absent in the original admixture simulations) is a non-uniform ancestral allele frequency distribution, which recapitulated some of the skew for smaller minor allele frequencies of the real datasets (\cref{fig:kinship}C).
+The second feature included in these simulations (absent in the admixture simulations) is a non-uniform ancestral allele frequency distribution, which recapitulated some of the skew for smaller minor allele frequencies of the real datasets (\cref{fig:kinship}C).
 
-The $\rmsd$ and $\auc$ distributions for the tree simulations fit to the human data (\cref{fig:rmsd-auc-real-sim}) resembled our previous admixture simulation much more than either the family simulation (\cref{fig:rmsd-auc-sim}) or real data results (\cref{fig:rmsd-auc-real}).
-In all three simulations, both LMM with $r=0$ and PCA (various $r$) achieve mean $|\rmsd| < 0.01$, and in two out of the three cases both association models (with their best $r$) were tied (not significantly different; \cref{tab:human_sum_pcs}).
+The $\rmsd$ and $\auc$ distributions for these tree simulations (\cref{fig:rmsd-auc-real-sim}) resembled our admixture simulation more than either the family simulation (\cref{fig:rmsd-auc-sim}) or real data results (\cref{fig:rmsd-auc-real}).
+In all three of these simulations, both LMM with $r=0$ and PCA (various $r$) achieve mean $|\rmsd| < 0.01$, and in two out of the three cases both association models (with their best $r$) were not significantly different for $|\rmsd|$ (\cref{tab:human_sum_pcs}).
 The $\auc$ distributions of both LMM and PCA track closely as $r$ is varied, although there is a small gap in performance that results in LMM ($r=0$) besting PCA in all three simulations.
-Lastly, the results are qualitatively similar for traits drawn from the random coefficients model (\cref{fig:rmsd-auc-real-sim-rc,tab:human_sum_pcs}).
+The results are qualitatively similar for the random coefficients trait model (\cref{fig:rmsd-auc-real-sim-rc,tab:human_sum_pcs}).
 Overall, the tree simulations do not recapitulate the large LMM advantage over PCA observed in the previous real human data results.
 
 \begin{figure}[bp!]
@@ -578,7 +567,7 @@ Overall, the tree simulations do not recapitulate the large LMM advantage over P
       {\bf Evaluations in tree simulations fit to human data.}
       Traits simulated from \textit{fixed effect sizes} model.
       Same setup as \cref{fig:rmsd-auc-sim}, see that for details.
-      These tree simulations, which exclude within-subpopulation structure by design, do not explain the large gaps in LMM-PCA performance observed in the real datasets.
+      These tree simulations, which exclude within-subpopulation family structure by design, do not explain the large gaps in LMM-PCA performance observed in the real datasets.
       \textbf{A.}
       The Human Origins simulation.
       \textbf{B.}
@@ -595,67 +584,80 @@ Overall, the tree simulations do not recapitulate the large LMM advantage over P
 A first-principles hypothesis for why PCA performs well in some datasets and not in others is their differences in dimensionality, since PCA assumes a low-dimensional genetic structure whereas LMM can model high-dimensional genetic structures.
 We applied the Tracy-Widom statistical test \citep{patterson_population_2006} with $p < 0.01$ to determine the number of significant principal components in each dataset, which estimates the rank of the kinship matrix (i.e., its dimensionality).
 These kinship ranks (\cref{fig:eigen}A) slightly underestimated the true dimensionality of our simulations (\cref{tab:human_sum}).
-However, rank estimates agree that the admixed family simulation has a greater rank than the admixture-only simulation, and that the real datasets have a much greater rank than the admixture simulations and (to a lesser extent) than the tree simulations that were fit to each real dataset (\cref{fig:eigen}A).
-However, these estimated ranks do not differentiate datasets where PCA performs well from those where performance was poor.
-For example, the ranks of the Human Origins and HGDP tree simulations, were PCA performed relatively well (\cref{fig:rmsd-auc-real-sim}), are much larger than the rank of the family simulation, where PCA performed very poorly (\cref{fig:rmsd-auc-sim}).
+However, rank estimates agree that the admixed family simulation has the greatest rank, and that the real datasets have greater ranks than the admixture simulations and, to a lesser extent, their respective tree simulations.
+However, these estimated ranks do not differentiate datasets where PCA performs well from those where performance was poor, particularly between the real and tree simulations, which span a similar range of ranks.
 Moreover, the 1000 Genomes rank estimate is lower than 90, yet PCA performed poorly for all $r \ge 90$ numbers of PCs tested (\cref{fig:rmsd-auc-real}).
 Performance might depend on the ratio of the matrix rank to its dimension (the number of individuals) or a more complicated formula, but the datasets tested do not differ greatly in dimensions (at most 3x, excluding the small simulation), while our analysis does not reveal an obvious line that separates these dataset by PCA performance.
 
-\begin{figure}[bp!]
-  \centering
-  \includegraphics[width=\textwidth]{eigen.pdf}
-  \caption{
-    {\bf Estimated dimensionality of datasets.}
-    \textbf{A.}
-    Kinship matrix ranks estimated with the Tracy-Widom test with $p < 0.01$.
-    \textbf{B.}
-    Cumulative variance explained versus eigenvalue rank fraction ($i/n$ where $i$ is rank, $n$ is number of eigenvalues/individuals).
-    \textbf{C.}
-    Variance explained by first 10 eigenvalues.
-  }
-  \label{fig:eigen}
-\end{figure}
-
 We also compared eigenvalues across datasets, expressed as variance explained (each eigenvalue divided by the sum of eigenvalues) to facilitate comparisons across datasets.
-The top eigenvalue explained a proportion of variance roughly proportional to \Fst (\cref{tab:human_sum}), but the rest of the top 10 eigenvalues show no large differences between datasets (\cref{fig:eigen}C), except the small admixture simulation had larger variances explained per eigenvalue (as expected since it has fewer of them).
-We also visualized all eigenvalues (beyond the top 10), computing their cumulative variance explained distributions versus their eigenvalue rank fraction (normalized to account for dataset sample size differences).
-Each dataset has a different starting point, but all increase almost linearly from there until they reach 1, except for the admixed family simulation, which has much greater variance explained by mid-rank eigenvalues (\cref{fig:eigen}B).
+The top eigenvalue explained a proportion of variance roughly proportional to \Fst (\cref{tab:human_sum}), but the rest of the top 10 eigenvalues show no large differences between datasets (\cref{fig:eigen}C), except the small admixture simulation had larger variances explained per eigenvalue (as expected since it has fewer eigenvalues).
+We also visualized all eigenvalues (beyond the top 10), computing their cumulative variance explained distributions versus their eigenvalue rank fraction (normalized to account for sample size differences).
+Each dataset has a different starting point, but all increase almost linearly from there until they reach 1, except for the family simulation, which has much greater variance explained by mid-rank eigenvalues (\cref{fig:eigen}B).
 However, there are again no obvious clues separating datasets where PCA performed poorly (such as the real datasets) from those where it performed relatively well (such as the corresponding tree simulations).
 
+\subsection{Local kinship explains PCA performance}
+
+Local kinship, which is relatedness due to family structure ignoring population structure if present, is the presumed cause of the LMM to PCA gap observed in real datasets but not in their tree simulation counterparts.
+Rather than measure its presence indirectly as increased dimensionality, as attempted in the previous section, here we measure it directly using the KING-robust estimator (\cref{fig:king}).
+As expected, we observe more larger local kinship values in the real datasets and the family simulation compared to the admixture and tree the simulations.
+However, this distribution in the real datasets depends on both sample size and number of subpopulations, as locally related pairs are most likely in the same subpopulation and conversely pairs between subpopulations tend to be negative for this estimator.
+For these reasons, the only comparable curve to each real dataset is their corresponding tree simulation, which matches sample size and subpopulation structure.
+
+\begin{figure}[bp!]
+  \centering
+  \includegraphics[width=\textwidth]{king_log-x.pdf}
+  \caption{
+    {\bf Local kinship estimate distribution.}
+    Curves are the complementary cumulative distribution of all lower triangular kinship matrix values from the KING-robust estimator.
+    Self kinship is excluded.
+    Note log scale of x-axis; negative estimates are counted in cumulatives but not shown.
+    The majority of values in all datasets are below the 4th degree relative threshold value.
+    Real datasets have greater cumulative distributions at every kinship value compared to their respective tree simulations.
+  }
+  \label{fig:king}
+\end{figure}
+
+In all real datasets we identified highly related individual pairs, defined here as those with kinship values above the 4th degree relative threshold of $2^{-11/2} \approx 0.022$ \citep{manichaikul_robust_2010, conomos_model-free_2016}.
+However, these highly related pairs are vastly outnumbered by pairs who are less related but have greater than zero kinship, which may be inferred stringently as exceeding the maximum values in the corresponding tree simulations, $\approx 0.01$, or if we are more permissive in allowing some small fraction of false positives we might reasonably include values above 0.001 (\cref{fig:king}).
+
+We tested whether removal of the small number of highly related individual pairs improves PCA performance or if the presence of larger numbers of more distantly related pairs are to blame for poor PCA performance.
+After removing 4th degree relatives, which reduced sample sizes between 5\% and 10\% (\cref{tab:king_cutoff}). we find largely the same results as in the evaluation that included all individuals (\cref{fig:king_cutoff}).
+For simplicity a single number of PCs was tested for each model, $r=0$ for LMM and $r=20$ for PCA, as these consistently performed well in our earlier evaluation with all individuals.
+Similarly, only the fixed effect sizes trait was tested, as that previously showed a large gap in performance between association models, while the random coefficients trait had a much smaller gap.
+LMM significantly outperformed PCA in all these cases (Wilcoxon paired 1-tailed $p < 0.01$).
+Notably, PCA still had miscalibrated p-values in Human Origins and 1000 Genomes ($|\rmsd| > 0.01$).
+Otherwise, $\auc$ and $\rmsd$ ranges were similar in this evaluation and the one with all individuals.
+We therefore conclude that the small number of highly related individual pairs had a negligible effect in PCA performance, so it must be the larger number of more distantly related pairs that explain the poor PCA performance compared to LMM in the real datasets.
+
+\begin{figure}[bp!]
+  \centering
+  \includegraphics[width=\textwidth]{fes/rmsd-auc_king-cutoff-4.pdf}
+  \caption{
+    {\bf LMM and PCA performance in real datasets excluding 4th degree relatives.}
+    LMM had $r=0$ PCs and PCA had $r=20$, and only fixed effect sizes trait model was tested.
+    Each dataset is a column, rows are metrics.
+    The $\rmsd$ cases (first row) have $|\rmsd| < 0.01$ band marked with dashed gray lines.
+  }
+  \label{fig:king_cutoff}
+\end{figure}
+
+
+%TODOTODOTODO
 
 \subsection{Comparison between $\rmsd$ and inflation factor}
 
-Now that our main evaluation of the PCA and LMM models is concluded, we switch gears to a comparison of our new $\rmsd$ measure and the more traditional inflation factor common in the field.
-The inflation factor $\lambda$ measures test statistic inflation, which is a way to measure total or residual population structure \citep{price_new_2010}.
-We measured both measures in all of our evaluations, which enables us to discover a correspondence which we fit to all of our data.
-
-Across our tests, we computed inflation factors by mapping median p-values back to their $\chi^2$ quantiles and comparing those values to their expectations under the null hypothesis (see Methods).
-Remarkably, there appears to be a near one-to-one correspondence between these inflation factors $\lambda$ and our $\rmsd$ statistics (\cref{fig:rmsd_lambda}).
-The curves for PCA and LMM models differ in sign: PCA tended to be inflated ($\lambda > 1$ and $\rmsd > 0$) whereas LMM tended to be deflated ($\lambda < 1$ and $\rmsd < 0$; not shown).
-Other than that, it appears that the statistics for both PCA and LMM fall on the same contiguous curve.
-One immediate advantage of $\rmsd$ over $\lambda$ is that the former does not take on as large values as the latter, which we had to plot on a log scale in \cref{fig:rmsd_lambda}.
-
-\begin{figure}[bp!]
-  \centering
-  \includegraphics{sum-rmsd-vs-lambda.pdf}
-  \caption{
-    {\bf Comparison between $\rmsd$ and inflation factor.}
-    These statistics were pooled from every number of PCs $r$ of both PCA and LMM models, both trait models, and every dataset (color coded by dataset).
-    Note y-axis ($\lambda$) is on a log scale, while x-axis ($\rmsd$) is linear scale.
-    The sigmoidal curve corresponds to \cref{eq:rmsd_lambda_sigmoidal}, and the log-linear approximation to \cref{eq:rmsd_lambda_log_linear}.
-  }
-  \label{fig:rmsd_lambda}
-\end{figure}
-
-We fit a sigmoidal curve to this data in order to further characterize the connection between $\lambda$ and $\rmsd$.
-The family of functions we considered was
+Now that our main evaluation of the PCA and LMM models is concluded, we turn to a comparison of our new $\rmsd$ measure and the more common inflation factor.
+Remarkably, there is a near one-to-one correspondence between $\lambda$ and our $\rmsd$ statistics (\cref{fig:rmsd_lambda}).
+PCA tended to be inflated ($\lambda > 1$ and $\rmsd > 0$) whereas LMM tended to be deflated ($\lambda < 1$ and $\rmsd < 0$), otherwise the data for both models fall on the same contiguous curve.
+One advantage of $\rmsd$ is that its range is limited, while $\lambda$ is unbounded and on a log scale.
+We fit the following sigmoidal function to this data,
 \begin{equation}
   \label{eq:rmsd_lambda_sigmoidal}
   \rmsd( \lambda ) = a \frac{ \lambda^b - 1 }{ \lambda^b + 1 },
 \end{equation}
 % inverse:
 % lambda <- ( ( a + rmsd ) / ( a - rmsd ) )^(1/b)
-which for all values of the parameters $a > 0$ and $b > 0$ satisfies $\rmsd( \lambda = 1 ) = 0$ and reflects $\log( \lambda )$ about zero ($\lambda = 1$) as desired from visual inspection, namely that
+which for all $a,b > 0$ satisfies $\rmsd( \lambda = 1 ) = 0$ and reflects $\log( \lambda )$ about zero ($\lambda = 1$) as desired, namely that
 $$
 \rmsd( \log( \lambda ) = -x ) = - \rmsd( \log( \lambda ) = x ).
 $$
@@ -663,16 +665,15 @@ $$
 % = a \frac{ e^{-bx} - 1 }{ e^{-bx} + 1 }
 % = a \frac{ 1 - e^{bx} }{ 1 + e^{bx} }
 We fit this model to the upper portion of the data only ($\lambda > 1$), since it was less noisy and of greater interest, and obtained the curve shown in \cref{fig:rmsd_lambda} with parameters $a = 0.566$ and $b = 0.616$.
-Using this model, we also produced a log-linear approximation based on its Taylor series with respect to $x = \log( \lambda )$ about $x=0$, resulting in
-\begin{equation}
-  \label{eq:rmsd_lambda_log_linear}
-  \rmsd( \lambda ) \approx \frac{a b}{2} \log( \lambda ),
-\end{equation}
-% inverse:
-% lambda <- exp( 2 * rmsd / ( a * b ) )
-which is also shown in \cref{fig:rmsd_lambda}.
-The value $\lambda = 1.05$, a threshold typically used to determine that there is no inflation \citep{price_new_2010}, corresponds to $\rmsd = 0.0085$ according to both \cref{eq:rmsd_lambda_sigmoidal,eq:rmsd_lambda_log_linear}.
-Conversely, $\rmsd = 0.01$, serving as a simpler rule of thumb, corresponds to $\lambda = 1.06$ according to both formulas too.
+% Using this model, we also produced a log-linear approximation based on its Taylor series with respect to $x = \log( \lambda )$ about $x=0$, resulting in
+% \begin{equation}
+%   \label{eq:rmsd_lambda_log_linear}
+%   \rmsd( \lambda ) \approx \frac{a b}{2} \log( \lambda ).
+% \end{equation}
+% % inverse:
+% % lambda <- exp( 2 * rmsd / ( a * b ) )
+The value $\lambda = 1.05$, a threshold typically used to determine that there is no inflation \citep{price_new_2010}, corresponds to $\rmsd = 0.0085$ according to \cref{eq:rmsd_lambda_sigmoidal}.
+Conversely, $\rmsd = 0.01$, serving as a simpler rule of thumb, corresponds to $\lambda = 1.06$.
 
 
 \section{Discussion}
@@ -726,7 +727,8 @@ Post-hoc evaluations, or simulations such as ours, remain important in all cases
 Overall, our results force us to always recommend the use of LMM over PCA.
 Although PCA offer flexibility and speed compared to LMM, additional work is required to ensure that PCA is adequate, including identifying close relatives for exclusion (lowering sample size and resulting in wasted resources) followed by simulations or other evaluations of the output statistics, and even then, without also running LMM there is no guarantee that PCA performance will be close enough to the improved power of LMM we observed in all of our evaluations.
 Our findings also suggest that other applications that employ PCA to control for population structure, such as polygenic risk scores \citep{qian_fast_2020}, may enjoy gains in power by instead employing an LMM or some other high-dimensional population structure model capable of jointly modeling population structure and cryptic relatedness.
-%This was one of the observations of a recent reevaluation of polygenic adaptation for height \citep{berg_reduced_2019}.
+% This was one of the observations of a recent reevaluation of polygenic adaptation for height \citep{berg_reduced_2019}.
+% TODO: add LASSO-LMM and such citations here?
 
 % Since PCA matches the performance of LMM when there is no family structure, this argues against the simple characterization that either fixed or random effects are in principle superior models for association studies \citep{price_new_2010, sul_mixed_2013, price_response_2013, sul_population_2018}.
 
@@ -798,7 +800,7 @@ Note that many common PCA implementations trade this t-test for a less accurate 
 % In human genetic studies it has long been customary to set a p-value threshold of $5 \times 10^{-8}$ [TODO: citation], which may be thought of as controlling the total number of false discoveries, or equivalently, the family-wise error rate [TODO citations].
 % The recommended solution to this problem in other fields is to control the FDR rather than setting a fixed p-value threshold.
 % We recommend estimating q-values and setting a threshold of $q < 0.05$ so that the FDR is controlled at the 5\% level \citep{storey_positive_2003, storey_statistical_2003}.
-% However, in this present work we do not calculate q-values; instead we focus on testing for the correctness of null p-value distributions (a prerequisite for acccurate q-value estimation) and on predictive power (for which ranking of loci by p-values suffice; q-values do not alter these rankings).
+% However, in this present work we do not calculate q-values; instead we focus on testing for the correctness of null p-value distributions (a prerequisite for acccurate q-value estimation) and on classification performance (for which ranking of loci by p-values suffice; q-values do not alter these rankings).
 
 \subsubsection{Kinship model for genotypes}
 
@@ -875,12 +877,12 @@ and results in the kinship estimate
 This kinship estimate and minor variants are also employed in LMMs \citep{yang_gcta:_2011}.
 This estimator of the kinship matrix is biased, and this bias is different for every individual pair \citep{ochoa_estimating_2021, ochoa_human}.
 However, in regression-based genetic association models such as PCA and LMM, the existing approach performs as well as when the above estimate is replaced by the true kinship matrix (data not shown).
-The explanation, briefly, is that the biased expectation of the above estimator differs from the true kinship matrix by a rank-1 update, which is exactly compensated for by the intercept term $\mathbf{1} \alpha$ in \cref{eq:pca_gwas}.
-[TODO: cite BIAS GWAS]
+%The explanation, briefly, is that the biased expectation of the above estimator differs from the true kinship matrix by a rank-1 update, which is exactly compensated for by the intercept term $\mathbf{1} \alpha$ in \cref{eq:pca_gwas}.
+%[TODO: cite BIAS GWAS]
 
 \subsubsection{Connection between PCs and ancestry proportions}
 
-Here we show that genetic association using ancestry proportions as covariates is equivalent to using PCs.
+Here we show that genetic association using ancestry proportions as covariates is equivalent in expectation to using PCs under the assumptions of the admixture model (\textit{i.e.}, there are no other forms of relatedness), which has been demonstrated empirically before \citep{alexander_fast_2009, zhou_strong_2016}.
 We shall assume the following individual-specific admixture model commonly assumed when inferring ancestry proportions \citep{pritchard_inference_2000, falush_inference_2003, alexander_fast_2009, gopalan_scaling_2016, cabreros_likelihood-free_2019}.
 There are $K$ subpopulations and every individual $j$ draws a proportion $q_{ju}$ of its alleles from subpopulation $S_u$.
 These ancestry proportions must be non-negative and sum to one for every individual $j$ ($\sum_{u=1}^K q_{ju} = 1$ for every $j$).
@@ -921,14 +923,14 @@ $$
 .
 $$
 The above random effect $\mathbf{s}$ satisfies those equations, where the variance scale equals $\sigma^2_s = || \boldsymbol{\beta}_S ||^2$.
-Thus, the PCA approach is the fixed model equivalent of the LMM under the additional approximation that only the top $r$ eigenvectors are used in PCA whereas the LMM uses all eigenvectors.
+Thus, PCA is the fixed model equivalent of LMM under the additional approximation that only the top $r$ eigenvectors are used in PCA whereas the LMM uses all eigenvectors.
 A more explicit comparison follows in the next subsection.
 
 In practice, the key advantage of LMM over PCA is that it has fewer parameters to fit: ignoring the shared terms in \cref{eq:pca_gwas} and \cref{eq:lmm_gwas}, PCA has $r$ parameters to fit (each PC coefficient in the $\boldsymbol{\gamma}$ vector), whereas LMMs only fit one additional parameter, namely $\sigma^2_s$.
 Therefore, PCA is expected to overfit more substantially than LMM---and thus lose power---when $r$ is very large, and especially when the sample size (the number of individuals $n$) is very small.
 Statistical significance in LMMs most often employs a likelihood ratio test, whose test statistic has a asymptotic $\chi^2$ distribution under the null hypothesis.
 
-\subsubsection{Connection between LMM and PCA models}
+\subsubsection{Connection between LMM and PCA}
 
 The LMM of \cref{eq:lmm_gwas} can be written to resemble more greatly the PCA model of \cref{eq:pca_gwas} \citep{astle_population_2009, hoffman_correcting_2013}, as
 \begin{equation}
@@ -947,7 +949,7 @@ $$
 = \text{Normal}( \mathbf{0}, \sigma_s^2 \mathbf{\Phi}^T ),
 $$
 which itself follows from the affine transformation property of multivariate normal distributions.
-Note that $\mathbf{U}$ also equals in the limit the right singular vectors of the standardized genotype matrix $\mathbf{X}_S = \mathbf{V}_S \mathbf{D}_S \mathbf{U}_S^\intercal$, which is how we originally motivated the PCA model, since
+Note that $\mathbf{U}$ also equals in the limit the right singular vectors of the standardized genotype matrix $\mathbf{X}_S = \mathbf{V}_S \mathbf{D}_S \mathbf{U}_S^\intercal$, which is how we originally motivated PCA, since
 $$
 \frac{1}{m} \mathbf{X}_S^\intercal \mathbf{X}_S
 %= \frac{1}{m} \mathbf{U}_S \mathbf{D}_S \mathbf{V}_S^\intercal \mathbf{V}_S \mathbf{D}_S \mathbf{U}_S^\intercal
@@ -959,7 +961,7 @@ $$
 $$
 since $\mathbf{V}_S$ is orthonormal, and where $\mathbf{\Lambda}_S = \frac{1}{m} \mathbf{D}_S^2$.
 
-Therefore, when the kinship matrix is low-dimensional (when only a few eigenvalues are very large), the LMM fits the same low-dimensional space as PCA would with an appropriate number of PCs, except that the coefficients $\boldsymbol{\gamma}_\text{LMM}$ are constrained by the likelihood model, whereas the analogous PCA coefficients $\boldsymbol{\gamma}_r$ are unconstrained variables.
+Therefore, when the true kinship matrix is low-dimensional (when only a few eigenvalues are very large), the LMM fits the same low-dimensional space as PCA would with an appropriate number of PCs, except that the coefficients $\boldsymbol{\gamma}_\text{LMM}$ are constrained by the likelihood model, whereas the analogous PCA coefficients $\boldsymbol{\gamma}_r$ are unconstrained variables.
 On the other hand, when the kinship matrix is high-dimensional then the LMM can fit this space better than a corresponding PCA model with a small number of PCs, while PCA with a larger number of PCs will instead overfit the data.
 
 \subsection{Simulations}
@@ -1004,6 +1006,7 @@ Briefly, allele frequencies \pit for the ancestral population $T$ are drawn inde
 Subpopulation allele frequencies $p_i^{S_u}$ are drawn independently for each intermediate subpopulation $S_u$ from the Balding-Nichols distribution, resulting in marginal distributions with mean \pit and variance $\pit \left( 1 - \pit \right) \ft[S_u]$ \citep{balding_method_1995}.
 The individual-specific allele frequency $\pi_{ij}$ at locus $i$ of individual $j$ weigh the intermediate subpopulation allele frequencies $p_i^{S_u}$ according to the admixture proportions $q_{ju}$, and genotypes are drawn from these admixed frequencies.
 Loci that are fixed ($i$ where $\xij = 0$ for all $j$, or $\xij = 2$ for all $j$) are drawn again from the model, starting from \pit, iterating until no loci are fixed.
+Each replicate draws a new genotype matrix starting from new ancestral and subpopulation allele frequencies.
 
 \subsubsection{Genotype simulation from random admixed families}
 
@@ -1333,7 +1336,7 @@ The (narrow-sense) heritability of the trait is $h^2 = 0.8$.
 The non-genetic effects are drawn from $\epsilon_j \sim \text{Normal}(0, 1 - h^2 )$ independently for each individual $j$.
 To balance power across datasets with varying numbers of individuals $n$, the number of causal loci is $m_1 = n / 10$.
 For each replicate, new causal loci are picked randomly from the genome, and new coefficients are drawn or constructed depending on the trait model.
-The length-$m_1$ set of causal loci $C$ is drawn from the subset of loci $\{ i \}$ that satisfy $\text{MAF} \ge 0.01$, to avoid simulations with very rare causal variants (in the random coefficients model they are typically undetectable, while in the fixed effect size model they have extremely large coefficients, which may be problematic; either way PCA and LMM are not appropriate inference models for these cases).
+The length-$m_1$ set of causal loci $C$ is drawn from the subset of loci $\{ i \}$ that satisfy $\text{MAF} \ge 0.01$, to avoid simulations with very rare causal variants (in the random coefficients model they are typically undetectable, while in the fixed effect size model they have extremely large coefficients, which may be problematic; in both cases neither PCA nor LMM are appropriate inference models).
 
 \textbf{Initial coefficients for \textit{fixed effect sizes} model.}
 The effect size of a locus $i$ is defined as $2 \pit \left( 1 - \pit \right) \beta_i^2$, which is its contribution of the trait variance \citep{park_estimation_2010}.
@@ -1391,7 +1394,7 @@ The estimated kinship rank was the largest eigenvalue rank for which $p < 0.01$ 
 
 All of the approaches considered here are evaluated in two orthogonal dimensions.
 The first one---$\rmsd$---quantifies the extent to which non-causal p-values are uniform, which is a prerequisite for accurate control of the type-I error and successful FDR control.
-The second measure---the area under the precision-recall curve---quantifies the predictive power of each model, which makes it possible to qualitatively compare the statistical power of each model without having to select a single threshold, and most importantly, overcoming the problem of comparing models that may not have accurate p-values \citep{bouaziz_accounting_2011}.
+The second measure---the area under the precision-recall curve---quantifies causal locus classification performance of each model, which makes it possible to qualitatively compare the statistical power of each model without having to select a single threshold, and most importantly, overcoming the problem of comparing models with miscalibrated p-values \citep{bouaziz_accounting_2011}.
 
 \subsubsection{$\rmsd$: a measure of p-value uniformity}
 
@@ -1520,7 +1523,7 @@ $\pi_1 = \frac{m_1}{m} = \frac{1}{m} \sum_{i = 1}^m c_i$.
 
 \subsection{Software}
 
-We selected modern software implementing each of the basic PCA and LMM approaches that are the fastest and most robust of their category based on our internal, unpublished benchmarks.
+We selected modern software implementing each of the basic PCA and LMM models that are the fastest and most robust of their category based on internal benchmarks.
 
 PCA association was performed using \texttt{plink2} \citep{chang_second-generation_2015}.
 When applied to quantitative traits, the model is a linear regression with covariates that employs the t-test for significance testing.
@@ -1597,6 +1600,49 @@ The data processing in this work is also uniquely enabled by the R packages \tex
   \label{fig:rmsd-auc-real-sim-rc}
 \end{figure}
 
+\begin{figure}[bp!]
+  \centering
+  \includegraphics[width=\textwidth]{eigen.pdf}
+  \caption{
+    {\bf Estimated dimensionality of datasets.}
+    \textbf{A.}
+    Kinship matrix ranks estimated with the Tracy-Widom test with $p < 0.01$.
+    \textbf{B.}
+    Cumulative variance explained versus eigenvalue rank fraction ($i/n$ where $i$ is rank, $n$ is number of eigenvalues).
+    \textbf{C.}
+    Variance explained by first 10 eigenvalues.
+  }
+  \label{fig:eigen}
+\end{figure}
+
+\begin{figure}[bp!]
+  \centering
+  \includegraphics{sum-rmsd-vs-lambda.pdf}
+  \caption{
+    {\bf Comparison between $\rmsd$ and inflation factor.}
+    Each point is a pair of statistics for one replicate evaluation for one association model (PCA or LMM with some number of PCs $r$), one trait model (FES vs RC), and one dataset (color coded by dataset).
+    Note y-axis ($\lambda$) is on a log scale, while x-axis ($\rmsd$) is linear scale.
+    The sigmoidal curve is \cref{eq:rmsd_lambda_sigmoidal} fit to the data.
+  }
+  \label{fig:rmsd_lambda}
+\end{figure}
+
+\begin{table}[hb!]
+  \centering
+  \footnotesize
+  \caption{
+    \textbf{Dataset sizes after 4th degree relative filter.}
+  }
+  \label{tab:king_cutoff}
+  % read and automatically format data from a TSV file!
+  \sisetup{ table-format = 2, table-number-alignment = right }
+  \csvreader[
+  tabular = {lSSS},
+  separator = tab,
+  table head = \toprule Dataset & {Loci ($m$)} & {Ind.~($n$)} & {Ind. removed (\%)} \\\midrule,
+  late after last line = \\\bottomrule
+  ]{../data/dimensions_king-cutoff-4.txt}{}{\csvlinetotablerow}
+\end{table}
 
 
 \end{document}
