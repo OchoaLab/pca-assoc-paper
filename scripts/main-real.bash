@@ -421,8 +421,6 @@ time Rscript real-11-inflation-across-datasets.R
 # 0.5629478 0.6208654 
 # threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00853
 # Inverse threshold map (sigmoidal): RMSD = 0.01, lambda = 1.06
-# log-linear approx: log(lambda) = RMSD * 5.72
-# threshold map (log-linear): lambda = 1.05, RMSD = 0.00853
 
 # look at kinship distributions in real and simulated datasets
 time Rscript all-03-king.R

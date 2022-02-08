@@ -42,9 +42,7 @@ name_dir_order <- c(
 
 # color for fit curve
 col_fit_sigmoid <- 'gray40'
-lty_fit_sigmoid <- 5
-col_fit_loglin <- 'gray'
-lty_fit_loglin <- 2
+lty_fit_sigmoid <- 2
 # and guide lines
 col_guides <- 'gray95'
 lty_guides <- 1
@@ -230,34 +228,6 @@ abline( h = 1, lty = lty_guides, col = col_guides )
 lines( predict(objp, list(xp = xp) ), xp, lty = lty_fit_sigmoid, col = col_fit_sigmoid ) # using uniformly spaced points
 #lines( predict(objp, list(xp = x2) ), x2, lty = lty_fit_sigmoid, col = col_fit_sigmoid ) # using actual data
 
-# slope prediction at lambda = 1
-# (linear approx)
-lm_m <- 1 / ( a_fit * b_fit / 2)
-## message( 'linear approx: lambda = RMSD * ', signif( lm_m, 3)  )
-message( 'log-linear approx: log(lambda) = RMSD * ', signif( lm_m, 3)  )
-## abline(
-##     1,
-##     lm_m,
-##     lty = lty_fit_loglin,
-##     col = col_fit_loglin,
-##     untf = TRUE # untransform because it's a log plot
-## )
-# log-linear approx
-lines(
-    log( xp ) / lm_m,
-    xp,
-    lty = lty_fit_loglin,
-    col = col_fit_loglin
-)
-# report on the RMSD predicted for lambda = 1.05
-# lambda is in linear scale here too
-rmsd_cut_loglin <- log( lambda_cut ) / lm_m
-message(
-    'threshold map (log-linear): ',
-    'lambda = ', lambda_cut, ', ',
-    'RMSD = ', signif( rmsd_cut_loglin, 3 )
-)
-
 
 # randomize rows so last dataset doesn't just overlap previous datasets
 data <- data[ sample( nrow(data) ), ]
@@ -283,15 +253,13 @@ legend(
     'topleft',
     c(
         expression( bold( 'Data' ) ),
-        expression( bold( 'Sigmoid fit' ) ),
-        expression( bold( paste( 'Log-linear approx at ', lambda == 1 ) ) )
+        expression( bold( 'Sigmoid fit' ) )
     ),
-    col = c('black', col_fit_sigmoid, col_fit_loglin),
-    lty = c(NA, lty_fit_sigmoid, lty_fit_loglin),
-    pch = c('.', NA, NA),
+    col = c('black', col_fit_sigmoid),
+    lty = c(NA, lty_fit_sigmoid),
+    pch = c('.', NA),
     bty = 'n',
-    cex = 0.7,
-    seg.len = 5
+    cex = 0.7
 )
 fig_end()
 
