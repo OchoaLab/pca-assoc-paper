@@ -368,8 +368,8 @@ We employ two complementary summary measures:
 (1) $\rmsd$ (p-value signed root mean square deviation) measures null p-value uniformity and relates to the accuracy of type-I error control across thresholds (closer to zero is better), and
 (2) $\auc$ (precision-recall area under the curve) measures causal locus classification performance (higher is better; \cref{fig:measures_illustration}).
 The $\auc$ has been used previously to evaluate association models \citep{rakitsch_lasso_2013}.
-$\rmsd$ is a more robust alternative to the common inflation factor and type-I error measures; a detailed comparison is presented at the end of the results, where we found that $\rmsd > 0.01$ corresponds to an inflation factor $> 1.06$, and thus evidence of inflation.
-$\auc$ is a more robust alternative to statistical power calculations, which are not meaningful when p-values are not accurate (as is often the case in this investigation).
+$\rmsd$ is a more robust alternative to the common inflation factor $\lambda$ and type-I error measures; we found in our data a near one-to-one correspondence between $\lambda$ and $\rmsd$, and determined that the threshold $\rmsd > 0.01$ corresponds to $\lambda > 1.06$ (\cref{fig:rmsd_lambda}) and thus evidence of inflation close to the rule of thumb of $\lambda > 1.05$ \citep{price_new_2010}.
+$\auc$ is a more robust alternative to statistical power, which is not meaningful when p-values are not calibrated.
 Reducing the complexity of null p-value distributions and precision-recall curves to two scalars is crucial for our extensive evaluations, which consider 0-90 numbers of PCs and 50 replicates.
 
 \begin{figure}[bp!]
@@ -621,13 +621,13 @@ In all real datasets we identified highly related individual pairs, defined here
 However, these highly related pairs are vastly outnumbered by pairs who are less related but have greater than zero kinship, which may be inferred stringently as exceeding the maximum values in the corresponding tree simulations, $\approx 0.01$, or if we are more permissive in allowing some small fraction of false positives we might reasonably include values above 0.001 (\cref{fig:king}).
 
 We tested whether removal of the small number of highly related individual pairs improves PCA performance or if the presence of larger numbers of more distantly related pairs are to blame for poor PCA performance.
-After removing 4th degree relatives, which reduced sample sizes between 5\% and 10\% (\cref{tab:king_cutoff}). we find largely the same results as in the evaluation that included all individuals (\cref{fig:king_cutoff}).
-For simplicity a single number of PCs was tested for each model, $r=0$ for LMM and $r=20$ for PCA, as these consistently performed well in our earlier evaluation with all individuals.
-Similarly, only the fixed effect sizes trait was tested, as that previously showed a large gap in performance between association models, while the random coefficients trait had a much smaller gap.
-LMM significantly outperformed PCA in all these cases (Wilcoxon paired 1-tailed $p < 0.01$).
+After removing 4th degree relatives, which reduced sample sizes between 5\% and 10\% (\cref{tab:king_cutoff}), we find largely the same results as when all individuals were included.
+For simplicity a single number of PCs was tested for each model, $r=0$ for LMM and $r=20$ for PCA, as these performed well in our earlier evaluation.
+Similarly, only the fixed effect sizes trait was tested, as that previously showed a large gap in performance between association models.
+LMM significantly outperformed PCA in all these cases (Wilcoxon paired 1-tailed $p < 0.01$; \cref{fig:king_cutoff}).
 Notably, PCA still had miscalibrated p-values in Human Origins and 1000 Genomes ($|\rmsd| > 0.01$).
 Otherwise, $\auc$ and $\rmsd$ ranges were similar in this evaluation and the one with all individuals.
-We therefore conclude that the small number of highly related individual pairs had a negligible effect in PCA performance, so it must be the larger number of more distantly related pairs that explain the poor PCA performance compared to LMM in the real datasets.
+Therefore, the small number of highly related individual pairs had a negligible effect in PCA performance, so the larger number of more distantly related pairs explain the poor PCA performance compared to LMM in the real datasets.
 
 \begin{figure}[bp!]
   \centering
@@ -640,38 +640,6 @@ We therefore conclude that the small number of highly related individual pairs h
   }
   \label{fig:king_cutoff}
 \end{figure}
-
-
-\subsection{Comparison between $\rmsd$ and inflation factor}
-
-Now that our main evaluation of the PCA and LMM models is concluded, we turn to a comparison of our new $\rmsd$ measure and the more common inflation factor.
-Remarkably, there is a near one-to-one correspondence between $\lambda$ and our $\rmsd$ statistics (\cref{fig:rmsd_lambda}).
-PCA tended to be inflated ($\lambda > 1$ and $\rmsd > 0$) whereas LMM tended to be deflated ($\lambda < 1$ and $\rmsd < 0$), otherwise the data for both models fall on the same contiguous curve.
-One advantage of $\rmsd$ is that its range is limited, while $\lambda$ is unbounded and on a log scale.
-We fit the following sigmoidal function to this data,
-\begin{equation}
-  \label{eq:rmsd_lambda_sigmoidal}
-  \rmsd( \lambda ) = a \frac{ \lambda^b - 1 }{ \lambda^b + 1 },
-\end{equation}
-% inverse:
-% lambda <- ( ( a + rmsd ) / ( a - rmsd ) )^(1/b)
-which for all $a,b > 0$ satisfies $\rmsd( \lambda = 1 ) = 0$ and reflects $\log( \lambda )$ about zero ($\lambda = 1$) as desired, namely that
-$$
-\rmsd( \log( \lambda ) = -x ) = - \rmsd( \log( \lambda ) = x ).
-$$
-% \rmsd
-% = a \frac{ e^{-bx} - 1 }{ e^{-bx} + 1 }
-% = a \frac{ 1 - e^{bx} }{ 1 + e^{bx} }
-We fit this model to the upper portion of the data only ($\lambda > 1$), since it was less noisy and of greater interest, and obtained the curve shown in \cref{fig:rmsd_lambda} with parameters $a = 0.566$ and $b = 0.616$.
-% Using this model, we also produced a log-linear approximation based on its Taylor series with respect to $x = \log( \lambda )$ about $x=0$, resulting in
-% \begin{equation}
-%   \label{eq:rmsd_lambda_log_linear}
-%   \rmsd( \lambda ) \approx \frac{a b}{2} \log( \lambda ).
-% \end{equation}
-% % inverse:
-% % lambda <- exp( 2 * rmsd / ( a * b ) )
-The value $\lambda = 1.05$, a threshold typically used to determine that there is no inflation \citep{price_new_2010}, corresponds to $\rmsd = 0.0085$ according to \cref{eq:rmsd_lambda_sigmoidal}.
-Conversely, $\rmsd = 0.01$, serving as a simpler rule of thumb, corresponds to $\lambda = 1.06$.
 
 
 \section{Discussion}
@@ -1429,6 +1397,36 @@ Thus, $\lambda \ne 1$ always implies $\rmsd \ne 0$ (and in that case $\lambda - 
 Overall, $\lambda$ depends only on the median of the statistic distribution, which $\rmsd$ improves upon by making use of the complete distribution.
 However, $\rmsd$ requires knowing which loci are null, so unlike $\lambda$ it is only applicable to simulated traits.
 
+\subsubsection{Comparison between $\rmsd$ and inflation factor $\lambda$}
+
+One advantage of $\rmsd$ is that its range is bounded, while $\lambda$ is unbounded and on a log scale.
+There is a near one-to-one correspondence between $\lambda$ and our $\rmsd$ statistics (\cref{fig:rmsd_lambda}).
+PCA tended to be inflated ($\lambda > 1$ and $\rmsd > 0$) whereas LMM tended to be deflated ($\lambda < 1$ and $\rmsd < 0$), otherwise the data for both models fall on the same contiguous curve.
+We fit the following sigmoidal function to this data,
+\begin{equation}
+  \label{eq:rmsd_lambda_sigmoidal}
+  \rmsd( \lambda ) = a \frac{ \lambda^b - 1 }{ \lambda^b + 1 },
+\end{equation}
+% inverse:
+% lambda <- ( ( a + rmsd ) / ( a - rmsd ) )^(1/b)
+which for all $a,b > 0$ satisfies $\rmsd( \lambda = 1 ) = 0$ and reflects $\log( \lambda )$ about zero ($\lambda = 1$) as desired, namely that
+$$
+\rmsd( \log( \lambda ) = -x ) = - \rmsd( \log( \lambda ) = x ).
+$$
+% \rmsd
+% = a \frac{ e^{-bx} - 1 }{ e^{-bx} + 1 }
+% = a \frac{ 1 - e^{bx} }{ 1 + e^{bx} }
+We fit this model to the upper portion of the data only ($\lambda > 1$), since it was less noisy and of greater interest, and obtained the curve shown in \cref{fig:rmsd_lambda} with parameters $a = 0.566$ and $b = 0.616$.
+% Using this model, we also produced a log-linear approximation based on its Taylor series with respect to $x = \log( \lambda )$ about $x=0$, resulting in
+% \begin{equation}
+%   \label{eq:rmsd_lambda_log_linear}
+%   \rmsd( \lambda ) \approx \frac{a b}{2} \log( \lambda ).
+% \end{equation}
+% % inverse:
+% % lambda <- exp( 2 * rmsd / ( a * b ) )
+The value $\lambda = 1.05$, a common threshold for benign inflation \citep{price_new_2010}, corresponds to $\rmsd = 0.0085$ according to \cref{eq:rmsd_lambda_sigmoidal}.
+Conversely, $\rmsd = 0.01$, serving as a simpler rule of thumb, corresponds to $\lambda = 1.06$.
+
 \subsubsection{The area under the precision-recall curve}
 
 Precision and recall are standard performance measures for binary classifiers that does not require calibrated p-values \citep{grau_prroc:_2015}.
@@ -1505,6 +1503,8 @@ Our $\auc$ function makes use of the R package \texttt{PRROC}, which integrates 
 Unbiased population kinship estimates are obtained with the R package \texttt{popkin} \citep{ochoa_estimating_2021}.
 The data processing in this work is also uniquely enabled by the R packages \texttt{BEDMatrix} \citep{grueneberg_bgdata_2019} and \texttt{genio} (introduced here).
 
+Complete code reproducing our results, data, and this manuscript is available at \url{https://github.com/OchoaLab/pca-assoc-paper}.
+
 % \section*{Acknowledgments}
 % [TODO?] ...
 
@@ -1519,6 +1519,18 @@ The data processing in this work is also uniquely enabled by the R packages \tex
 \beginsupplement
 
 \section{Supplementary figures}
+
+\begin{figure}[bp!]
+  \centering
+  \includegraphics{sum-rmsd-vs-lambda.pdf}
+  \caption{
+    {\bf Comparison between $\rmsd$ and inflation factor.}
+    Each point is a pair of statistics for one replicate evaluation for one association model (PCA or LMM with some number of PCs $r$), one trait model (FES vs RC), and one dataset (color coded by dataset).
+    Note y-axis ($\lambda$) is on a log scale, while x-axis ($\rmsd$) is linear scale.
+    The sigmoidal curve in \cref{eq:rmsd_lambda_sigmoidal} is fit to the data.
+  }
+  \label{fig:rmsd_lambda}
+\end{figure}
 
 \begin{figure}[bp!]
   \centering
@@ -1569,18 +1581,6 @@ The data processing in this work is also uniquely enabled by the R packages \tex
     Variance explained by first 10 eigenvalues.
   }
   \label{fig:eigen}
-\end{figure}
-
-\begin{figure}[bp!]
-  \centering
-  \includegraphics{sum-rmsd-vs-lambda.pdf}
-  \caption{
-    {\bf Comparison between $\rmsd$ and inflation factor.}
-    Each point is a pair of statistics for one replicate evaluation for one association model (PCA or LMM with some number of PCs $r$), one trait model (FES vs RC), and one dataset (color coded by dataset).
-    Note y-axis ($\lambda$) is on a log scale, while x-axis ($\rmsd$) is linear scale.
-    The sigmoidal curve is \cref{eq:rmsd_lambda_sigmoidal} fit to the data.
-  }
-  \label{fig:rmsd_lambda}
 \end{figure}
 
 \clearpage
