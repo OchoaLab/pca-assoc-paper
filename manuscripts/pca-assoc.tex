@@ -125,7 +125,7 @@ However, many previous studies have found that LMM outperforms PCA \citep{
   kang_variance_2010,
   wu_comparison_2011, % power only, not TIE
   song_testing_2015}.
-Other studies find that PCA was less inflated and/or controlled type-I errors better than LMM in a hypothetical setting, namely unusually differentiated markers \citep{price_new_2010, wu_comparison_2011}, which as simulated are an artificial scenario not based on a population genetics model, and are otherwise believed to be unusual \citep{sul_mixed_2013, price_response_2013}.
+Other studies find that PCA was less inflated and/or controlled type I errors better than LMM in a hypothetical setting, namely unusually differentiated markers \citep{price_new_2010, wu_comparison_2011}, which as simulated are an artificial scenario not based on a population genetics model, and are otherwise believed to be unusual \citep{sul_mixed_2013, price_response_2013}.
 A theoretical analysis claimed estimation biases under flawed assumptions, but LMM outperformed PCA in its simulation study \citep{wang_analytical_2013}.
 % Discussion: however ascertainment in CC is an issue we don't explore
 Moreover, various explanations for why LMM might outperforms PCA or viceversa are vague and have not been tested directly \citep{price_new_2010, sul_mixed_2013, price_response_2013, hoffman_correcting_2013}.
@@ -228,8 +228,8 @@ For example, although there are methods for selecting the numbers of PCs \citep{
 Conversely, only a few studies consider a (small) set of numbers of PCs, where they show remarkable robustness to this choice \citep{price_principal_2006, kang_variance_2010, wojcik_genetic_2019}.
 Moreover, most of these evaluations considered simulated data with only $K = 2$ independent subpopulations or admixture from only two subpopulations (exceptions are \citet{astle_population_2009} with $K=3$, and \citet{wu_comparison_2011} with $K = 4$), although worldwide human population structure is expected to have a larger dimensionality of at least $K = 9$ \citep{wojcik_genetic_2019}.
 Similarly, only two evaluations simulated data from a family pedigree: \citet{price_new_2010} included sibling pairs, and \citet{thornton_roadtrips:_2010} included parents, siblings and uncles/aunts.
-Some studies include evaluations involving real data that featured known or cryptic relatedness, but these analyses did not measure type-I error rates or power calculations, most of which settled for measuring test statistic inflation.
-Lastly, many of the earlier evaluations employed case-control simulations exclusively (as opposed to quantitative traits as we do here), were based on very small real or simulated datasets relative to today's standards, did not include any LMMs in their evaluations, and often did not measure both type-I error rates and power (or one of their proxies).
+Some studies include evaluations involving real data that featured known or cryptic relatedness, but these analyses did not measure type I error rates or power calculations, most of which settled for measuring test statistic inflation.
+Lastly, many of the earlier evaluations employed case-control simulations exclusively (as opposed to quantitative traits as we do here), were based on very small real or simulated datasets relative to today's standards, did not include any LMMs in their evaluations, and often did not measure both type I error rates and power (or one of their proxies).
 % \cite{wang_analytical_2013} might need to mention but setup is too artificial, particularly genotype/kinship mismatch; one of a few papers comparing PCA to LMM though!
 
 % LMM+PCA
@@ -246,7 +246,7 @@ The first three simulations consist of an admixture model with $K = 10$ ancestra
 The real datasets are the 1000 Genomes Project \citep{the_1000_genomes_project_consortium_map_2010, 1000_genomes_project_consortium_integrated_2012}, the Human Genome Diversity Panel (HGDP) \citep{cann_human_2002, rosenberg_genetic_2002, bergstrom_insights_2020}, and Human Origins \citep{patterson_ancient_2012, lazaridis_ancient_2014, lazaridis_genomic_2016, skoglund_genomic_2016}.
 The last three simulations aim to approximately match each of the real datasets by fitting trees and ancestral allele frequency distirbutions, to determine whether those features alone recapitulate the observations on the real data or not.
 In all cases we simulate from two trait models: one with fixed effect sizes (regression coefficients roughly inverse to allele frequency) that approximates estimates in real data \citep{park_distribution_2011} and corresponds to high pleiotropy and strong balancing selection \citep{simons_population_2018}, which are appropriate assumptions for diseases; and one with random coefficients (independent of allele frequency) that corresponds to neutral traits \citep{simons_population_2018}.
-Our evaluation directly measures the uniformity of null p-values (required for accurate type-I error and FDR control; \cite{storey_positive_2003, storey_statistical_2003}) and classification performance (a robust alternative to power for miscalibrated models) via the area under precision-recall curves \citep{grau_prroc:_2015}.
+Our evaluation directly measures the uniformity of null p-values (required for accurate type I error and FDR control; \cite{storey_positive_2003, storey_statistical_2003}) and classification performance (a robust alternative to power for miscalibrated models) via the area under precision-recall curves \citep{grau_prroc:_2015}.
 Across all tests LMM without PCs consistently performs best.
 However, in our admixture simulations PCA nearly matches LMM performance when enough PCs are used and there are no close relatives in the study.
 In reasonably large studies PCA is robust to including far beyond the optimal number of PCs.
@@ -365,11 +365,10 @@ Effect size distributions in this simulation are wider, which reduces associatio
 % MEASURES
 Since our quantitative traits are simulated, true causal loci are known, permitting exact identification of true positives, false positives, and false negatives.
 We employ two complementary summary measures:
-(1) $\rmsd$ (p-value signed root mean square deviation) measures null p-value uniformity and relates to the accuracy of type-I error control across thresholds (closer to zero is better), and
+(1) $\rmsd$ (p-value signed root mean square deviation) measures null p-value uniformity and relates to the accuracy of type I error control across thresholds (closer to zero is better), and
 (2) $\auc$ (precision-recall area under the curve) measures causal locus classification performance (higher is better; \cref{fig:measures_illustration}).
-The $\auc$ has been used previously to evaluate association models \citep{rakitsch_lasso_2013}.
-$\rmsd$ is a more robust alternative to the common inflation factor $\lambda$ and type-I error measures; we found in our data a near one-to-one correspondence between $\lambda$ and $\rmsd$, and determined that the threshold $\rmsd > 0.01$ corresponds to $\lambda > 1.06$ (\cref{fig:rmsd_lambda}) and thus evidence of inflation close to the rule of thumb of $\lambda > 1.05$ \citep{price_new_2010}.
-$\auc$ is a more robust alternative to statistical power, which is not meaningful when p-values are not calibrated.
+$\rmsd$ is a more robust alternative to the common inflation factor $\lambda$ and type I error measures; we found in our data a near one-to-one correspondence between $\lambda$ and $\rmsd$, and determined that the threshold $\rmsd > 0.01$ corresponds to $\lambda > 1.06$ (\cref{fig:rmsd_lambda}) and thus evidence of inflation close to the rule of thumb of $\lambda > 1.05$ \citep{price_new_2010}.
+$\auc$ has been used previously to evaluate association models \citep{rakitsch_lasso_2013}, reflects statistical power for calibrated models (see Models and Methods), and in general is a more robust alternative to statistical power for miscalibrated models.
 Reducing the complexity of null p-value distributions and precision-recall curves to two scalars is crucial for our extensive evaluations, which consider 0-90 numbers of PCs and 50 replicates.
 
 \begin{figure}[bp!]
@@ -388,7 +387,7 @@ Reducing the complexity of null p-value distributions and precision-recall curve
     \textbf{C.}
     Precision-Recall plot assesses causal locus classification performance across significance thresholds, without assuming that p-values are accurate (only locus ranks matter; higher is better).
     \textbf{D.}
-    The $\auc$ (Precision-Recall Area Under the Curve) summarizes classification performance (higher is better).
+    The $\auc$ (Precision-Recall Area Under the Curve) summarizes classification performance and reflects power (higher is better).
   }
   \label{fig:measures_illustration}
 \end{figure}
@@ -494,7 +493,7 @@ The last of the first three simulations adds a 20-generation random family to ou
 Previous work has reported, in limited settings, that PCA performs poorly in the presence of family structure, so it is important to establish the detailed behavior of PCA and LMM in this setting as $r$ is varied for both.
 Since LMM is formulated in terms of kinship, it is expected to perform better here.
 Only the last generation is studied for association, which contains numerous siblings, first cousins, etc.
-The initial population structure due to admixture is preserved across the generations by strongly biasing mating pairs for proximity over the one-dimensional geography, which results in an indirect ancestry-biased assortative mating (see Methods).
+The initial population structure due to admixture is preserved across the generations by strongly biasing mating pairs for proximity over the one-dimensional geography, which results in an indirect ancestry-biased assortative mating.
 Our evaluation reveals a sizable gap in both metrics between LMM and PCA across all values of $r$ (\cref{fig:rmsd-auc-sim}C).
 LMM again performs best with $r=0$ and achieves mean $|\rmsd| < 0.01$.
 However, PCA does not achieve zero $\rmsd$ at any $r$ value (all p-values are strongly anti-conservative), and the best mean $\auc$ value across $r$ for PCA is worse than the worst mean $\auc$ value for LMM.
@@ -660,7 +659,7 @@ PCA performed well in the admixture simulations (without families, both trait mo
 Conversely, PCA performed poorly in the admixed family simulation (both trait models) and the real human genotypes with fixed effect sizes traits.
 
 PCA assumes that genetic structure is low-dimensional, whereas LMM can handle high-dimensional structures.
-Thus, PCA performs well in the admixture simulation, which is explicitly low-dimensional (see Methods), as well as in tree simulations with few nodes with long branches, such as the trees we fit to the real human data, where a low-dimensional approximation suffices.
+Thus, PCA performs well in the admixture simulation, which is explicitly low-dimensional (see Models and Methods), as well as in tree simulations with few nodes with long branches, such as the trees we fit to the real human data, where a low-dimensional approximation suffices.
 Conversely, PCA performs poorly under family structure because its kinship matrix is high-dimensional.
 One theoretical inconvenience is that true kinship matrices are always full rank: for example, an unstructured population where all individuals are equally unrelated and outbred has a kinship matrix of $\mathbf{I}/2$, whose eigenvalues are all equal to $1/2$.
 Nevertheless, population structure induces a more unbalanced eigenvalue distribution with a few very large eigenvalues (\cref{fig:eigen}), so we may define dimensionality in practice as the number of eigenvalues that exceed some small threshold.
@@ -690,7 +689,7 @@ However, if an LMM has a large number of covariates relative to its sample size 
 Post-hoc evaluations, or simulations such as ours, remain important in all cases to ensure that statistics are as expected.
 
 Overall, our results lead us to always recommend the use of LMM over PCA for association studies.
-Although PCA offer flexibility and speed compared to LMM, additional work is required to ensure that PCA is adequate, including identifying close relatives for exclusion (lowering sample size and resulting in wasted resources) followed by simulations or other evaluations of the output statistics, and even then there is no guarantee that PCA will perform as well as LMM, in terms of both type-I error control and power.
+Although PCA offer flexibility and speed compared to LMM, additional work is required to ensure that PCA is adequate, including identifying close relatives for exclusion (lowering sample size and resulting in wasted resources) followed by simulations or other evaluations of the output statistics, and even then there is no guarantee that PCA will perform as well as LMM, in terms of both type I error control and power.
 The presence of large numbers of distant relatives, expected on any real dataset, all but ensures that PCA will perform poorly in practice compared to LMM for association studies.
 Our findings also suggest that other applications that employ PCA to control for population structure, such as polygenic models \citep{qian_fast_2020}, may enjoy gains in power by instead employing an LMM or some other high-dimensional population structure model capable of modeling both population structure and cryptic relatedness.
 % This was one of the observations of a recent reevaluation of polygenic adaptation for height \citep{berg_reduced_2019}.
@@ -1333,13 +1332,14 @@ The estimated kinship rank was the largest eigenvalue rank for which $p < 0.01$ 
 \subsection{Evaluation of performance}
 
 All of the approaches considered here are evaluated in two orthogonal dimensions.
-The first one, $\rmsd$, quantifies the uniformity of non-causal p-values, which is a prerequisite for type-I error and FDR control.
-The second measure, $\auc$, quantifies causal locus classification performance of each model, which makes it possible to compare models with miscalibrated p-values.
+The first one, $\rmsd$, quantifies the uniformity of non-causal p-values, which is a prerequisite for type I error and FDR control.
+The second measure, $\auc$, quantifies causal locus classification performance of each model and reflects power, while making it possible to rank miscalibrated models fairly.
+We also define and contrast to related performance measures from the literature.
 
 \subsubsection{$\rmsd$: a measure of p-value uniformity}
 
 From their definition, p-values for continuous test statistics have a uniform distribution when the null hypothesis holds.
-This fact is crucial for type-I error and FDR control by common approaches such as q-values \citep{storey_positive_2003, storey_statistical_2003}.
+This fact is crucial for type I error and FDR control by common approaches such as q-values \citep{storey_positive_2003, storey_statistical_2003}.
 We use the Signed Root Mean Square Deviation (SRMSD) to measure the difference between the observed p-value quantiles and the expected uniform quantiles:
 $$
 \rmsd
@@ -1427,7 +1427,14 @@ We fit this model to the upper portion of the data only ($\lambda > 1$), since i
 The value $\lambda = 1.05$, a common threshold for benign inflation \citep{price_new_2010}, corresponds to $\rmsd = 0.0085$ according to \cref{eq:rmsd_lambda_sigmoidal}.
 Conversely, $\rmsd = 0.01$, serving as a simpler rule of thumb, corresponds to $\lambda = 1.06$.
 
-\subsubsection{The area under the precision-recall curve}
+\subsubsection{Type I error rate}
+
+The type I error rate is the proportion of null p-values below a given p-value threshold $t$.
+Calibrated p-values result in a type I error rate near $t$, which may be evaluated for significance using a binomial test.
+This measure depends on the choice of threshold $t$ and can give rise to misleading results, as a model may appear calibrated for some $t$ but not for others, or may be significantly miscalibrated only for sufficiently large $t$ (due to lack of power for smaller $t$).
+In contrast, $\rmsd = 0$ guarantees calibrated type I error rates at all thresholds $t$, while large $|\rmsd|$ indicates incorrect type I errors for at least some thresholds $t$.
+
+\subsubsection{$\auc$: the area under the precision-recall curve}
 
 Precision and recall are standard performance measures for binary classifiers that does not require calibrated p-values \citep{grau_prroc:_2015}.
 Let $c_i$ be the the true classification of locus $i$: $c_i = 1$ for causal loci ($\beta_i \ne 0$), $c_i = 0$ otherwise.
@@ -1473,6 +1480,64 @@ Precision and Recall trace a curve as the threshold $t$ is varied, and the area 
 A model obtains the maximum $\auc = 1$ if there is some threshold that classifies all loci perfectly.
 In contrast, the worst models, which classify at random, have an expected precision ($= \auc$) equal to the overall proportion of alternative cases:
 $\pi_1 = \frac{m_1}{m} = \frac{1}{m} \sum_{i = 1}^m c_i$.
+
+\subsubsection{Statistical power and comparison to $\auc$}
+
+Power is the probability that a test is declared significant when the alternative hypothesis $H_1$ holds.
+At a p-value threshold $t$, power equals
+$$
+F(t) = \Pr( p < t | H_1 ).
+$$
+Note that $F(t)$ is a cumulative function, so it is monotonically increasing with $t$ and has an inverse.
+
+Power is hard to interpret when p-values are not calibrated.
+However, to establish a clear connection to $\auc$, assume calibrated p-values so the distribution under the null hypothesis $H_0$ is uniform: $\Pr( p < t | H_0 ) = t$.
+The numbers of true positives, false positives, and false negatives at $t$ are therefore
+\begin{align*}
+  \text{TP}(t)
+  &=
+    m \pi_1 F(t)
+    , \\
+  \text{FP}(t)
+  &=
+    m \pi_0 t
+    , \\
+  \text{FN}(t)
+  &=
+    m \pi_1 ( 1 - F(t) )
+    ,
+\end{align*}
+where $\pi_0 = \Pr( H_0 )$ is the proportion of null cases and $\pi_1 = 1 - \pi_0$ of alternative cases.
+Therefore, precision and recall are
+\begin{align*}
+  \text{Precision}(t)
+  &=
+    \frac{ \pi_1 F(t) }{ \pi_1 F(t) + \pi_0 t }
+    , \\
+  \text{Recall}(t)
+  &=
+    F(t)
+    .
+\end{align*}
+Noting that $t = F^{-1}( \text{Recall} )$, precision can be written as a function of recall:
+\begin{align*}
+  \text{Precision}( \text{Recall} )
+  &=
+    \frac{ \pi_1 \text{Recall} }{ \pi_1 \text{Recall} + \pi_0 F^{-1}( \text{Recall} ) }
+    .
+\end{align*}
+Finally, the area under the curve equals
+$
+\auc
+=
+\int_0^1 \text{Precision}( \text{Recall} ) d \text{Recall}
+$
+.
+
+Now lets consider a simple yet common case in which model $A$ is uniformly more powerful than model $B$, so that their power functions satisfy $F_A(t) \ge F_B(t)$ for every $t$.
+It follows that the inverse functions satisfy $F_A^{-1}( \text{Recall} ) \le F_B^{-1}( \text{Recall} )$ for every recall value.
+This ensures that the precision of model $A$ is greater or equal than the precision of model $B$ at every recall value, and therefore $\auc$ is greater or equal for $A$ than $B$.
+
 
 \subsection{Software}
 
@@ -1520,7 +1585,7 @@ Complete code reproducing our results, data, and this manuscript is available at
 
 \section{Supplementary figures}
 
-\begin{figure}[bp!]
+\begin{figure}[hp!]
   \centering
   \includegraphics{sum-rmsd-vs-lambda.pdf}
   \caption{
@@ -1532,7 +1597,7 @@ Complete code reproducing our results, data, and this manuscript is available at
   \label{fig:rmsd_lambda}
 \end{figure}
 
-\begin{figure}[bp!]
+\begin{figure}[hp!]
   \centering
   \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{rmsd-auc-sim.pdf}
   \caption{
@@ -1544,7 +1609,7 @@ Complete code reproducing our results, data, and this manuscript is available at
   \label{fig:rmsd-auc-sim-rc}
 \end{figure}
 
-\begin{figure}[bp!]
+\begin{figure}[hp!]
   \centering
   \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{rmsd-auc-real.pdf}
   \caption{
@@ -1556,7 +1621,7 @@ Complete code reproducing our results, data, and this manuscript is available at
   \label{fig:rmsd-auc-real-rc}
 \end{figure}
 
-\begin{figure}[bp!]
+\begin{figure}[hp!]
   \centering
   \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{rmsd-auc-real-sim.pdf}
   \caption{
@@ -1568,7 +1633,7 @@ Complete code reproducing our results, data, and this manuscript is available at
   \label{fig:rmsd-auc-real-sim-rc}
 \end{figure}
 
-\begin{figure}[bp!]
+\begin{figure}[hp!]
   \centering
   \includegraphics[width=\textwidth]{eigen.pdf}
   \caption{
