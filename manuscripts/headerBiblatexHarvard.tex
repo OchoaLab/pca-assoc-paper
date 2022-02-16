@@ -14,6 +14,8 @@
 \AtEveryBibitem{\clearlist{language}}
 % remove month
 \AtEveryBibitem{\clearfield{month}}
+% and also notes
+\AtEveryBibitem{\clearfield{note}}
 % remove dots between volume and issue
 \usepackage{xpatch}
 \xpatchbibmacro{volume+number+eid}{%
