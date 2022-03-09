@@ -122,135 +122,74 @@ Recent work has focused on developing variants of the PCA algorithm that scale b
 PCA remains a popular and powerful approach for association studies.
 
 % LMM
-The other dominant association model for structured populations is the LMM, in which this structure is a random effect drawn from a covariance model parametrized by the kinship matrix.
+The other dominant association model for structured populations is the LMM, in which this structure is a random effect drawn from a multivariate Normal model parametrized by the kinship matrix.
 Unlike PCA, LMM does not assume that relatedness is low-dimensional, and explicitly models family structure via the kinship matrix.
-The LMM model assumes a quantitative and polygenic (complex) trait.
-% TODO: jumps into LMM-PCA comparisons too quickly, those fit better in the next paragraph.
-Interestingly, LMM and PCA share deep connections \citep{astle_population_2009, hoffman_correcting_2013}, which suggest that both models ought to perform similarly under certain conditions, particularly under low-dimensional relatedness.
-However, many previous studies have found that LMM outperforms PCA \citep{
-  zhao_arabidopsis_2007,
-  astle_population_2009,
-  kang_variance_2010,
-  wu_comparison_2011, % power only, not TIE
-  song_testing_2015}.
-Other studies find that PCA was less inflated and/or controlled type I errors better than LMM in a hypothetical setting, namely unusually differentiated markers \citep{price_new_2010, wu_comparison_2011}, which as simulated are an artificial scenario not based on a population genetics model, and are otherwise believed to be unusual \citep{sul_mixed_2013, price_response_2013}.
-A theoretical analysis claimed estimation biases under flawed assumptions, but LMM outperformed PCA in its simulation study \citep{wang_analytical_2013}.
-% Discussion: however ascertainment in CC is an issue we don't explore
-Moreover, various explanations for why LMM might outperforms PCA or viceversa are vague and have not been tested directly \citep{price_new_2010, sul_mixed_2013, price_response_2013, hoffman_correcting_2013}.
-Since LMMs tend to be considerably slower than PCA, it is important to understand when their difference in power or accuracy is outweighed by their difference in runtime.
-For that reason, much effort has been devoted to improving the runtime and scalability of LMMs \citep{aulchenko_genomewide_2007, kang_efficient_2008, kang_variance_2010, zhang_mixed_2010, lippert_fast_2011, yang_gcta:_2011, listgarten_improved_2012, zhou_genome-wide_2012, svishcheva_rapid_2012, loh_efficient_2015, zhou_efficiently_2018}.
+Early LMMs required kinship matrices estimated from known pedigrees or otherwise capturing family-level relatedness only \citep{yu_unified_2006, zhao_arabidopsis_2007}.
+Modern LMMs estimate kinship from genotypes using a non-parametric estimator, often referred to as a genetic relationship matrix, that captures the combined covariance due to recent family relatedness and ancestral population structure \citep{kang_efficient_2008, astle_population_2009}.
+The classic LMM assumes a quantitative (continuous) complex trait, the focus of our work.
+Although case-control (binary) traits and their underlying ascertainment are theoretically a challenge \citep{yang_advantages_2014}, LMMs have been applied successfully to balanced case-control studies \citep{astle_population_2009, kang_variance_2010} and simulations \citep{price_new_2010, wu_comparison_2011, sul_mixed_2013}, and have been adapted for unbalanced case-control studies \citep{zhou_efficiently_2018}.
+However, LMMs tend to be considerably slower than PCA and other models, so much effort has been devoted to improving their runtime and scalability \citep{aulchenko_genomewide_2007, kang_efficient_2008, kang_variance_2010, zhang_mixed_2010, lippert_fast_2011, yang_gcta:_2011, listgarten_improved_2012, zhou_genome-wide_2012, svishcheva_rapid_2012, loh_efficient_2015, zhou_efficiently_2018}.
 
-[TODO haven't incorporated fully maybe: \citep{thornton_roadtrips:_2010}]
+% LMM+PCA
+An LMM variant that incorporates PCs as fixed covariates is tested thoroughly in our work.
+Since PCs are the top eigenvectors of the same kinship matrix estimate used in modern LMMs \citep{astle_population_2009, hoffman_correcting_2013}, then population structure is essentially modeled twice in an LMM with PCs.
+However, some previous work has found the apparent redundancy of an LMM with PCs beneficial \citep{price_new_2010, tucker_improving_2014}, while others did not \citep{liu_controlling_2011}, and the approach continues to be used \citep{zeng_signatures_2018}.
+It is worth noting that early LMMs had other arrangements, as their kinship matrices captured family relatedness only, so population structure had to be modeled separately, in practice as admixture fractions instead of PCs \citep{yu_unified_2006, zhao_arabidopsis_2007}.
 
 \begin{table}[hb!]
   \centering
-  \tiny
+  \small
   \caption{
-    \textbf{Summary of previous evaluations in the literature.}
+    \textbf{Previous PCA-LMM evaluations in the literature.}
   }
   \label{tab:lit}
-  \begin{tabular}{lrrrrrlrlllllll}
+  \begin{tabular}{l|ccc|ccccc}
     \toprule
-    Publication & $n$\textsuperscript{a} & $m$\textsuperscript{a} & $K$ & $r$ & Scen & Sim\textsuperscript{b} & \Fst & Real\textsuperscript{c} & Trait & Inf & Power & Reps & LMM & Best \\
+                & \multicolumn{3}{c|}{Sim. Genotypes} & \\
+    Publication & Type\textsuperscript{a} & $K$\textsuperscript{b} & \Fst\textsuperscript{c} & Real\textsuperscript{d} & Trait\textsuperscript{e} & Power & PCs ($r$) & Best \\
     \midrule
-    % Publication                    &     n &        m &    K & PCAr &Scen& Sim &  Fst &  Re & Ph & Inf & Pow & Rep & LMM & Best\\
-    \cite{zhang_semiparametric_2003} &   150 &      300 &    4 &    1 &  3 & IAF &    ? &AF,N &  Q &   T &   Y & 250 &   N &  NA \\ % First PCA GWAS, albeit more complicated than is more common now in practice. Q = here Dominant, Additive, and Recessive, and also Normal and Log-Normal
-    \cite{price_principal_2006}      & 1,000 &  100,000 &    2 & 1-10 & 12 &  IA & 0.01 &   N & CC &   T &   Y &  10 &   N &  NA \\
-    \cite{yu_unified_2006}*          &   277 &    1,384 &   NA & N(3) &  6 &   N & 0.12 &   Y &  Q &   T &   Y &   1 &   Y &  NA \\
-    \cite{epstein_simple_2007}       & 1,000 &      111 &    3 &   10 &  2 & \~I & 0.15 &   N & CC &   T &   Y &   1 &   N &  NA \\
-    \cite{kimmel_randomization_2007} & 2,000 &   38,864 &  2-3 &  10? &  2 & \~I &   NA & hap & CC &   T &   Y & 100 &   N &  NA \\
-    \cite{zhao_arabidopsis_2007}     &    95 &      900 &   NA &    8 &  1 &   N &   NA &   Y &  Q &   Q &   Y &   1 &   Y & LMM \\
-    \cite{luca_use_2008}             &   400 &   24,000 &  2-9 &  10? &  2 &   I & 0.01 &   N & CC &   T &   Y &   1 &   N &  NA \\
-    \cite{zhang_comparison_2008}     &  4000 &      240 &    2 &  10? &  1 &   I &   NA & hap & CC &   T &   Y &1000 &   N &  NA \\
-    \cite{li_improved_2008}          &  2000 &   10,000 &  2-4 &   10 &  5 &  IA & 0.03 &AF,N & CC &  TI &   Y & 100 &   N &  NA \\
-    \cite{kang_efficient_2008}**     &   277 &  140,000 &   NA &    N &  3 &   N &   NA &   Y &  Q &   Q &   Y &1000 &  YG?&  NA \\
-    \cite{astle_population_2009}     & 2,000 &   10,000 &    3 &   10 &  2 &   I & 0.10 &   N & CC &   Q & ROC & 500 &  YG & Tie \\
-    \cite{li_correcting_2010}        & 1,000 &    1,000 &  2-4 &   10 &  3 &  IA & 0.01 &AF,N & CC &  TI & Y/N & 100 &   N &  NA \\
-    \cite{kang_variance_2010}        & 5,326 &  368,177 &   NA &2-100 &  2 &   N &   NA &   Y &Q+CC&  IQ &   N &   1 &  YG & LMM \\
-    \cite{thornton_roadtrips:_2010}  &   620 &  100,000 &    3 &  10? &  6 & IAF & 0.01 &  Sc & CC &   T &   Y &   1 &   N &  NA \\
-    \cite{price_new_2010}            & 1,000 &  100,000 &    2 &    1 &  4 &  IF & 0.01 &   N & CC &   I &   N &   1 &  YG & L+P \\
-    \cite{wu_comparison_2011}        & 4,000 &  100,000 &  2-4 &   10 &  5 &  IA & 0.01 &   N & CC &   T &   Y &  10 &  YG & PCA \\
-    \cite{bouaziz_accounting_2011}   &     ? &    5,500 &  1-5 &    5 &  6 &  GF &   NA &  GF & CC &   T &   Y &   1 &   N &  NA \\
-    \cite{liu_controlling_2011}      & 1,000 &   10,000 &  2-3 &   10 &  4 &  IA &    ? & hap &  Q &  TQ &Y,ROC&1000 &  YG?& Tie \\
-    \cite{hoffman_correcting_2013}   & 1,000 &   45,000 &   NA &    N &  2 &   N &   NA &   Y &  Q &   Q &   Y &  50 &  YG &  NA \\
-    \cite{sul_mixed_2013}            & 1,000?&  100,000?&   2? &   1? &  2 &  I? & 0.01 &   N &CC? &   I &   N &   1 &  YG & Tie \\
-    \cite{wang_analytical_2013}      &   500 &       NA &  1,4 &  1-4 &  2 &Other&   NA &   N &  Q &   N &   N &1000 &  YF & LMM \\
-    \cite{tucker_improving_2014}     &15,633 &  360,557 &    2 &    5 &  4 &   I & 0.05 &  YN &  Q &   I &   Y & 100 &  YG & Tie \\
-    \cite{yang_advantages_2014}      &105,633&  458,560 &   NA &    5 &  2 &   N &   NA &   Y & CC &   I & \~Y &   1 &  YG & Tie?\\
-    \cite{song_testing_2015}         & 5,000 &  100,000 &  2-3 &  10? & 33 &  IA &\~0.10&PC,N &Q+CC&   T &   N & 100 &  YG & LMM \\
-    \cite{loh_efficient_2015}        &23,294 &  360,000 &   NA &   10 &  2 &   N &   NA &   Y &  Q & ITQ &   Y & 100 &  YG & LMM \\
-    \cite{liu_iterative_2016}        & 8,807 &  681,258 &   NA &  3-6 &  6 &   N &   NA &   Y &  Q &  TQ &   Y &1000 &  YG & LMM \\ 
-    ?                                &     ? &        ? &    ? &    ? &  ? &   ? &    ? &   ? &  ? &   ? &   ? &   ? &   ? &   ? \\
-    \cite{sul_population_2018}       & 5,326 &  331,475 &   NA &  100 &  1 &   N &   NA &   Y &  Q &   I &   N &  10 &  YG & LMM \\
-    This work                        & 2,922 &1,185,208 &10-243& 0-90 & 18 & ATF & 0.10 &  YN &  Q &   R &   Y &  50 &  YG & LMM \\
+    % Publication                & Sim &    K &  Fst &  Re & Ph & Pow & PCAr & Best\\
+    \cite{zhao_arabidopsis_2007} &     &      &      &   Y &  Q &   Y &    8 & LMM \\
+    \cite{astle_population_2009} &   I &    3 & 0.10 &     & CC &   Y &   10 & Tie \\
+    \cite{kang_variance_2010}    &     &      &      &   Y &Q,CC&     &2-100 & LMM \\
+    \cite{price_new_2010}        &  IF &    2 & 0.01 &     & CC &     &    1 & LMM+PCs \\
+    \cite{wu_comparison_2011}    &  IA &  2-4 & 0.01 &     & CC &   Y &   10 & Mixed \\
+    \cite{liu_controlling_2011}  &  IA &  2-3 &    R &     &  Q &   Y &   10 & Tie \\
+    \cite{sul_mixed_2013}        &   I &    2 & 0.01 &     & CC &     &    1 & Tie \\
+    \cite{tucker_improving_2014} &   I &    2 & 0.05 &   Y &Q,CC&   Y &    5 & Tie \\
+    \cite{yang_advantages_2014}  &     &      &      &   Y & CC &   Y &    5 & Tie \\
+    \cite{song_testing_2015}     &  IA &  2-3 &    R &     &  Q &     &    3 & LMM \\
+    \cite{loh_efficient_2015}    &     &      &      &   Y &  Q &   Y &   10 & LMM \\
+    \cite{liu_iterative_2016}    &     &      &      &   Y &  Q &   Y &  3-6 & LMM \\ 
+    \cite{sul_population_2018}   &     &      &      &   Y &  Q &     &  100 & LMM \\
+    This work                    & ATF &10-243&$\le$0.25&Y &  Q &   Y & 0-90 & LMM \\
     \bottomrule
   \end{tabular}
   \begin{flushleft} 
-    \textsuperscript{a}Max sizes.\\
-    \textsuperscript{b}Genotype simulation types.\\
-    \textsuperscript{c}Evaluations combining real data with simulated data (not just a real data analysis).\\
-    *LMM had kinship from SPAGeDi (family-level relatedness), admixture proportions (no PCA).\\
-    **No PCA (only admix prop/structured assoc(SA)).
+    \textsuperscript{a}Genotype simulation types. I: Independent subpopulations; A: Admixture; T: Tree; F: Family.\\
+    \textsuperscript{b}Model dimensionality (number of subpopulations or ancestries)\\
+    \textsuperscript{c}R: simulated parameters based on real data, \Fst not reported.\\
+    \textsuperscript{d}Evaluations utilizing real genotypes.\\
+    \textsuperscript{e}Q: quantitative; CC: case-control.
   \end{flushleft}
 \end{table}
 
-% \cite{zhao_arabidopsis_2007}:
-% Looks at p-value uniformity (visually), but potentially included non-null loci in figures.
-% Looks at power too, averaged over a few simulations.
-% Found that K+Q are both needed, but presumably used K from SPAGeDi (that's why?); they note that (IBD/IBS bs diff) appear to derive popkin in words (proportion of shared haplotypes, K*).  K* alone worked without Q.
-% Sim: real geno, perturbed traits by adding constant additive effect to random causal SNP.
-% They also find that PCA can replace admixture in this setting.
-% Unclear if there's family structure here, since PCA (P) has high power relative to LMM (P+K, K*, etc).
-% Power suggests P+K has best power (second fig shows K* has worst power than all P/Q+K/K* combinations, though just P or Q aren't shown).
-
-% \cite{kimmel_randomization_2007}
-% incorrect explanation for why PCA fails (correlated projection error argument).
-
-% \cite{li_improved_2008}:
-% wrong explanation for why PCA fails (says it can't handle subpopulations, only admixture, i.e. needs linearity).
-
-% which was the first LMM to use the modern standard estimator?
-% \cite{kang_efficient_2008} is close to modern (uses a popkin-like similarity matrix).
-% They say as much in the review Sul et al 2018.
-
-% TODOTODO
-
-% TODO: add
-% - mean chi-sq with herit (reminds me of LDSC): Yang, J. et al. Genomic inflation factors under polygenic inheritance. Eur. J. Hum. Genet. 19, 807–812 (2011).
-% - rescan /home/viiia/docs/pdf/gwas/lmm/ for missing benchmarks, particularly saige
-% - question (new column) how many of these are polygenic trait models?  (not super important)
-% LIGERA/PRS reading
-% - Segura et al 2012 (read)
-% - Cordell, H.J. & Clayton, D.G. A unified stepwise regression procedure for evaluating the relative effects of polymorphisms within a gene using case/control or family data: application to HLA in type 1 diabetes. Am. J. Hum. Genet. 70, 124–141 (2002).
-% - Hoggart, C.J., Whittaker, J.C., De Iorio, M. & Balding, D.J. Simultaneous analysis of all SNPs in genome-wide and re-sequencing association studies. PLoS Genet. 4, e1000130 (2008).
-% - Malo, N., Libiger, O. & Schork, N.J. Accommodating linkage disequilibrium in genetic-association analyses via ridge regression. Am. J. Hum. Genet. 82, 375–385 (2008).
-% - Croiseau, P. & Cordell, H.J. Analysis of North American Rheumatoid Arthritis Consortium data using a penalized logistic regression approach. BMC Proc. 3, S61 (2009).
-% - Cho, S. et al. Joint identification of multiple genetic variants via elastic-net variable selection in a genome-wide association analysis. Ann. Hum. Genet. 74, 416–428 (2010).
-% - Wang, D., Eskridge, K.M. & Crossa, J. Identifying QTLs and epistasis in structured plant populations using adaptive mixed LASSO. J. Agric. Biol. Environ. Stat. 16, 170–184 (2011).
-% - Ayers, K.L. & Cordell, H.J. SNP selection in genome-wide and candidate gene studies via penalized logistic regression. Genet. Epidemiol. 34, 879–891 (2010).
-
-% previous PCA evaluations
-% TODO: focus on comparisons to (modern) LMMs (comparisons to structured assoc, etc, are irrelevant to family structure focus).
-PCA has been compared to other association models, particularly to LMMs.
-However, all of these studies have important limitations, for the most part due to PCA being treated as a competitor rather than a model worthy of exploring more fully.
-For example, although there are methods for selecting the numbers of PCs \citep{patterson_population_2006}, most evaluations either admit to selecting 10 because it has long been the default and it performs well enough, regardless of the dataset in question \citep{epstein_simple_2007, li_improved_2008, astle_population_2009, li_correcting_2010, wu_comparison_2011}, or otherwise test only one number of PCs, often without justification \citep{zhang_semiparametric_2003, kimmel_randomization_2007, zhao_arabidopsis_2007, zhang_comparison_2008, price_new_2010, bouaziz_accounting_2011, hoffman_correcting_2013, tucker_improving_2014, yang_advantages_2014, song_testing_2015, sul_population_2018}.
-Conversely, only a few studies consider a (small) set of numbers of PCs, where they show remarkable robustness to this choice \citep{price_principal_2006, kang_variance_2010, wojcik_genetic_2019}.
-Moreover, most of these evaluations considered simulated data with only $K = 2$ independent subpopulations or admixture from only two subpopulations (exceptions are \citet{astle_population_2009} with $K=3$, and \citet{wu_comparison_2011} with $K = 4$), although worldwide human population structure is expected to have a larger dimensionality of at least $K = 9$ \citep{wojcik_genetic_2019}.
-Similarly, only two evaluations simulated data from a family pedigree: \citet{price_new_2010} included sibling pairs, and \citet{thornton_roadtrips:_2010} included parents, siblings and uncles/aunts.
-Some studies include evaluations involving real data that featured known or cryptic relatedness, but these analyses did not measure type I error rates or power calculations, most of which settled for measuring test statistic inflation.
-Lastly, many of the earlier evaluations employed case-control simulations exclusively (as opposed to quantitative traits as we do here), were based on very small real or simulated datasets relative to today's standards, did not include any LMMs in their evaluations, and often did not measure both type I error rates and power (or one of their proxies).
-% \cite{wang_analytical_2013} might need to mention but setup is too artificial, particularly genotype/kinship mismatch; one of a few papers comparing PCA to LMM though!
-
-% LMM+PCA
-An LMM variant we focus on testing in this work incorporates PCs as fixed covariates.
-Since PCs are the top eigenvectors of the same kinship matrix estimate used to draw the random effects \citep{astle_population_2009, hoffman_correcting_2013}, then the population structure is essentially modeled twice in an LMM with PCs, which can lead to loss of power when the number of PCs is very large.
-However, some previous work has found the apparent redundancy of an LMM with PCs beneficial \citep{price_new_2010, tucker_improving_2014}, while others did not \citep{liu_controlling_2011}, and the approach continues to be used \citep{zeng_signatures_2018}.
-([TODO rephrase] Note that earlier LMM approaches estimated non-redundant kinship and fixed effects covariates: kinship matrices were estimated from pedigrees (thus excluding population structure) or estimated equivalent parameters from genotypes by assuming no inbreeding [TODO: cite SPaGeDi?], and population structure was modeled via admixture proportions rather than PCA \citep{yu_unified_2006, zhao_arabidopsis_2007}.)
+% LMM and PCA are similar
+LMM and PCA are closely related models \citep{astle_population_2009, hoffman_correcting_2013}, which suggests similar performance in some cases, particularly low-dimensional relatedness.
+Direct comparisons have yielded mixed results, with several studies finding superior performance for LMM (notably from papers promoting advances in LMMs) while many others report comparable performance for PCA and LMM (\cref{tab:lit}).
+None of these papers find that PCA outperforms LMM decisively, although PCA occasionally performs better in isolated cases or individual measures (usually lacking significance or not evaluated).
+Several patterns emerged in our literature search, which may explain these discrepancies.
+Previous studies were generally divided into two types: those that exmployed exclusively simulated genotypes, versus exclusively real genotypes (only one study used both types).
+We find that the simulated genotype studies, which tended to have low dimensionalities and differentiation (\Fst), were more likely to report ties (5/7), whereas the real genotypes studies tended to favor LMM (5/7).
+Similarly, 6/8 papers that use quantitative traits favor LMM, whereas 5/7 papers that used binary traits gave ties or mixed results (the only factor we do not explore).
+Other limitations of previous evaluations are that, although all measured type-I error (or proxies such as inflation factors or QQ plots), a large fraction (5/13) did not measure power (including proxies such as ROC curves), and only two reported trying more than one number of PCs when evaluating PCA.
+Lastly, no consensus has emerged as to why LMM might outperform PCA or viceversa \citep{price_new_2010, sul_mixed_2013, price_response_2013, hoffman_correcting_2013}, with the exception that LMM handles family relatedness whereas PCA does not, leaving users confused as to when it is correct to use PCA.
+To better evaluate PCA and LMM, our work includes more complex, high-dimensional genotype simulations with differentiation matching that of multiethnic human cohorts, as well as real genotypes, we vary the number of PCs, and consistently measure proxies for type-I error and power.
 
 % this work
 In this work, we study the performance of the PCA and LMM association models, characterizing their behavior under various numbers of PCs (included in LMM too).
 We use genotype simulations (admixture, family, and tree models) and three real datasets: the 1000 Genomes Project \citep{the_1000_genomes_project_consortium_map_2010, 1000_genomes_project_consortium_integrated_2012}, the Human Genome Diversity Panel (HGDP) \citep{cann_human_2002, rosenberg_genetic_2002, bergstrom_insights_2020}, and Human Origins \citep{patterson_ancient_2012, lazaridis_ancient_2014, lazaridis_genomic_2016, skoglund_genomic_2016}.
-We simulate traits from two models: fixed effect sizes (FES; coefficients inverse to allele frequency) that matches real data \citep{park_distribution_2011, zeng_signatures_2018, oconnor_extreme_2019} and corresponds to high pleiotropy and strong balancing selection \citep{simons_population_2018} and strong negative selection \citep{zeng_signatures_2018, oconnor_extreme_2019}, which are appropriate assumptions for diseases; and random coefficients (RC; independent of allele frequency) that corresponds to neutral traits \citep{zeng_signatures_2018, simons_population_2018}.
+We simulate quantitative traits from two models: fixed effect sizes (FES; coefficients inverse to allele frequency) that matches real data \citep{park_distribution_2011, zeng_signatures_2018, oconnor_extreme_2019} and corresponds to high pleiotropy and strong balancing selection \citep{simons_population_2018} and strong negative selection \citep{zeng_signatures_2018, oconnor_extreme_2019}, which are appropriate assumptions for diseases; and random coefficients (RC; independent of allele frequency) that corresponds to neutral traits \citep{zeng_signatures_2018, simons_population_2018}.
 Across all tests, LMM without PCs consistently performs best, and greatly outperforms PCA in the family simulation, as expected \citep{patterson_population_2006, price_new_2010}, and in all real datasets.
 The tree simulations do not recapitulate the real data results, suggesting that additional family-like structure is the reason for poor PCA performance.
 Removing up to 4th degree relatives in the real datasets recapitulates our results, showing that the more numerous distant relatives explain the poor PCA performance.
@@ -366,7 +305,7 @@ Reducing the complexity of null p-value distributions and precision-recall curve
     Three archetypal models illustrate our two complementary measures:
     M1 is well calibrated, M2 overfits slightly, and M3 does not model relatedness.
     \textbf{A.}
-    Probability-probability plot of p-values of ``null'' (non-causal) loci.
+    QQ plot of p-values of ``null'' (non-causal) loci.
     M1 has uniform null p-values as desired (overlaps $y=x$).
     M2/M3 have null p-values larger/smaller than expected.
     \textbf{B.}
@@ -626,6 +565,9 @@ Our evaluations conclusively determined that LMM without PCs performs better tha
 Although the addition of a few PCs does not greatly hurt the performance of LMM (except for small sample sizes), such additions rarely improved perfomance (\cref{tab:human_sum_pcs}), which agrees with previous observations \citep{liu_controlling_2011} but contradicts others \citep{zhao_arabidopsis_2007, price_new_2010}.
 Our findings make sense since PCs are the eigenvectors of the kinship matrix used to model the random effects, so including both is redundant.
 
+[TODO: text originally in intro to merge into here now!!!]
+Other studies find that PCA was less inflated and/or controlled type I errors better than LMM in a hypothetical setting, namely unusually differentiated markers \citep{price_new_2010, wu_comparison_2011}, which as simulated are an artificial scenario not based on a population genetics model, and are otherwise believed to be unusual \citep{sul_mixed_2013, price_response_2013}.
+
 Previous work also suggested that PCA can outperform LMM when [TODO: harmonize with intro] there are loci under selection or otherwise highly differentiated \citep{price_new_2010, wu_comparison_2011, yang_advantages_2014}.
 Our evaluations on real human data, which contain such loci in relevant proportions if they exist, do not replicate those observations.
 The presence of cryptic relatedness strongly favors LMM, an advantage that probably always outweighs this potential PCA benefit in real datasets.
@@ -661,6 +603,8 @@ The exception was the small sample size simulation, where only small numbers of 
 In contrast, LMM is simpler since there is no need to choose the number of PCs.
 However, an LMM with a large number of covariates may have conservative p-values (as we observed for LMM with large numbers of PCs), a weakness of the asymptotic likelihood ratio test that can be overcome with the more accurate t-test used by PCA.
 Simulations or post-hoc evaluations remain crucial (for any association model) to ensure that statistics are calibrated.
+
+[TODO: CC/ascertainment is an issue we don't explore.]
 
 Overall, our results lead us to always recommend the use of LMM over PCA for association studies.
 Although PCA offer flexibility and speed compared to LMM, additional work is required to ensure that PCA is adequate, including removal of close relatives (lowering sample size and wasting resources) followed by simulations or other evaluations of statistics, and even then there is no guarantee that PCA will perform nearly as well as LMM, in terms of both type I error control and power.
