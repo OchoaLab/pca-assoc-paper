@@ -69,27 +69,25 @@ $^2$ Duke Center for Statistical Genetics and Genomics, Duke University, Durham,
 $^*$ Corresponding author: \texttt{alejandro.ochoa@duke.edu}
 
 \begin{abstract}
-  Modern genetic association studies require modeling population structure and family relatedness in order to calculate correct association statistics.
-  Principal Component Analysis (PCA) is an efficient, flexible, and one of the most common models for population structure, but nowadays the Linear Mixed-Effects Model (LMM) is believed by many to perform better.
+  Principal Component Analysis (PCA) and the Linear Mixed-Effects Model (LMM), sometimes in combination, are the most common modern models for genetic association.
   Previous PCA-LMM comparisons give mixed results and unclear guidance, and have several limitations, including not varying the number of principal components (PCs), simulating overly simple population structures, and inconsistent use of real data and power evaluations.
-  LMMs with PCs are also used, but evidence of improved performance is lacking.
-  In this work, we thoroughly evaluate PCA and LMM both with varying number of PCs in various new realistic genotype and complex trait simulations including admixture together with family structure, in large real multiethnic human genotype datasets (1000 Genomes Project, the Human Genome Diversity Panel, and Human Origins) with simulated traits, and simulations from trees fit to each real dataset.
+  In this work, we thoroughly evaluate PCA and LMM both with varying number of PCs in new realistic genotype and complex trait simulations including admixed families, trees, and large real multiethnic human genotype datasets (1000 Genomes Project, the Human Genome Diversity Panel, and Human Origins) with simulated traits.
   We find that LMM without PCs performs best in all cases, with the largest effects in the family simulation and all real human datasets.
   We determined that the large gaps in PCA to LMM performance on the real human datasets is due to the high-dimensional family structure stemming from large numbers of distant relatives, and not from the smaller number of highly related pairs present.
-  While it was known that PCA fails on family data, here we report an apparently unavoidable strong effect on association of cryptic family relatedness in several human datasets that focused on capturing genetic diversity.
+  While it was known that PCA fails on family data, here we report a strong effect on association of cryptic family relatedness in several genetically diverse human datasets, a problem that is not avoided with the common practice of pruning high-relatedness individual pairs.
   Overall, this work better characterizes the severe limitations of PCA compared to LMM in modeling the complex relatedness structures present in real multiethnic human data and its impact in association studies.
-
-  % used for ASHG abstract
-  % \textbf{Keywords:} genetic association, statistical genetics, population structure, complex traits, genetic diversity.
-  
-  \textbf{Abbreviations:}
-  PCA: principal component analysis;
-  PCs: principal components;
-  LMM: linear mixed-effects model;
-  FES: fixed effect sizes;
-  RC: random coefficients;
-  WGS: whole genome sequencing.
 \end{abstract}
+
+% used for ASHG abstract
+% \textbf{Keywords:} genetic association, statistical genetics, population structure, complex traits, genetic diversity.
+
+\textbf{Abbreviations:}
+PCA: principal component analysis;
+PCs: principal components;
+LMM: linear mixed-effects model;
+FES: fixed effect sizes;
+RC: random coefficients;
+WGS: whole genome sequencing.
 
 \section{Introduction} 
 
