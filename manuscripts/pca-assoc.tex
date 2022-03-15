@@ -73,7 +73,7 @@ $^*$ Corresponding author: \texttt{alejandro.ochoa@duke.edu}
   Previous PCA-LMM comparisons give mixed results and unclear guidance, and have several limitations, including not varying the number of principal components (PCs), simulating overly simple population structures, and inconsistent use of real data and power evaluations.
   In this work, we thoroughly evaluate PCA and LMM both with varying number of PCs in new realistic genotype and complex trait simulations including admixed families, trees, and large real multiethnic human genotype datasets (1000 Genomes Project, the Human Genome Diversity Panel, and Human Origins) with simulated traits.
   We find that LMM without PCs performs best in all cases, with the largest effects in the family simulation and all real human datasets.
-  We determined that the large gaps in PCA to LMM performance on the real human datasets is due to the high-dimensional family structure stemming from large numbers of distant relatives, and not from the smaller number of highly related pairs present.
+  We determined that the large gaps in PCA to LMM performance on the real human datasets is due to the high-dimensional family structure stemming from large numbers of distant relatives, and not from the smaller number of highly related pairs.
   While it was known that PCA fails on family data, here we report a strong effect on association of cryptic family relatedness in several genetically diverse human datasets, a problem that is not avoided with the common practice of pruning high-relatedness individual pairs.
   Overall, this work better characterizes the severe limitations of PCA compared to LMM in modeling the complex relatedness structures present in real multiethnic human data and its impact in association studies.
 \end{abstract}
@@ -100,11 +100,11 @@ Therefore, many specialized approaches have been developed for genetic associati
 Here we focus on extensively evaluating the two most popular association models: PCA and LMM.
 
 % PCA
-Many association models for structured populations are generalized linear models that incorporate this structure via covariates, which have included inferred ancestry or admixture proportions \citep{pritchard_association_2000}.
-PCA represents the most common of these variants nowadays, in which the top eigenvectors of the population kinship matrix are used to model the population structure \citep{zhang_semiparametric_2003, price_principal_2006, bouaziz_accounting_2011}.
+Genetic association with PCA consists of including the top eigenvectors of the population kinship matrix as covariates in a generalized linear model \citep{zhang_semiparametric_2003, price_principal_2006, bouaziz_accounting_2011}.
 These top eigenvectors are commonly referred to as PCs in genetics \citep{patterson_population_2006}, the convention adopted here, but it is worth noting that in other fields PCs instead denote the projections of loci onto eigenvectors \citep{jolliffe_principal_2002}.
-PCs map to ancestry (\textit{e.g.}, \cite{alexander_fast_2009, zhou_strong_2016}), have deep connections to admixture models \citep{mcvean_genealogical_2009,zheng_eigenanalysis_2016,cabreros_likelihood-free_2019}, and they work as well as global ancestry in association studies but are estimated more easily \citep{patterson_population_2006, zhao_arabidopsis_2007, alexander_fast_2009, bouaziz_accounting_2011}.
-An additional strength of PCA is its simplicity, which as covariates can be readily integrated into more complex models, such as haplotype association \citep{xu_detecting_2014} and polygenic models \citep{qian_fast_2020}.
+The direct ancestor of PCA association is structured association, in which inferred ancestry or admixture proportions are used as regression covariates \citep{pritchard_association_2000}.
+These models are deeply connected because PCs map to ancestry empirically (\textit{e.g.}, \cite{alexander_fast_2009, zhou_strong_2016}) and theoretically \citep{mcvean_genealogical_2009,zheng_eigenanalysis_2016,cabreros_likelihood-free_2019}, and they work as well as global ancestry in association studies but are estimated more easily \citep{patterson_population_2006, zhao_arabidopsis_2007, alexander_fast_2009, bouaziz_accounting_2011}.
+The strength of PCA is its simplicity, which as covariates can be readily integrated into more complex models, such as haplotype association \citep{xu_detecting_2014} and polygenic models \citep{qian_fast_2020}.
 However, PCA fundamentally assumes that relatedness is low-dimensional, which may limit its applicability.
 PCA is known to be inadequate for data containing family structure \citep{patterson_population_2006, thornton_roadtrips:_2010, price_new_2010}, which is called ``cryptic relatedness'' when it is unknown to the researchers, but no other specific troublesome scenarios have been confidently identified.
 Recent work has focused on developing more scalable versions of the PCA algorithm \citep{lee_sparse_2012, abraham_fast_2014, galinsky_fast_2016, abraham_flashpca2:_2017, agrawal_scalable_2020}.
@@ -125,7 +125,7 @@ Since PCs are the top eigenvectors of the same kinship matrix estimate used in m
 However, some previous work has found the apparent redundancy of an LMM with PCs beneficial \citep{price_new_2010, tucker_improving_2014}, while others did not \citep{liu_controlling_2011}, and the approach continues to be used \citep{zeng_signatures_2018}.
 It is worth noting that early LMMs had a different arrangement, as their kinship matrices captured family relatedness only, so population structure had to be modeled separately, in practice as admixture fractions instead of PCs \citep{yu_unified_2006, zhao_arabidopsis_2007}.
 
-\begin{table}[hb!]
+\begin{table}[b!]
   \centering
   \small
   \caption{
