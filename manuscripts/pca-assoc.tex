@@ -103,7 +103,7 @@ Here we focus on extensively evaluating the two most popular association models:
 Genetic association with PCA consists of including the top eigenvectors of the population kinship matrix as covariates in a generalized linear model \citep{zhang_semiparametric_2003, price_principal_2006, bouaziz_accounting_2011}.
 These top eigenvectors are commonly referred to as PCs in genetics \citep{patterson_population_2006}, the convention adopted here, but it is worth noting that in other fields PCs instead denote the projections of loci onto eigenvectors \citep{jolliffe_principal_2002}.
 The direct ancestor of PCA association is structured association, in which inferred ancestry or admixture proportions are used as regression covariates \citep{pritchard_association_2000}.
-These models are deeply connected because PCs map to ancestry empirically (\textit{e.g.}, \cite{alexander_fast_2009, zhou_strong_2016}) and theoretically \citep{mcvean_genealogical_2009,zheng_eigenanalysis_2016,cabreros_likelihood-free_2019}, and they work as well as global ancestry in association studies but are estimated more easily \citep{patterson_population_2006, zhao_arabidopsis_2007, alexander_fast_2009, bouaziz_accounting_2011}.
+These models are deeply connected because PCs map to ancestry empirically (\textit{e.g.}, \cite{alexander_fast_2009, zhou_strong_2016}) and theoretically \citep{mcvean_genealogical_2009,zheng_eigenanalysis_2016,cabreros_likelihood-free_2019,chiu_inferring_2022}, and they work as well as global ancestry in association studies but are estimated more easily \citep{patterson_population_2006, zhao_arabidopsis_2007, alexander_fast_2009, bouaziz_accounting_2011}.
 The strength of PCA is its simplicity, which as covariates can be readily integrated into more complex models, such as haplotype association \citep{xu_detecting_2014} and polygenic models \citep{qian_fast_2020}.
 However, PCA fundamentally assumes that relatedness is low-dimensional, which may limit its applicability.
 PCA is known to be inadequate for data containing family structure \citep{patterson_population_2006, thornton_roadtrips:_2010, price_new_2010}, which is called ``cryptic relatedness'' when it is unknown to the researchers, but no other specific troublesome scenarios have been confidently identified.
@@ -737,7 +737,7 @@ Nevertheless, in PCA and LMM these biased estimates perform as well as using unb
 
 \subsubsection{Connection between PCs and ancestry proportions}
 
-Here we show that association using global ancestry proportions as covariates is equivalent in expectation to using PCs under the admixture model, which has been demonstrated empirically before \citep{alexander_fast_2009, zhou_strong_2016} and is the basis of recent admixture inference models \citep{zheng_eigenanalysis_2016,cabreros_likelihood-free_2019}.
+Here we show that association using global ancestry proportions as covariates is equivalent in expectation to using PCs under the admixture model, which has been demonstrated empirically before \citep{alexander_fast_2009, zhou_strong_2016} and is the basis of recent admixture inference models \citep{zheng_eigenanalysis_2016,cabreros_likelihood-free_2019,chiu_inferring_2022}.
 We shall assume the standard individual-specific admixture model \citep{pritchard_inference_2000, alexander_fast_2009}.
 There are $K$ subpopulations and every individual $j$ draws a proportion $q_{ju}$ of its alleles from subpopulation $S_u$, so ancestry proportions are non-negative and sum to one for every individual $j$.
 Each subpopulation $S_u$ has an allele frequency $p_i^{S_u}$ at locus $i$, and thus the individual-specific allele frequency $\pi_{ij}$ is the mean subpopulation allele frequencies weighted by the ancestry proportions:
@@ -1464,8 +1464,8 @@ The data processing in this work is also uniquely enabled by \texttt{BEDMatrix} 
 
 Complete code reproducing our results, data, and this manuscript is available at \url{https://github.com/OchoaLab/pca-assoc-paper}.
 
-% \section*{Acknowledgments}
-% [TODO?] ...
+\section*{Acknowledgments}
+The 1000 Genomes data were generated at the New York Genome Center with funds provided by NHGRI Grant 3UM1HG008901-03S1.
 
 \printbibliography
 
