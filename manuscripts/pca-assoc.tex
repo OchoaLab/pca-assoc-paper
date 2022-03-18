@@ -599,7 +599,7 @@ The large numbers of distant relatives expected of any real dataset all but ensu
 Our findings also suggest that related applications such as polygenic models may enjoy gains in power and accuracy by employing an LMM instead of PCA to model relatedness \citep{rakitsch_lasso_2013,qian_fast_2020}.
 PCA remains indispensable across population genetics, from visualizing population structure and performing quality control to its deep connection to admixture models, but the time has come to limit its use in association testing in favor of LMM or other, richer models capable of modeling all forms of relatedness.
 
-\section{Models and Methods}
+\section{Materials and Methods}
 
 \subsection{Models for genetic association studies}
 
@@ -1242,8 +1242,7 @@ After removing these individuals, an MAF filter of 0.01 is applied again (\cref{
 All approaches are evaluated in two orthogonal dimensions.
 $\rmsd$ quantifies the uniformity of non-causal p-values, a prerequisite for type I error and FDR control.
 $\auc$ quantifies causal locus classification performance and reflects power while ranking miscalibrated models fairly.
-We also define and contrast to related performance measures from the literature.
-These measures are implemented in \texttt{simtrait}.
+These measures are more robust alternatives to previous measures from the literature (see Appendices), and are implemented in \texttt{simtrait}.
 
 \subsubsection{$\rmsd$: a measure of p-value uniformity}
 
@@ -1276,6 +1275,31 @@ $$
 .
 $$
 The same worst-case value (with negative sign) occurs for all p-values of 1.
+
+\subsubsection{$\auc$: the area under the precision-recall curve}
+
+Precision and recall are standard performance measures for binary classifiers that do not require calibrated p-values \citep{grau_prroc:_2015}.
+Given the total numbers of true positives (TP), false positives (FP) and false negatives (FN) at some threshold or parameter $t$, precision and recall are
+\begin{align*}
+  \text{Precision}(t)
+  &=
+    \frac{ \text{TP}(t) }{ \text{TP}(t) + \text{FP}(t) }
+    , \\
+  \text{Recall}(t)
+  &=
+    \frac{ \text{TP}(t) }{ \text{TP}(t) + \text{FN}(t) }
+    .
+\end{align*}
+Precision and Recall trace a curve as $t$ is varied, and the area under this curve is $\auc$.
+We use the R package \texttt{PRROC} to integrate the correct non-linear piecewise function when interpolating between points.
+A model obtains the maximum $\auc = 1$ if there is a $t$ that classifies all loci perfectly.
+In contrast, the worst models, which classify at random, have an expected precision ($= \auc$) equal to the overall proportion of causal loci:
+$\frac{m_1}{m}$.
+
+
+\section{Appendices}
+
+\subsection{Appendix A: comparisons between $\rmsd$, $\auc$, and evaluation measures from the literature}
 
 \subsubsection{The inflation factor $\lambda$}
 
@@ -1343,54 +1367,6 @@ Calibrated p-values have type I error rate near $t$, which may be evaluated with
 This measure may give different results for different $t$, for example be significantly miscalibrated only for large $t$ (due to lack of power for smaller $t$).
 In contrast, $\rmsd = 0$ guarantees calibrated type I error rates at all $t$, while large $|\rmsd|$ indicates incorrect type I errors for a range of $t$.
 
-\subsubsection{$\auc$: the area under the precision-recall curve}
-
-Precision and recall are standard performance measures for binary classifiers that do not require calibrated p-values \citep{grau_prroc:_2015}.
-Let $c_i$ be the true classification of locus $i$: $c_i = 1$ for causal ($\beta_i \ne 0$), $c_i = 0$ otherwise.
-For given test statistics $t_i$ and some threshold $t$, the model predicts classifications as
-$$
-\hat{c}_i(t) =
-\begin{cases}
-  1 & \text{if} \quad t_i \ge t, \\
-  0 & \text{otherwise}.
-\end{cases}
-$$
-The total numbers of true positives (TP), false positives (FP) and false negatives (FN) at $t$ are
-\begin{align*}
-  \text{TP}(t)
-  &=
-    \sum_{i = 1}^m c_i \hat{c}_i(t)
-    , \\
-  \text{FP}(t)
-  &=
-    \sum_{i = 1}^m (1 - c_i) \hat{c}_i(t)
-    , \\
-  \text{FN}(t)
-  &=
-    \sum_{i = 1}^m c_i \left( 1 - \hat{c}_i(t) \right)
-    .
-\end{align*}
-Precision and recall at $t$ are
-\begin{align*}
-  \text{Precision}(t)
-  &=
-    \frac{ \text{TP}(t) }{ \text{TP}(t) + \text{FP}(t) }
-    =
-    \frac{ \sum_{i = 1}^m c_i \hat{c}_i(t) }{ \sum_{i = 1}^m \hat{c}_i(t) }
-    , \\
-  \text{Recall}(t)
-  &=
-    \frac{ \text{TP}(t) }{ \text{TP}(t) + \text{FN}(t) }
-    =
-    \frac{ \sum_{i = 1}^m c_i \hat{c}_i(t) }{ \sum_{i = 1}^m c_i }
-    .
-\end{align*}
-Precision and Recall trace a curve as $t$ is varied, and the area under this curve is $\auc$.
-We use the R package \texttt{PRROC} to integrate the correct non-linear piecewise function when interpolating between points.
-A model obtains the maximum $\auc = 1$ if there is a $t$ that classifies all loci perfectly.
-In contrast, the worst models, which classify at random, have an expected precision ($= \auc$) equal to the overall proportion of causal loci:
-$\pi_1 = \frac{m_1}{m} = \frac{1}{m} \sum_{i = 1}^m c_i$.
-
 \subsubsection{Statistical power and comparison to $\auc$}
 
 Power is the probability that a test is declared significant when the alternative hypothesis $H_1$ holds.
@@ -1449,8 +1425,6 @@ Now lets consider a simple yet common case in which model $A$ is uniformly more 
 Therefore $F_A^{-1}( \text{Recall} ) < F_B^{-1}( \text{Recall} )$ for every recall value.
 This ensures that the precision of $A$ is greater than that of $B$ at every recall value, so $\auc$ is greater for $A$ than $B$.
 Thus, in this case $\auc$ ranks models according to their power.
-
-
 
 
 \section*{Declaration of interests}
