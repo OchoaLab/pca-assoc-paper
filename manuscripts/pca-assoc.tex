@@ -815,6 +815,22 @@ since $\mathbf{V}_S$ is orthonormal, and where $\mathbf{\Lambda}_S = \frac{1}{m}
 Therefore, when the kinship matrix is low-dimensional, the LMM fits the same low-dimensional space as PCA, except that the coefficients $\boldsymbol{\gamma}_\text{LMM}$ are shrunk by the likelihood model, whereas PCA's $\boldsymbol{\gamma}_r$ are unconstrained.
 On the other hand, when the kinship matrix is high-dimensional then LMM fits this space better than PCA with any number of PCs $r$, since large $r$ will overfit.
 
+\subsubsection{Software}
+
+We selected fast and robust software implementing the basic PCA and LMM models based on internal benchmarks.
+
+PCA association was performed with \texttt{plink2} \citep{chang_second-generation_2015}.
+The quantitative trait association model is a linear regression with covariates, evaluated using the t-test.
+PCs were calculated with \texttt{plink2}, which equal the top eigenvectors of \cref{eq:kinship_std} after removing loci with $\text{MAF} < 0.1$.
+KING-robust estimates and removal of related individuals were also done with \texttt{plink2}.
+
+LMM association was performed using GCTA \citep{yang_gcta:_2011}.
+Kinship equals \cref{eq:kinship_std} except self-kinship uses a different formula \citep{yang_gcta:_2011}.
+PCs were calculated using GCTA from its kinship estimate.
+Association significance is evaluated with a score test \citep{yang_advantages_2014}.
+GCTA with large numbers of PCs in the small simulation only had convergence and singularity errors in some replicates, where $\rmsd$ and $\auc$ were treated as missing.
+% such as ``the information matrix is not invertible'', ``analysis stopped because more than half of the variance components are constrained'', and ``Log-likelihood not converged (stop after 100 iteractions)'' (sic),
+
 \subsection{Simulations}
 
 Below we use the following notation.
@@ -824,7 +840,7 @@ In the special case of the \textit{total} inbreeding of $A$, $\ft[A]$, $T$ is an
 \subsubsection{Genotype simulation from the admixture model}
 
 We consider three admixture simulation scenarios: Large, Small, and Family.
-The basic admixture model is as described previously \citep{ochoa_fst1, ochoa_estimating_2021}.
+The basic admixture model is as described previously \citep{ochoa_fst1, ochoa_estimating_2021} and is implemented in the R package \texttt{bnpsd} available on the Comprehensive R Archive Network (CRAN).
 
 Large and Family have $n = 1,000$ individuals, while Small has $n = 100$.
 The number of loci is $m = 100,000$.
@@ -866,6 +882,7 @@ We simulated a pedigree with admixed founders that features:
 (1) strict avoidance of close relatives when pairing individuals;
 (2) favoring close pairs in their 1-dimensional geography, which helps preserve the population structure by preferentially pairing individuals with similar admixture proportions (a form of assortative mating); and
 (3) many generations, resulting in a distribution of close and distant relatives.
+This simulation is implemented in the R package \texttt{simfam} available on CRAN.
 
 The 20 generations are drawn iteratively.
 Generation 1 has individuals from the large admixture simulation.
@@ -891,7 +908,7 @@ A new random pedigree was drawn for each replicate, as well as new founder genot
 
 \subsubsection{Genotype simulation from a tree model}
 
-This variant of the admixture model draws subpopulations allele frequencies from a hierarchical model parametrized by a tree.
+This variant of the admixture model draws subpopulations allele frequencies from a hierarchical model parametrized by a tree, which is also implemented in the R package \texttt{bnpsd} and relies on \texttt{ape} for general tree data structures and methods \citep{paradis_ape_2019}.
 The ancestral population $T$ is at the root of the tree, and each node is a subpopulation $S_w$ indexed ($w$) arbitrarily.
 Each edge between $S_w$ and its parent population $P_w$ has an inbreeding coefficient \f{P_w}{S_w}.
 Allele frequencies are drawn from the root to the tips of the tree iteratively, as a hierarchical or graphical model, since this tree is a directed acyclic graph.
@@ -918,7 +935,7 @@ To match the real datasets, which had loci with $\text{MAF} = \min \left\{ \pith
 
 \subsubsection{Fitting tree to data}
 
-We developed new methods to fit trees to real data based on unbiased kinship estimates from \texttt{popkin}.
+We developed new methods to fit trees to real data based on unbiased kinship estimates from \texttt{popkin}, implemented in \texttt{bnpsd}.
 The general approach is divided into these parts:
 deriving a simple additive estimation model,
 estimating population-averaged coancestry values,
@@ -1012,7 +1029,7 @@ This algorithm recovers the true tree topology when the true coancestry values a
 However, the edge lengths estimated by hierarchical clustering are ignored, fit in the next step.
 
 \textbf{Estimating tree edge lengths.}
-Additive edge lengths $\delta_w$ are estimated from \cref{eq:coanc_tree_additive} from the estimated subpopulation coancestry matrix $\hat{\vartheta}_{uv}^T$, using non-negative least squares linear regression \citep{lawson_solving_1974}, which minimizes the sum of squared residuals to the data while constraining every coefficient $\delta_w$ to be non-negative.
+Additive edge lengths $\delta_w$ are estimated from \cref{eq:coanc_tree_additive} from the estimated subpopulation coancestry matrix $\hat{\vartheta}_{uv}^T$, using non-negative least squares linear regression \citep{lawson_solving_1974}, which minimizes the sum of squared residuals to the data while constraining every coefficient $\delta_w$ to be non-negative (implemented in the R package \texttt{nnls}; \cite{mullen_nnls_2012}).
 The desired inbreeding edge values $\f{P_w}{S_w}$ are calculated from $\delta_w$ using the recursive algorithm described earlier.
 To account for small biases in coancestry estimation, an intercept term $\delta_0$ is fit (with $I_0(u,v) = 1$ for all $u,v$), and when converting $\delta_w$ to $\f{P_w}{S_w}$, $\delta_0$ is treated as an additional edge from the root of the input topology and the new root.
 However, $\delta_0$ is ignored when drawing allele frequencies from the tree.
@@ -1128,45 +1145,12 @@ $$
 w = \frac{ 2 V^T }{ W^T + V^T }.
 $$
 
-\subsubsection{Real human genotype datasets}
-
-The three datasets were processed as before \citep{ochoa_human} (summarized below), except with an additional filter so loci are in approximate linkage equilibrium and rare variants are removed.
-All processing was performed with \texttt{plink2} \citep{chang_second-generation_2015}.
-Each dataset groups individuals in a two-level hierarchy, which we call continental and fine-grained subpopulations, respectively.
-Final dataset sizes are in \cref{tab:human_sum}.
-
-\textbf{Human Origins.}
-We obtained the full (including non-public) Human Origins by contacting the authors and agreeing to their usage restrictions.
-The public subset is available at \url{https://reich.hms.harvard.edu/datasets}.
-The Pacific data \citep{skoglund_genomic_2016} was obtained separately from the rest \citep{lazaridis_ancient_2014,lazaridis_genomic_2016}, and datasets were merged using the intersection of loci.
-We removed ancient individuals, and individuals from singleton and non-native subpopulations.
-Non-autosomal loci were removed.
-
-\textbf{Human Genome Diversity Panel (HGDP) dataset.}
-The WGS version of HGDP \citep{bergstrom_insights_2020} was downloaded from the Wellcome Sanger Institute FTP site at \url{ftp://ngs.sanger.ac.uk/production/hgdp/hgdp_wgs.20190516/}.
-Our analysis was restricted to autosomal biallelic SNP loci with filter ``PASS''.
-
-\textbf{1000 Genomes Project.}
-The recent high-coverage NYGC version of the 1000 Genomes Project \citep{fairley_international_2020} was downloaded from \url{ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20190425_NYGC_GATK/}.
-Our analysis was restricted to autosomal biallelic SNP loci with filter ``PASS''.
-
-\textbf{LD pruning.}
-Our evaluations require uncorrelated loci, so non-causal loci are independent of the trait.
-We filtered each dataset with \texttt{plink2} using parameters ``\texttt{-{}-indep-pairwise 1000kb 0.3}'', which iteratively removes loci that have a greater than 0.3 correlation coefficient with another locus that is within 1000kb, stopping until no such loci remain.
-
-\textbf{MAF filters.}
-All real datasets have large numbers of rare variants.
-Since PCA and LMM are not able to detect associations involving rare variants, we removed all loci with $\text{MAF} < 0.01$.
-
-\textbf{Close relative removal.}
-For the evaluation with close relatives removed, each dataset was filtered with \texttt{plink2} with option ``\texttt{-{}-king-cutoff}'' with cutoff 0.02209709 ($= 2^{-11/2}$) for removing up to 4th degree relatives using KING-robust \citep{manichaikul_robust_2010}.
-After removing these individuals, an MAF filter of 0.01 is applied again (\cref{tab:king_cutoff}).
-
 \subsubsection{Trait Simulation}
 
 Complex traits are simulated from the additive quantitative trait model in \cref{eq:trait} from a given genotype matrix (simulated or real).
 To simulate the correct heritability, true ancestral allele frequencies \pit are required, which are only available for simulated genotypes.
 We extend the procedure to real genotypes and estimated allele frequencies \pith with novel bias corrections relying on the unbiased kinship estimator \texttt{popkin} \citep{ochoa_estimating_2021}.
+This simulation is implemented in the R package \texttt{simtrait}.
 
 All simulations share the following features.
 The narrow-sense heritability is $h^2 = 0.8$.
@@ -1221,12 +1205,45 @@ $$
 Eigenvalues were assigned p-values with \texttt{twstats} of the Eigensoft package \citep{patterson_population_2006}.
 Kinship rank was estimated as the largest number of consecutive eigenvalue from the start that all satisfy $p < 0.01$ (p-values did not increase monotonically).
 
+\subsection{Real human genotype datasets}
+
+The three datasets were processed as before \citep{ochoa_human} (summarized below), except with an additional filter so loci are in approximate linkage equilibrium and rare variants are removed.
+All processing was performed with \texttt{plink2} \citep{chang_second-generation_2015}.
+The data processing in this work is also uniquely enabled by the R packages \texttt{BEDMatrix} \citep{grueneberg_bgdata_2019} and \texttt{genio} (introduced here).
+Each dataset groups individuals in a two-level hierarchy, which we call continental and fine-grained subpopulations, respectively.
+Final dataset sizes are in \cref{tab:human_sum}.
+
+\textbf{Human Origins.}
+We obtained the full (including non-public) Human Origins by contacting the authors and agreeing to their usage restrictions.
+The Pacific data \citep{skoglund_genomic_2016} was obtained separately from the rest \citep{lazaridis_ancient_2014,lazaridis_genomic_2016}, and datasets were merged using the intersection of loci.
+We removed ancient individuals, and individuals from singleton and non-native subpopulations.
+Non-autosomal loci were removed.
+
+\textbf{Human Genome Diversity Panel (HGDP).}
+Our analysis of the WGS version of HGDP \citep{bergstrom_insights_2020} was restricted to autosomal biallelic SNP loci with filter ``PASS''.
+
+\textbf{1000 Genomes Project.}
+Our analysis of the high-coverage NYGC version of 1000 Genomes \citep{fairley_international_2020} was restricted to autosomal biallelic SNP loci with filter ``PASS''.
+
+\textbf{LD pruning.}
+Our evaluations require uncorrelated loci, so non-causal loci are independent of the trait.
+We filtered each dataset with \texttt{plink2} using parameters ``\texttt{-{}-indep-pairwise 1000kb 0.3}'', which iteratively removes loci that have a greater than 0.3 correlation coefficient with another locus that is within 1000kb, stopping until no such loci remain.
+
+\textbf{MAF filters.}
+All real datasets have large numbers of rare variants.
+Since PCA and LMM are not able to detect associations involving rare variants, we removed all loci with $\text{MAF} < 0.01$.
+
+\textbf{Close relative removal.}
+For the evaluation with close relatives removed, each dataset was filtered with \texttt{plink2} with option ``\texttt{-{}-king-cutoff}'' with cutoff 0.02209709 ($= 2^{-11/2}$) for removing up to 4th degree relatives using KING-robust \citep{manichaikul_robust_2010}.
+After removing these individuals, an MAF filter of 0.01 is applied again (\cref{tab:king_cutoff}).
+
 \subsection{Evaluation of performance}
 
 All approaches are evaluated in two orthogonal dimensions.
 $\rmsd$ quantifies the uniformity of non-causal p-values, a prerequisite for type I error and FDR control.
 $\auc$ quantifies causal locus classification performance and reflects power while ranking miscalibrated models fairly.
 We also define and contrast to related performance measures from the literature.
+These measures are implemented in \texttt{simtrait}.
 
 \subsubsection{$\rmsd$: a measure of p-value uniformity}
 
@@ -1369,6 +1386,7 @@ Precision and recall at $t$ are
     .
 \end{align*}
 Precision and Recall trace a curve as $t$ is varied, and the area under this curve is $\auc$.
+We use the R package \texttt{PRROC} to integrate the correct non-linear piecewise function when interpolating between points.
 A model obtains the maximum $\auc = 1$ if there is a $t$ that classifies all loci perfectly.
 In contrast, the worst models, which classify at random, have an expected precision ($= \auc$) equal to the overall proportion of causal loci:
 $\pi_1 = \frac{m_1}{m} = \frac{1}{m} \sum_{i = 1}^m c_i$.
@@ -1432,40 +1450,36 @@ Therefore $F_A^{-1}( \text{Recall} ) < F_B^{-1}( \text{Recall} )$ for every reca
 This ensures that the precision of $A$ is greater than that of $B$ at every recall value, so $\auc$ is greater for $A$ than $B$.
 Thus, in this case $\auc$ ranks models according to their power.
 
-\subsection{Software}
 
-We selected fast and robust software implementing the basic PCA and LMM models based on internal benchmarks.
 
-PCA association was performed with \texttt{plink2} \citep{chang_second-generation_2015}.
-The quantitative trait association model is a linear regression with covariates, evaluated using the t-test.
-PCs were calculated with \texttt{plink2}, which equal the top eigenvectors of \cref{eq:kinship_std} after removing loci with $\text{MAF} < 0.1$.
-KING-robust estimates and removal of related individuals were also done with \texttt{plink2}.
 
-LMM association was performed using GCTA \citep{yang_gcta:_2011}.
-Kinship equals \cref{eq:kinship_std} except self-kinship uses a different formula \citep{yang_gcta:_2011}.
-PCs were calculated using GCTA from its kinship estimate.
-Association significance is evaluated with a score test \citep{yang_advantages_2014}.
-GCTA with large numbers of PCs in the small simulation only had convergence and singularity errors in some replicates, where $\rmsd$ and $\auc$ were treated as missing.
-% such as ``the information matrix is not invertible'', ``analysis stopped because more than half of the variance components are constrained'', and ``Log-likelihood not converged (stop after 100 iteractions)'' (sic),
-
-\subsubsection{R packages}
-All following R packages are available on the Comprehensive R Archive Network (CRAN).
-
-Our genotype admixture and tree simulations are implemented in \texttt{bnpsd} \citep{ochoa_estimating_2021}.
-Our tree fitting and simulation implementations, introduced in this work, also use \texttt{nnls} for non-negative least squares \citep{mullen_nnls_2012} and \texttt{ape} for general tree data structures and methods \citep{paradis_ape_2019}.
-
-Our random family simulation procedure, introduced in this work, is implemented in \texttt{simfam}.
-
-Our trait simulation procedure and the $\auc$ and $\rmsd$ measures, all introduced in this work, are implemented in \texttt{simtrait}.
-Our $\auc$ function uses \texttt{PRROC}, which integrates the correct non-linear piecewise function when interpolating between points \citep{grau_prroc:_2015}.
-
-Unbiased population kinship estimates are obtained with \texttt{popkin} \citep{ochoa_estimating_2021}.
-The data processing in this work is also uniquely enabled by \texttt{BEDMatrix} \citep{grueneberg_bgdata_2019} and \texttt{genio} (introduced here).
-
-Complete code reproducing our results, data, and this manuscript is available at \url{https://github.com/OchoaLab/pca-assoc-paper}.
+\section*{Declaration of interests}
+The authors declare no competing interests.
 
 \section*{Acknowledgments}
 The 1000 Genomes data were generated at the New York Genome Center with funds provided by NHGRI Grant 3UM1HG008901-03S1.
+
+\section*{Web resources}
+plink2, \url{https://www.cog-genomics.org/plink/2.0/}\\
+GCTA, \url{https://yanglab.westlake.edu.cn/software/gcta/}\\
+Eigensoft, \url{https://github.com/DReichLab/EIG}\\g
+bnpsd, \url{https://cran.r-project.org/package=bnpsd}\\
+simfam, \url{https://cran.r-project.org/package=simfam}\\
+simtrait, \url{https://cran.r-project.org/package=simtrait}\\
+genio, \url{https://cran.r-project.org/package=genio}\\
+popkin, \url{https://cran.r-project.org/package=popkin}\\
+ape, \url{https://cran.r-project.org/package=ape}\\
+nnls, \url{https://cran.r-project.org/package=nnls}\\
+PRROC, \url{https://cran.r-project.org/package=PRROC}\\
+BEDMatrix, \url{https://cran.r-project.org/package=BEDMatrix}
+
+\section*{Data and code availability}
+The data and code generated during this study are available on GitHub at \url{https://github.com/OchoaLab/pca-assoc-paper}.
+The public subset of Human Origins is available on the Reich Lab website at \url{https://reich.hms.harvard.edu/datasets}; non-public samples have to be requested from David Reich.
+The WGS version of HGDP was downloaded from the Wellcome Sanger Institute FTP site at \url{ftp://ngs.sanger.ac.uk/production/hgdp/hgdp_wgs.20190516/}.
+The high-coverage version of the 1000 Genomes Project was downloaded from \url{ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20190425_NYGC_GATK/}.
+
+
 
 \printbibliography
 
