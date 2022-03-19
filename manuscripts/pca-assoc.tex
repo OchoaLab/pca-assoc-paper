@@ -735,21 +735,6 @@ However, this kinship estimator has a complex bias that differs for every indivi
 Nevertheless, in PCA and LMM these biased estimates perform as well as using unbiased estimates, an observation that will be explored in future work (data not shown).
 %[TODO: cite BIAS GWAS]
 
-\subsubsection{Connection between PCs and ancestry proportions}
-
-Here we show that association using global ancestry proportions as covariates is equivalent in expectation to using PCs under the admixture model, which has been demonstrated empirically before \citep{alexander_fast_2009, zhou_strong_2016} and is the basis of recent admixture inference models \citep{zheng_eigenanalysis_2016,cabreros_likelihood-free_2019,chiu_inferring_2022}.
-We shall assume the standard individual-specific admixture model \citep{pritchard_inference_2000, alexander_fast_2009}.
-There are $K$ subpopulations and every individual $j$ draws a proportion $q_{ju}$ of its alleles from subpopulation $S_u$, so ancestry proportions are non-negative and sum to one for every individual $j$.
-Each subpopulation $S_u$ has an allele frequency $p_i^{S_u}$ at locus $i$, and thus the individual-specific allele frequency $\pi_{ij}$ is the mean subpopulation allele frequencies weighted by the ancestry proportions:
-\begin{equation}
-  \label{eq:admix}
-  \pi_{ij} = \sum_{u=1}^K q_{ju} p_i^{S_u}.
-\end{equation}
-Genotypes are the sum of alleles drawn independently from this frequency: $\xij | \pi_{ij} \sim \text{Binomial}(2, \pi_{ij})$.
-Thus, the rowspace of $\mathbf{X}$ equals in expectation that of $(\pi_{ij})$, which by \cref{eq:admix} is the same as the rowspace of the $n \times K$ admixture proportions matrix $\mathbf{Q} = (q_{ju})$.
-Therefore, the top $K$ PCs span the rowspace of the genotypes.
-Since associations include an intercept term ($\mathbf{1} \alpha$ in \cref{eq:pca_gwas}), estimated PCs are orthogonal to $\mathbf{1}$ (note $\mathbf{\hat{\Phi}}^T \mathbf{1} = \mathbf{0}$ because $\mathbf{\hat{X}}_S \mathbf{1} = \mathbf{0}$), and the sum of rows of $\mathbf{Q}$ sums to one, then only $K-1$ PCs (plus intercept) are needed to span the rowspace of this admixture model.
-
 \subsubsection{The LMM approximation}
 
 The LMM is another approximation to the complex trait model in \cref{eq:trait}, given by
@@ -872,9 +857,15 @@ Random allele frequencies and genotypes are drawn from this hierarchical model:
 \end{align*}
 Briefly, ancestral allele frequencies \pit are drawn independently per locus $i$.
 Subpopulation allele frequencies $p_i^{S_u}$ are drawn independently for each $S_u$ from the Balding-Nichols distribution with mean \pit and variance $\pit \left( 1 - \pit \right) \ft[S_u]$ \citep{balding_method_1995}.
-Lastly, the individual-specific allele frequencies $\pi_{ij}$ and genotypes \xij are as in the admixture model (\cref{eq:admix}).
+The individual-specific allele frequency $\pi_{ij}$ is the mean subpopulation allele frequency $p_i^{S_u}$ weighted by the ancestry proportions $q_{ju}$.
+Genotypes $\xij$ are the sum of alleles drawn independently with frequency $\pi_{ij}$.
 Fixed loci ($i$ where $\xij = 0$ for all $j$, or $\xij = 2$ for all $j$) are drawn again from the model, starting from \pit, iterating until no loci are fixed.
 Each replicate draws a new genotype matrix starting from \pit.
+
+As a brief aside, we prove that global ancestry proportions as covariates is equivalent in expectation to using PCs under the admixture model.
+Note that the rowspace of $\mathbf{X}$ equals in expectation that of $(\pi_{ij})$, which is the same as the rowspace of the $n \times K$ admixture proportions matrix $\mathbf{Q} = (q_{ju})$.
+Therefore, the top $K$ PCs span the rowspace of the genotypes.
+Since associations include an intercept term ($\mathbf{1} \alpha$ in \cref{eq:pca_gwas}), estimated PCs are orthogonal to $\mathbf{1}$ (note $\mathbf{\hat{\Phi}}^T \mathbf{1} = \mathbf{0}$ because $\mathbf{\hat{X}}_S \mathbf{1} = \mathbf{0}$), and the sum of rows of $\mathbf{Q}$ sums to one, then only $K-1$ PCs (plus intercept) are needed to span the rowspace of this admixture model.
 
 \subsubsection{Genotype simulation from random admixed families}
 
@@ -1199,12 +1190,6 @@ $$
 \alpha = - \frac{2}{m_1} \left( \sum_{i \in C} \pith \right) \left(\sum_{i \in C} \beta_i \right).
 $$
 
-\subsubsection{Kinship rank estimates}
-
-\texttt{Popkin} kinship estimates (from first replicate for simulated genotypes) were used to calculate eigenvalues, without excluding individuals.
-Eigenvalues were assigned p-values with \texttt{twstats} of the Eigensoft package \citep{patterson_population_2006}.
-Kinship rank was estimated as the largest number of consecutive eigenvalue from the start that all satisfy $p < 0.01$ (p-values did not increase monotonically).
-
 \subsection{Real human genotype datasets}
 
 The three datasets were processed as before \citep{ochoa_human} (summarized below), except with an additional filter so loci are in approximate linkage equilibrium and rare variants are removed.
@@ -1232,6 +1217,11 @@ We filtered each dataset with \texttt{plink2} using parameters ``\texttt{-{}-ind
 \textbf{MAF filters.}
 All real datasets have large numbers of rare variants.
 Since PCA and LMM are not able to detect associations involving rare variants, we removed all loci with $\text{MAF} < 0.01$.
+
+\textbf{Kinship rank estimates.}
+\texttt{Popkin} kinship estimates (from first replicate for simulated genotypes) were used to calculate eigenvalues, without excluding individuals.
+Eigenvalues were assigned p-values with \texttt{twstats} of the Eigensoft package \citep{patterson_population_2006}.
+Kinship rank was estimated as the largest number of consecutive eigenvalue from the start that all satisfy $p < 0.01$ (p-values did not increase monotonically).
 
 \textbf{Close relative removal.}
 For the evaluation with close relatives removed, each dataset was filtered with \texttt{plink2} with option ``\texttt{-{}-king-cutoff}'' with cutoff 0.02209709 ($= 2^{-11/2}$) for removing up to 4th degree relatives using KING-robust \citep{manichaikul_robust_2010}.
