@@ -661,7 +661,7 @@ Under the kinship model, genotypes are random variables obeying
 =
 4 \pit ( 1 - \pit ) \mathbf{\Phi}^T,
 \end{equation}
-where \pit is the ancestral allele frequency of locus $i$ \citep{malecot_mathematiques_1948, wright_genetical_1951, jacquard_structures_1970}.
+where \pit is the ancestral allele frequency of locus $i$ \citep{malecot_mathematiques_1948, wright_genetical_1951, jacquard_structures_1970, astle_population_2009}.
 Assuming independent loci, the covariance of the polygenic effect is
 $$
 \Cov( \mathbf{X}^\intercal \boldsymbol{\beta} ) = 2 \sigma^2_s \mathbf{\Phi}^T,
@@ -738,22 +738,19 @@ GCTA with large numbers of PCs in the small simulation only had convergence and 
 
 \subsection{Simulations}
 
-Below we use the following notation.
-Let $\f{B}{A}$ denote the inbreeding coefficient of a subpopulation $A$ from another subpopulation $B$ ancestral to $A$.
-In the special case of the \textit{total} inbreeding of $A$, $\ft[A]$, $T$ is an overall ancestral population (ancestral to every subpopulation and/or individual under consideration, such as the most recent common ancestor population).
+Below we use the notation $\f{B}{A}$ for the inbreeding coefficient of a subpopulation $A$ from another subpopulation $B$ ancestral to $A$.
+In the special case of the \textit{total} inbreeding of $A$, $\ft[A]$, $T$ is an overall ancestral population (ancestral to every individual under consideration, such as the most recent common ancestor (MRCA) population).
 
 \subsubsection{Genotype simulation from the admixture model}
 
 We consider three admixture simulation scenarios: Large, Small, and Family.
 The basic admixture model is as described previously \citep{ochoa_fst1, ochoa_estimating_2021} and is implemented in the R package \texttt{bnpsd} available on the Comprehensive R Archive Network (CRAN).
-
 Large and Family have $n = 1,000$ individuals, while Small has $n = 100$.
 The number of loci is $m = 100,000$.
 Individuals are admixed from $K = 10$ intermediate subpopulations, or ancestries.
 Each subpopulation $S_u$ ($u \in \{ 1, ..., K \}$) lies at coordinate $u$ and has an inbreeding coefficient $\ft[S_u] = u \tau$ for some $\tau$.
 Ancestry proportions $q_{ju}$ for individual $j$ and subpopulation $S_u$ arise from a random walk model on the given 1-dimensional geography with spread $\sigma$, and the free parameters $\tau$ and $\sigma$ are fit to result in $\Fst = 0.1$ and mean kinship $\bar{\theta}^T = 0.5 \Fst$ for the admixed individuals, as before \citep{ochoa_estimating_2021}.
-
-Random allele frequencies and genotypes are drawn from this hierarchical model:
+Random ancestral allele frequencies \pit, subpopulation allele frequencies $p_i^{S_u}$, individual-specific allele frequencies $\pi_{ij}$, and genotypes \xij are drawn from this hierarchical model:
 \begin{align*}
   \pit
   &\sim
@@ -773,58 +770,41 @@ Random allele frequencies and genotypes are drawn from this hierarchical model:
   \xij | \pi_{ij}
   &\sim
     \text{Binomial}(2, \pi_{ij})
-    .
+    ,
 \end{align*}
-Briefly, ancestral allele frequencies \pit are drawn independently per locus $i$.
-Subpopulation allele frequencies $p_i^{S_u}$ are drawn independently for each $S_u$ from the Balding-Nichols distribution with mean \pit and variance $\pit \left( 1 - \pit \right) \ft[S_u]$ \citep{balding_method_1995}.
-The individual-specific allele frequency $\pi_{ij}$ is the mean subpopulation allele frequency $p_i^{S_u}$ weighted by the ancestry proportions $q_{ju}$.
-Genotypes $\xij$ are the sum of alleles drawn independently with frequency $\pi_{ij}$.
+where Beta is the Balding-Nichols distribution with mean \pit and variance $\pit \left( 1 - \pit \right) \ft[S_u]$ \citep{balding_method_1995}.
 Fixed loci ($i$ where $\xij = 0$ for all $j$, or $\xij = 2$ for all $j$) are drawn again from the model, starting from \pit, iterating until no loci are fixed.
 Each replicate draws a new genotype matrix starting from \pit.
 
 As a brief aside, we prove that global ancestry proportions as covariates is equivalent in expectation to using PCs under the admixture model.
-Note that the rowspace of $\mathbf{X}$ equals in expectation that of $(\pi_{ij})$, which is the same as the rowspace of the $n \times K$ admixture proportions matrix $\mathbf{Q} = (q_{ju})$.
-Therefore, the top $K$ PCs span the rowspace of the genotypes.
-Since associations include an intercept term ($\mathbf{1} \alpha$ in \cref{eq:pca_gwas}), estimated PCs are orthogonal to $\mathbf{1}$ (note $\mathbf{\hat{\Phi}}^T \mathbf{1} = \mathbf{0}$ because $\mathbf{\hat{X}}_S \mathbf{1} = \mathbf{0}$), and the sum of rows of $\mathbf{Q}$ sums to one, then only $K-1$ PCs (plus intercept) are needed to span the rowspace of this admixture model.
+Note that the latent space of $\mathbf{X}$, given by $(\pi_{ij})$, has $K$ dimensions (number of columns of $\mathbf{Q} = (q_{ju})$), so the top $K$ PCs span this space.
+Since associations include an intercept term ($\mathbf{1} \alpha$ in \cref{eq:pca_gwas}), estimated PCs are orthogonal to $\mathbf{1}$ (note $\mathbf{\hat{\Phi}}^T \mathbf{1} = \mathbf{0}$ because $\mathbf{X}_S \mathbf{1} = \mathbf{0}$), and the sum of rows of $\mathbf{Q}$ sums to one, then only $K-1$ PCs (plus intercept) are needed to span the latent space of this admixture model.
 
 \subsubsection{Genotype simulation from random admixed families}
 
-We simulated a pedigree with admixed founders that features:
-(1) strict avoidance of close relatives when pairing individuals;
-(2) favoring close pairs in their 1-dimensional geography, which helps preserve the population structure by preferentially pairing individuals with similar admixture proportions (a form of assortative mating); and
-(3) many generations, resulting in a distribution of close and distant relatives.
+We simulated a pedigree with admixed founders, no close relative pairings, assortative mating based on a 1D geography (to preserve admixture structure), and arbitrary numbers of generations (20 in this work).
 This simulation is implemented in the R package \texttt{simfam} available on CRAN.
-
-The 20 generations are drawn iteratively.
-Generation 1 has individuals from the large admixture simulation.
-These individuals are ordered by the 1-dimensional geography of the admixture scenario.
+Generations are drawn iteratively.
+Generation 1 has $n=1000$ individuals from the above admixture simulation ordered by their 1D geography.
 The local kinship matrix measures the pedigree relatedness; in the first generation, everybody is locally unrelated and outbred.
-Individuals are randomly assigned to male or female with equal probability.
-
-The children of the previous generation are the parents in the next generation, paired iteratively as follows.
-From the pool of available males, one is picked randomly and is paired with the nearest female that is not a second cousin or closer relative (local kinship must be $< 1/4^3$); males that are not pairable are removed from the pool of available males.
-Pairing stops when there are no more available males or females.
-
-Next, a random number of children per pair is constructed to yield a desired population size $n$ and a minimum family size of $n_m=1$, as follows.
-Let $n_f$ the be number of families (paired parents) in the current generation, then the number of additional children (beyond the minimum) is drawn from a Poisson distribution with parameter $n/n_f - n_m$.
-Although the mean population size is $n$ as desired, the random sample may deviate from this target size.
+Individuals are randomly assigned to male or female.
+In the next generation, individuals are paired iteratively, removing random males from the pool of available males and pairing them with the nearest available female with local kinship $< 1/4^3$ (stay unpaired if there are no matches), until there are no more available males or females.
+Let $n=1000$ be the desired population size, $n_m=1$ the minimum number of children and $n_f$ the number of families (paired parents) in the current generation, then the number of additional children (beyond the minimum) is drawn from $\text{Poisson}(n/n_f - n_m)$.
 Let $\delta$ be the difference between desired and current population sizes.
 If $\delta > 0$, then $\delta$ random families are incremented by 1.
 If $\delta < 0$, then $|\delta|$ random families with at least $n_m+1$ children are decremented by 1.
 If $|\delta|$ exceeds the number of families, all families are incremented or decremented as needed and the process is iterated.
 Children are assigned sex randomly, and are reordered by the average coordinate of their parents.
-
 Children draw alleles from their parents independently per locus.
-A new random pedigree was drawn for each replicate, as well as new founder genotypes from the admixture model.
+A new random pedigree is drawn for each replicate, as well as new founder genotypes from the admixture model.
 
 \subsubsection{Genotype simulation from a tree model}
 
-This variant of the admixture model draws subpopulations allele frequencies from a hierarchical model parametrized by a tree, which is also implemented in the R package \texttt{bnpsd} and relies on \texttt{ape} for general tree data structures and methods \citep{paradis_ape_2019}.
-The ancestral population $T$ is at the root of the tree, and each node is a subpopulation $S_w$ indexed ($w$) arbitrarily.
+This model draws subpopulations allele frequencies from a hierarchical model parametrized by a tree, which is also implemented in \texttt{bnpsd} and relies on \texttt{ape} for general tree data structures and methods \citep{paradis_ape_2019}.
+The ancestral population $T$ is the root, and each node is a subpopulation $S_w$ indexed arbitrarily.
 Each edge between $S_w$ and its parent population $P_w$ has an inbreeding coefficient \f{P_w}{S_w}.
-Allele frequencies are drawn from the root to the tips of the tree iteratively, as a hierarchical or graphical model, since this tree is a directed acyclic graph.
-For the root $T$, \pit are drawn from a given distribution (constructed to mimic each real dataset below).
-Given the allele frequencies $p_i^{P_w}$ of the parent population $P_w$, the child population $S_w$'s allele frequencies are drawn from:
+\pit are drawn from a given distribution (constructed to mimic each real dataset below).
+Given the allele frequencies $p_i^{P_w}$ of the parent population, $S_w$'s allele frequencies are drawn from:
 $$
 p_i^{S_w} | p_i^{P_w}
 \sim
@@ -834,69 +814,33 @@ p_i^{S_w} | p_i^{P_w}
 \right)
 .
 $$
-Finally, individuals $j$ in the tip subpopulation $S_w$ have genotypes drawn independently from its allele frequency:
-$$
+Individuals $j$ in $S_w$ draw genotypes from its allele frequency:
+$
 \xij | p_i^{S_w}
 \sim
 \text{Binomial}\left( 2, p_i^{S_w} \right)
 .
-$$
+$
+Loci with $\text{MAF} = \min \left\{ \pith, 1 - \pith \right\} < 0.01$ are drawn again starting from the \pit distribution, iterating until no such loci remain.
 
-To match the real datasets, which had loci with $\text{MAF} = \min \left\{ \pith, 1 - \pith \right\} < 0.01$ removed, here loci with $\text{MAF} < 0.01$ are drawn again from the model, starting from \pit, iterating until no such loci remain.
-
-\subsubsection{Fitting tree to data}
+\subsubsection{Fitting tree to real data}
 
 We developed new methods to fit trees to real data based on unbiased kinship estimates from \texttt{popkin}, implemented in \texttt{bnpsd}.
-The general approach is divided into these parts:
-deriving a simple additive estimation model,
-estimating population-averaged coancestry values,
-estimating tree topology, and
-estimating inbreeding edge values for a given tree topology.
-
-\textbf{Estimation model.}
-A tree with given inbreeding edges gives rise to a specific coancestry matrix calculated recursively here.
-Suppose as before that every node in the tree is indexed as $S_w$.
-Coancestry values $\vartheta_{uv}^T$ for a pair of subpopulations $S_u$ and $S_v$ are total inbreeding values of subpopulations in the tree.
-In particular, the self-coancestry of $S_u$ equals its total inbreeding coefficient ($\vartheta_{uu}^T = \ft[S_u]$), and the coancestry of $S_u$ and $S_v$ equals the total inbreeding of their most recent common ancestor (MRCA) population:
-$$
-\vartheta_{uv}^T
-=
-\ft[ S_w ]
-,
-\quad\quad
-S_w = \text{MRCA}( S_u, S_v )
-.
-$$
-Since the above $S_w$ is always some node in the tree, we obtain the coancestry matrix by calculating total inbreeding of every $S_w$.
-
-We calculate total inbreeding $\ft[S_w]$ for every node $S_w$ recursively from the root as follows.
-The value of the edge to $S_w$ from its parent $P_w$, $\f{P_w}{S_w}$, is given.
-Nodes with parent $P_w = T$ are already of the desired form.
-If \ft[P_w] has been calculated, then \ft[S_w] is given by \citep{ochoa_fst1}
-$$
-\ft[S_w] = \ft[P_w] + \f{P_w}{S_w} \left( 1 - \ft[P_w] \right).
-$$
-The previous calculation is nearly additive, but $\f{P_w}{S_w}$ is shrunk by $\left( 1 - \ft[P_w] \right)$ before adding to $\ft[P_w]$.
-Define the additive contribution of the edge to $S_w$ as
-$$
-\delta_w = \ft[S_w] - \ft[P_w] = \f{P_w}{S_w} \left( 1 - \ft[P_w] \right).
-$$
+A tree with given inbreeding edges \f{P_w}{S_w} gives rise to a coancestry matrix $\vartheta_{uv}^T$ for a subpopulation pair ($S_u,S_v$), and the goal is to recover the inbreeding edges from coancestry estimates.
+Coancestry values are total inbreeding coefficients of the MRCA population of each subpopulation pair.
+Therefore, we calculate $\ft[S_w]$ for every $S_w$ recursively from the root as follows.
+Nodes with parent $P_w = T$ are already as desired.
+Given \ft[P_w], the desired \ft[S_w] is calculated via the additive edge $\delta_w$ \citep{ochoa_fst1}:
+\begin{equation}
+  \label{eq:inbr_total_additive}
+  \ft[S_w] = \ft[P_w] + \delta_w,
+  \quad\quad
+  \delta_w = \f{P_w}{S_w} \left( 1 - \ft[P_w] \right).
+\end{equation}
 These $\delta_w \ge 0$ because $0 \le \f{P_w}{S_w}, \ft[P_w] \le 1$ for every $w$.
-Inbreeding edges can be recovered from additive edges recursively from the root, since nodes $S_w$ connected to the root satisfy
-$\f{P_w}{S_w} = \ft[S_w] = \delta_w$,
-and given $\ft[P_w]$ we can calculate $\f{P_w}{S_w}$ and $\ft[S_w]$ using
-\begin{equation*}
-  \f{P_w}{S_w}
-  =
-  \frac{ \delta_w }{ 1 - \ft[P_w] },
-  \quad
-  \ft[S_w]
-  =
-  \ft[P_w] + \delta_w
-  .
-\end{equation*}
-
-Coancestry values are simplified as a sum of additive contributions $\delta_w$ for the nodes that are ancestors of the given pair of subpopulations,
+Inbreeding edges can be recovered from additive edges:
+$\f{P_w}{S_w} = \delta_w /( 1 - \ft[P_w] )$.
+Overall, coancestry values are sums of $\delta_w$ over common ancestor nodes,
 \begin{equation}
   \label{eq:coanc_tree_additive}
   \vartheta_{uv}^T
@@ -904,13 +848,11 @@ Coancestry values are simplified as a sum of additive contributions $\delta_w$ f
   \sum_w \delta_w I_w(u,v)
   ,
 \end{equation}
-where the sum includes all $S_w$, and $I_w(u,v)$ is an indicator function equal to 1 if $S_w$ is an ancestor to both $S_u$ and $S_v$, 0 otherwise.
-Note that $I_w(u,v)$ are given by the tree topology, while $\delta_w$ reflect edge values.
-Therefore, given a topology, $\delta_w$ can be estimated by non-negative linear regression (see below), where $I_w(u,v)$ define the design matrix.
+where the sum includes all $w$, and $I_w(u,v)$ equals 1 if $S_w$ is a common ancestor of $S_u,S_v$, 0 otherwise.
+Note that $I_w(u,v)$ reflects tree topology and $\delta_w$ edge values.
 
-\textbf{Estimating population-averaged coancestry.}
-Kinship (\ktHat) is estimated using \texttt{popkin} \citep{ochoa_estimating_2021}.
-Coancestry ($\hat{\theta}_{jk}^T$) is estimated from kinship by replacing self-kinship with inbreeding (\ftHat) along the diagonal:
+To estimate population-level coancestry, first kinship (\ktHat) is estimated using \texttt{popkin} \citep{ochoa_estimating_2021}.
+Individual coancestry ($\hat{\theta}_{jk}^T$) is estimated from kinship using
 \begin{equation}
   \label{eq:kinship_to_coanc}
   \hat{\theta}_{jk}^T
@@ -920,7 +862,7 @@ Coancestry ($\hat{\theta}_{jk}^T$) is estimated from kinship by replacing self-k
     \ftHat = 2 \ktHat[j] - 1 & \text{if} \quad k = j.
   \end{cases}
 \end{equation}
-Lastly, coancestry values $\hat{\vartheta}_{uv}^T$ between subpopulations $S_u$ and $S_v$ are averages of the individual coancestry values across subpopulations, or within the subpopulation when $u=v$:
+Lastly, coancestry $\hat{\vartheta}_{uv}^T$ between subpopulations are averages of individual coancestry values:
 $$
 \hat{\vartheta}_{uv}^T
 =
@@ -928,32 +870,23 @@ $$
 .
 $$
 
-\textbf{Estimating tree topology.}
-Our simple topology estimation approach stems from the monotonic relationship between node depth and coancestry from \cref{eq:coanc_tree_additive}.
-Topology is estimated with hierarchical clustering using the weighted pair group method with arithmetic mean (WPGMA) algorithm \citep{sokal_statistical_1958}.
-The distance function between subpopulations is
-$$
-d( S_u, S_v ) = \hat{\vartheta}_\text{max}^T - \hat{\vartheta}_{uv}^T,
-$$
-where $\hat{\vartheta}_\text{max}^T$ is the maximum $\hat{\vartheta}_{uv}^T$.
-This algorithm recovers the true tree topology when the true coancestry values are provided, and performs well when $\hat{\vartheta}_{uv}^T$ are noisy estimates from genotypes.
-However, the edge lengths estimated by hierarchical clustering are ignored, fit in the next step.
+Topology is estimated with hierarchical clustering using the weighted pair group method with arithmetic mean \citep{sokal_statistical_1958}, with distance function
+$
+d( S_u, S_v ) = \text{max} \left\{ \hat{\vartheta}_{uv}^T \right\} - \hat{\vartheta}_{uv}^T,
+$
+which succeeds due to the monotonic relationship between node depth and coancestry (\cref{eq:coanc_tree_additive}).
+This algorithm recovers the true topology from the true coancestry values, and performs well for estimates from genotypes.
 
-\textbf{Estimating tree edge lengths.}
-Additive edge lengths $\delta_w$ are estimated from \cref{eq:coanc_tree_additive} from the estimated subpopulation coancestry matrix $\hat{\vartheta}_{uv}^T$, using non-negative least squares linear regression \citep{lawson_solving_1974}, which minimizes the sum of squared residuals to the data while constraining every coefficient $\delta_w$ to be non-negative (implemented in the R package \texttt{nnls}; \cite{mullen_nnls_2012}).
-The desired inbreeding edge values $\f{P_w}{S_w}$ are calculated from $\delta_w$ using the recursive algorithm described earlier.
-To account for small biases in coancestry estimation, an intercept term $\delta_0$ is fit (with $I_0(u,v) = 1$ for all $u,v$), and when converting $\delta_w$ to $\f{P_w}{S_w}$, $\delta_0$ is treated as an additional edge from the root of the input topology and the new root.
-However, $\delta_0$ is ignored when drawing allele frequencies from the tree.
+To estimate tree edge lengths, first $\delta_w$ are estimated from $\hat{\vartheta}_{uv}^T$ and the topology using \cref{eq:coanc_tree_additive} and non-negative least squares linear regression \citep{lawson_solving_1974} (implemented in \texttt{nnls}; \cite{mullen_nnls_2012}) to yield non-negative $\delta_w$, and $\f{P_w}{S_w}$ are calculated from $\delta_w$ by reversing \cref{eq:inbr_total_additive}.
+To account for small biases in coancestry estimation, an intercept term $\delta_0$ is included ($I_0(u,v) = 1$ for all $u,v$), and when converting $\delta_w$ to $\f{P_w}{S_w}$, $\delta_0$ is treated as an additional edge to the root, but is ignored when drawing allele frequencies from the tree.
 
-\subsubsection{Fitting ancestral allele frequency distribution to data}
+\subsubsection{Fitting ancestral allele frequency distribution to real data}
 
-We calculated the allele frequency distribution \pith of each real dataset.
-However, differentiation increases the variance of \pith relative to the true ancestral allele frequency \pit \citep{ochoa_estimating_2021}.
-Here we present a new algorithm for constructing an ``undifferentiated'' distribution of ancestral allele frequencies based on the input data \pith but which has the lower variance of the true \pit distribution.
-
-\textbf{Model.}
-Suppose the \pit distribution over loci $i$ satisfies $\E \left[ \pit \right] = \frac{1}{2}$ (symmetric about 0.5) and $\Var \left( \pit \right) = V^T$.
-The sample allele frequency \pith, conditioned on \pit, has moments
+We calculated \pith distributions of each real dataset.
+However, differentiation increases the variance of \pith relative to the true \pit \citep{ochoa_estimating_2021}.
+We present a new algorithm for constructing an ``undifferentiated'' distribution based on the input data but with the lower variance of the true ancestral distribution.
+Suppose the \pit distribution over loci $i$ satisfies $\E \left[ \pit \right] = \frac{1}{2}$ and $\Var \left( \pit \right) = V^T$.
+The sample allele frequency \pith, conditioned on \pit, satisfies
 $$
 \E \left[ \pith \middle| \pit \right]
 =
@@ -965,50 +898,38 @@ $$
 ,
 $$
 where $\bar{\varphi}^T = \frac{1}{n^2} \sum_{j=1}^n \sum_{k=1}^n \kt$ is the mean kinship over all individual \citep{ochoa_estimating_2021}.
-The unconditional moments of \pith are given by the laws of total expectation and variance:
-\begin{align*}
-  \E \left[ \pith \right]
-  &=
-    \E \left[ \E \left[ \pith \middle| \pit \right] \right]
-    =
-    \E \left[ \pit \right]
-    =
-    \frac{1}{2}
-    , \\
+The unconditional moments of \pith follow from the laws of total expectation and variance: 
+$
+\E \left[ \pith \right]
+% =
+% \E \left[ \E \left[ \pith \middle| \pit \right] \right]
+=
+\frac{1}{2}
+$
+and
+\begin{equation*}
   W^T
   =
   \Var \left( \pith \right)
-  &=
-    \E \left[ \Var \left( \pith \middle| \pit \right) \right ]
-    + \Var \left( \E \left[ \pith \middle| \pit \right] \right)
-  \\
-  &=
-    \E \left[ \pit \left( 1 - \pit \right) \bar{\varphi}^T \right]
-    + \Var \left( \pit \right)
-    % \\
-    % &=
-    % \left( \E \left[ \pit \left( 1 - \pit \right) \right] \right) \bar{\varphi}^T
-    % + \Var \left( \pit \right)
-    % \\
-    % &=
-    % \left( \E \left[ \pit \right] - \E \left[ \left( \pit \right)^2 \right] \right) \bar{\varphi}^T
-    % + \Var \left( \pit \right)
-    % \\
-    % &=
-    % \left( \E \left[ \pit \right] - \left( \Var \left( \pit \right) + \left( \E \left[ \pit \right] \right)^2 \right) \right) \bar{\varphi}^T
-    % + \Var \left( \pit \right)
-  \\
-  &=
-    \bar{\varphi}^T \E \left[ \pit \right] \left( 1 - \E \left[ \pit \right] \right)
-    + \left( 1 - \bar{\varphi}^T \right) \Var \left( \pit \right)
-  \\
-  &=
-    \bar{\varphi}^T \frac{1}{4}
-    + \left( 1 - \bar{\varphi}^T \right) V^T
-    .
-\end{align*}
-Since $V^T \le \frac{1}{4}$ and $\bar{\varphi}^T \ge 0$, the variance of \pith is greater: $W^T \ge V^T$.
-Thus, given $W^T$ and $\bar{\varphi}^T$, the goal is to construct a new distribution with the original, lower variance of
+  % &=
+  %   \E \left[ \Var \left( \pith \middle| \pit \right) \right ]
+  %   + \Var \left( \E \left[ \pith \middle| \pit \right] \right)
+  % \\
+  % &=
+  %   \E \left[ \pit \left( 1 - \pit \right) \bar{\varphi}^T \right]
+  %   + \Var \left( \pit \right)
+  % \\
+  % &=
+  %   \bar{\varphi}^T \E \left[ \pit \right] \left( 1 - \E \left[ \pit \right] \right)
+  %   + \left( 1 - \bar{\varphi}^T \right) \Var \left( \pit \right)
+  % \\
+  =
+  \bar{\varphi}^T \frac{1}{4}
+  + \left( 1 - \bar{\varphi}^T \right) V^T
+  .
+\end{equation*}
+Since $V^T \le \frac{1}{4}$ and $\bar{\varphi}^T \ge 0$, then $W^T \ge V^T$.
+Thus, the goal is to construct a new distribution with the original, lower variance of
 \begin{equation}
   \label{eq:var_undiff}
   V^T
@@ -1016,96 +937,76 @@ Thus, given $W^T$ and $\bar{\varphi}^T$, the goal is to construct a new distribu
   \frac{ W^T - \frac{1}{4} \bar{\varphi}^T }{ 1 - \bar{\varphi}^T }
   .
 \end{equation}
-
-\textbf{Estimation of ancestral variance.}
-Given empirical sample allele frequencies \pith, we use an unbiased sample estimator for $W^T$ that assumes a known expectation of one half, which is appropriate treating the choice of reference allele as random:
-$$
+We use the unbiased estimator
+$
 \hat{W}^T
 =
-\frac{1}{m} \sum_{i=1}^m \left( \pith - \frac{1}{2} \right)^2
-.
-$$
-The mean kinship $\bar{\varphi}^T$ is calculated from the tree parameters: the subpopulation coancestry matrix calculated using \cref{eq:coanc_tree_additive}, expanded from subpopulations to individuals, the diagonal converted to kinship (reversing \cref{eq:kinship_to_coanc}), and the matrix averaged.
-However, our model ignores the MAF-based locus ascertainment performed in our simulations, which introduces additional biases.
-We found that greater values of $\bar{\varphi}^T$ than the model parameter resulted in simulations with more accurately specified population structures.
+\frac{1}{m} \sum_{i=1}^m ( \pith - \frac{1}{2})^2
+,
+$
+while $\bar{\varphi}^T$ is calculated from the tree parameters: the subpopulation coancestry matrix (\cref{eq:coanc_tree_additive}), expanded from subpopulations to individuals, the diagonal converted to kinship (reversing \cref{eq:kinship_to_coanc}), and the matrix averaged.
+However, since our model ignores the MAF filters imposed in our simulations, $\bar{\varphi}^T$ was adjusted.
 For Human Origins the true model $\bar{\varphi}^T$ of 0.143 was used.
-For 1000 Genomes and HGDP the true model values $\bar{\varphi}^T$ are 0.126 and 0.124, respectively, but 0.4 produced a better fit for both.
+For 1000 Genomes and HGDP the true $\bar{\varphi}^T$ are 0.126 and 0.124, respectively, but 0.4 for both produced a better fit.
 
-\textbf{Construction of "undifferentiated" allele frequencies.}
-We construct a new allele frequency,
+Lastly, we construct new allele frequencies,
 $$
-p_i^{T'} = w \pith + ( 1 - w ) q,
+p' = w \pith + ( 1 - w ) q,
 $$
-by averaging \pith (with known variance $W^T$) with $q \in (0, 1)$ drawn independently from a lower-variance ``mixing'' distribution (constructed shortly) with weight $w$.
-We require that $\E[q] = \frac{1}{2}$ to have $\E \left[ p_i^{T'} \right] = \frac{1}{2}$.
-Letting $V_\text{mix} = \Var(q)$, the output variance is
+by a weighted average of \pith and $q \in (0, 1)$ drawn independently from a different distribution.
+$\E[q] = \frac{1}{2}$ is required to have $\E \left[ p' \right] = \frac{1}{2}$.
+The resulting variance is
 $$
-V^{T'}
+\Var(p')
 =
-w^2 W^T + (1-w)^2 V_\text{mix}
+w^2 W^T + (1-w)^2 \Var(q)
 ,
 $$
-which we equate to the desired $V^T$ in \cref{eq:var_undiff} and solve for $w$ in this quadratic equation.
-For simplicity, we set $V_\text{mix} = V^T$, which is achieved with the following Beta distribution:
+which we equate to the desired $V^T$ (\cref{eq:var_undiff}) and solve for $w$.
+For simplicity, we set $\Var(q) = V^T$, which is achieved with:
 $$
 q \sim \text{Beta} \left( \frac{1}{2} \left( \frac{1}{ 4 V^T } - 1 \right), \frac{1}{2} \left( \frac{1}{ 4 V^T } - 1 \right) \right)
 .
 $$
-Although $w=0$ yields $V^{T'} = V^T$, we use the second root of the quadratic equation to use the input \pith data:
+Although $w=0$ yields $\Var(p') = V^T$, we use the second root of the quadratic equation to use \pith:
 $$
 w = \frac{ 2 V^T }{ W^T + V^T }.
 $$
 
 \subsubsection{Trait Simulation}
 
-Complex traits are simulated from the additive quantitative trait model in \cref{eq:trait} from a given genotype matrix (simulated or real).
-To simulate the correct heritability, true ancestral allele frequencies \pit are required, which are only available for simulated genotypes.
-We extend the procedure to real genotypes and estimated allele frequencies \pith with novel bias corrections relying on the unbiased kinship estimator \texttt{popkin} \citep{ochoa_estimating_2021}.
+Traits are simulated from the quantitative trait model of \cref{eq:trait}, with novel bias corrections for simulating the desired heritability from real data relying on the unbiased kinship estimator \texttt{popkin} \citep{ochoa_estimating_2021}.
 This simulation is implemented in the R package \texttt{simtrait}.
-
-All simulations share the following features.
-The narrow-sense heritability is $h^2 = 0.8$.
-Non-genetic effects are drawn independently: $\epsilon_j \sim \text{Normal}(0, 1 - h^2 )$.
-To balance power across datasets with varying numbers of individuals $n$, the number of causal loci is $m_1 = n / 10$.
-For each replicate, new causal loci are picked randomly and coefficients drawn from the FES or RC trait model.
-The set of causal loci $C$ is drawn from loci with $\text{MAF} \ge 0.01$, to avoid rare causal variants (inappropriate for PCA or LMM).
-
-\textbf{Initial coefficients for FES model.}
-Letting $v_i^T = \pit \left( 1 - \pit \right)$, the effect size of locus $i$ is defined as $2 v_i^T \beta_i^2$, which is its contribution of the trait variance \citep{park_estimation_2010}.
-For known \pit, equal effect sizes across causal loci are obtained with
+All simulations have a narrow-sense heritability of $h^2 = 0.8$ and $\epsilon_j \sim \text{Normal}(0, 1 - h^2 )$.
+To balance power while varying $n$, the number of causal loci is $m_1 = n / 10$.
+The set of causal loci $C$ is drawn anew for each replicate, from loci with $\text{MAF} \ge 0.01$ to avoid rare causal variants (inappropriate for PCA and LMM).
+Letting $v_i^T = \pit \left( 1 - \pit \right)$, the effect size of locus $i$ equals $2 v_i^T \beta_i^2$, its contribution of the trait variance \citep{park_estimation_2010}.
+Under the \textit{fixed effect sizes} (FES) model, initial causal coefficients are
 $$
-\beta_i = \frac{1}{ \sqrt{ 2 v_i^T } }.
+\beta_i = \frac{1}{ \sqrt{ 2 v_i^T } }
 $$
-Each causal locus is multiplied by -1 with probability 0.5.
-For unknown \pit, we replace $v_i^T$ with the unbiased estimator \citep{ochoa_estimating_2021}
-\begin{equation*}
-  \hat{v}_i^T
-  =
-  \frac{ \pith \left( 1 - \pith \right) }{ 1 - \bar{\varphi}^T } 
-  ,
-\end{equation*}
+for known \pit; otherwise $v_i^T$ is replaced by the unbiased estimator \citep{ochoa_estimating_2021}
+$
+\hat{v}_i^T
+=
+\pith \left( 1 - \pith \right) / ( 1 - \bar{\varphi}^T )
+,
+$
 where $\bar{\varphi}^T$ is the mean kinship estimated with \texttt{popkin}.
-
-\textbf{Initial coefficients for RC model.}
-Causal locus coefficients are drawn independently from $\beta_i \sim \text{Normal}( 0, 1 )$.
-
-\textbf{Coefficient normalization.}
-Under the kinship model, the genetic variance component is
-$$
+Each causal locus is multiplied by -1 with probability 0.5.
+Alternatively, under the \textit{random coefficients} (RC) model, initial causal coefficients are drawn independently from $\beta_i \sim \text{Normal}( 0, 1 )$.
+For both models, the initial genetic variance is
+$
 \sigma^2_0
 =
 \sum_{i \in C} 2 v_i^T \beta_i^2 ,
-$$
-where $\hat{v}_i^T$ is used instead of $v_i^T$ for unknown \pit (in which case $\sigma^2_0$ is an unbiased estimate of the genetic variance).
-Multiplying every $\beta_i$ by $\frac{h}{ \sigma_0 }$ results in the desired heritability $h^2$.
-
-\textbf{Intercept coefficient.}
-For known \pit, the intercept coefficient in \cref{eq:trait} is set to
-$$
-\alpha = - \sum_{i \in C} 2 \pit \beta_i,
-$$
-so the trait expectation is zero.
-When \pit are unknown, \pith should not replace \pit above since that distorts the trait covariance (for the same reason the standard kinship estimator in \cref{eq:kinship_std} is biased; \cite{ochoa_estimating_2021}), which is avoided with the form
+$
+replacing $v_i^T$ with $\hat{v}_i^T$ for unknown \pit (so $\sigma^2_0$ is an unbiased estimate), so we multiply every initial $\beta_i$ by $\frac{h}{ \sigma_0 }$ to have the desired heritability.
+Lastly, for known \pit, the intercept coefficient is
+$
+\alpha = - \sum_{i \in C} 2 \pit \beta_i.
+$
+When \pit are unknown, \pith should not replace \pit since that distorts the trait covariance (for the same reason the standard kinship estimator in \cref{eq:kinship_std} is biased), which is avoided with
 $$
 \alpha = - \frac{2}{m_1} \left( \sum_{i \in C} \pith \right) \left(\sum_{i \in C} \beta_i \right).
 $$
@@ -1113,51 +1014,29 @@ $$
 \subsection{Real human genotype datasets}
 
 The three datasets were processed as before \citep{ochoa_human} (summarized below), except with an additional filter so loci are in approximate linkage equilibrium and rare variants are removed.
-All processing was performed with \texttt{plink2} \citep{chang_second-generation_2015}.
-The data processing in this work is also uniquely enabled by the R packages \texttt{BEDMatrix} \citep{grueneberg_bgdata_2019} and \texttt{genio} (introduced here).
+All processing was performed with \texttt{plink2} \citep{chang_second-generation_2015}, and analysis was uniquely enabled by the R packages \texttt{BEDMatrix} \citep{grueneberg_bgdata_2019} and \texttt{genio}.
 Each dataset groups individuals in a two-level hierarchy, which we call continental and fine-grained subpopulations, respectively.
 Final dataset sizes are in \cref{tab:human_sum}.
 
-\textbf{Human Origins.}
 We obtained the full (including non-public) Human Origins by contacting the authors and agreeing to their usage restrictions.
 The Pacific data \citep{skoglund_genomic_2016} was obtained separately from the rest \citep{lazaridis_ancient_2014,lazaridis_genomic_2016}, and datasets were merged using the intersection of loci.
 We removed ancient individuals, and individuals from singleton and non-native subpopulations.
 Non-autosomal loci were removed.
-
-\textbf{Human Genome Diversity Panel (HGDP).}
 Our analysis of the WGS version of HGDP \citep{bergstrom_insights_2020} was restricted to autosomal biallelic SNP loci with filter ``PASS''.
-
-\textbf{1000 Genomes Project.}
 Our analysis of the high-coverage NYGC version of 1000 Genomes \citep{fairley_international_2020} was restricted to autosomal biallelic SNP loci with filter ``PASS''.
 
-\textbf{LD pruning.}
-Our evaluations require uncorrelated loci, so non-causal loci are independent of the trait.
-We filtered each dataset with \texttt{plink2} using parameters ``\texttt{-{}-indep-pairwise 1000kb 0.3}'', which iteratively removes loci that have a greater than 0.3 correlation coefficient with another locus that is within 1000kb, stopping until no such loci remain.
-
-\textbf{MAF filters.}
-All real datasets have large numbers of rare variants.
-Since PCA and LMM are not able to detect associations involving rare variants, we removed all loci with $\text{MAF} < 0.01$.
-
-\textbf{Kinship rank estimates.}
-\texttt{Popkin} kinship estimates (from first replicate for simulated genotypes) were used to calculate eigenvalues, without excluding individuals.
-Eigenvalues were assigned p-values with \texttt{twstats} of the Eigensoft package \citep{patterson_population_2006}.
-Kinship rank was estimated as the largest number of consecutive eigenvalue from the start that all satisfy $p < 0.01$ (p-values did not increase monotonically).
-
-\textbf{Close relative removal.}
-For the evaluation with close relatives removed, each dataset was filtered with \texttt{plink2} with option ``\texttt{-{}-king-cutoff}'' with cutoff 0.02209709 ($= 2^{-11/2}$) for removing up to 4th degree relatives using KING-robust \citep{manichaikul_robust_2010}.
-After removing these individuals, an MAF filter of 0.01 is applied again (\cref{tab:king_cutoff}).
+Since our evaluations assume uncorrelated loci, we filtered each dataset with \texttt{plink2} using parameters ``\texttt{-{}-indep-pairwise 1000kb 0.3}'', which iteratively removes loci that have a greater than 0.3 correlation coefficient with another locus that is within 1000kb, stopping until no such loci remain.
+Since all real datasets have numerous rare variants, while PCA and LMM are not able to detect associations involving rare variants, we removed all loci with $\text{MAF} < 0.01$.
+Kinship rank and eigenvalues were calculated from \texttt{popkin} kinship estimates.
+Eigenvalues were assigned p-values with \texttt{twstats} of the Eigensoft package \citep{patterson_population_2006}, and kinship rank was estimated as the largest number of consecutive eigenvalue from the start that all satisfy $p < 0.01$ (p-values did not increase monotonically).
+For the evaluation with close relatives removed, each dataset was filtered with \texttt{plink2} with option ``\texttt{-{}-king-cutoff}'' with cutoff 0.02209709 ($= 2^{-11/2}$) for removing up to 4th degree relatives using KING-robust \citep{manichaikul_robust_2010}, and $\text{MAF} < 0.01$ is reapplied (\cref{tab:king_cutoff}).
 
 \subsection{Evaluation of performance}
 
-All approaches are evaluated in two orthogonal dimensions.
-$\rmsd$ quantifies the uniformity of non-causal p-values, a prerequisite for type I error and FDR control.
-$\auc$ quantifies causal locus classification performance and reflects power while ranking miscalibrated models fairly.
+All approaches are evaluated in two orthogonal dimensions: $\rmsd$ quantifies p-value uniformity, and $\auc$ measures causal locus classification performance and reflects power while ranking miscalibrated models fairly.
 These measures are more robust alternatives to previous measures from the literature (see Appendices), and are implemented in \texttt{simtrait}.
 
-\subsubsection{$\rmsd$: a measure of p-value uniformity}
-
-P-values for continuous test statistics have a uniform distribution when the null hypothesis holds.
-This fact is crucial for type I error and FDR control by common approaches such as q-values \citep{storey_positive_2003, storey_statistical_2003}.
+P-values for continuous test statistics have a uniform distribution when the null hypothesis holds, a crucial assumption for type I error and FDR control \citep{storey_positive_2003, storey_statistical_2003}.
 We use the Signed Root Mean Square Deviation ($\rmsd$) to measure the difference between the observed null p-value quantiles and the expected uniform quantiles:
 $$
 \rmsd
@@ -1185,8 +1064,6 @@ $$
 .
 $$
 The same worst-case value (with negative sign) occurs for all p-values of 1.
-
-\subsubsection{$\auc$: the area under the precision-recall curve}
 
 Precision and recall are standard performance measures for binary classifiers that do not require calibrated p-values \citep{grau_prroc:_2015}.
 Given the total numbers of true positives (TP), false positives (FP) and false negatives (FN) at some threshold or parameter $t$, precision and recall are
