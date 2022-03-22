@@ -601,12 +601,7 @@ PCA remains indispensable across population genetics, from visualizing populatio
 
 \section{Materials and Methods}
 
-\subsection{Models for genetic association studies}
-
-Here we describe the complex trait and kinship models that motivate PCA and LMM.
-The derivations of PCA and LMM from the general quantitative trait model are similar to previous presentations \citep{astle_population_2009, hoffman_correcting_2013}, but we emphasize the kinship model for random genotypes as crucial for these connections, and clearly distinguish the true kinship matrix from its biased common estimator \citep{ochoa_estimating_2021, ochoa_human}.
-
-\subsubsection{The complex trait model and PCA approximation}
+\subsection{The complex trait model and PCA and LMM approximations}
 
 Let $\xij \in \{ 0, 1, 2 \}$ be the genotype at the biallelic locus $i$ for individual $j$, which counts the number of reference alleles.
 Suppose there are $n$ individuals and $m$ loci,
@@ -629,83 +624,77 @@ and $\intercal$ denotes matrix transposition.
 The residuals follow $\epsilon_j \sim \text{Normal}(0, \sigma^2)$ independently per individual $j$, for some $\sigma^2$.
 For simplicity, non-genetic covariates are omitted from this model (and the PCA and LMM counterparts) but are trivial to include without changing any of our theoretical results.
 
-Current datasets have millions of loci $m$ while most have many fewer than a million individuals $n$.
-The full model above cannot be fit for $m \ge n$, as there are more parameters ($m+2$, the length of $\boldsymbol{\beta}$, $\alpha$, $\sigma^2$) than samples ($n$, the length of $\mathbf{y}$).
-The PCA model with $r$ PCs approximates the full model fit at a single locus $i$:
-\begin{equation}
+The full model of \cref{eq:trait}, which has a coefficient for each of the $m$ loci, is overdetermined in current datasets where $m \gg n$.
+The PCA and LMM models, respectively, approximate the full model fit at a single locus $i$:
+\begin{align}
   \label{eq:pca_gwas}
+  \text{PCA:}\quad
   \mathbf{y}
-  =
+  &=
   \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{U}_r \boldsymbol{\gamma}_r + \boldsymbol{\epsilon}
-  ,
-\end{equation}
+  , \\
+  \label{eq:lmm_gwas}
+  \text{LMM:}\quad
+  \mathbf{y}
+  &=
+  \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{s} + \boldsymbol{\epsilon}
+    ,
+    \quad\quad
+    \mathbf{s} \sim \text{Normal} \left( \mathbf{0}, 2 \sigma^2_s \mathbf{\Phi}^T \right),
+\end{align}
 where $\mathbf{x}_i$ is the length-$n$ vector of genotypes at locus $i$ only,
 $\beta_i$ is the locus coefficient,
-$\mathbf{U}_r$ is an $n \times r$ matrix of PCs, and
-$\boldsymbol{\gamma}_r$ is the length-$r$ vector of PC coefficients.
-This approximation follows from the singular value decomposition of the genotype matrix:
-$\mathbf{X}^\intercal = \mathbf{U} \mathbf{D} \mathbf{V}^\intercal$,
-where
-$\mathbf{U}$ is an $n \times n$ matrix of left singular vectors of $\mathbf{X}$,
-$\mathbf{V}$ is an $m \times n$ matrix of its right singular vectors, and
-$\mathbf{D}$ is an $n \times n$ diagonal matrix of its singular values.
-Thus, the full model has
-$\mathbf{X}^\intercal \boldsymbol{\beta} = \mathbf{U} \boldsymbol{\gamma}$,
-where
-$\boldsymbol{\gamma} = \mathbf{D} \mathbf{V}^\intercal \boldsymbol{\beta}$ is a length-$n$ vector.
-The approximation consists of replacing $\mathbf{U} \boldsymbol{\gamma}$ (the full set of $n$ left singular vectors and their coefficients) with $\mathbf{U}_r \boldsymbol{\gamma}_r$ (the top $r$ singular vectors only), which is the best rank-$r$ approximation of the genotypes \citep{jolliffe_principal_2002}. % Property A5, pg 47 of PDF
-Thus, PCs approximate the polygenic effect of the whole genome, and assumes that locus $i$ being tested does not contribute greatly to this signal.
-
-The null hypothesis of $\beta_j = 0$ (no association) is evaluated with a standard regression t-test, yielding a two-sided p-value.
-Some PCA implementations trade this t-test for an asymptotic $\chi^2$ test, which requires the number of parameters to be much smaller than the number of individuals.
-
-\subsubsection{Kinship model for genotypes}
-
-To better motivate the most common PC estimator for genotype data, and to connect PCA to LMM, consider the kinship model for random genotypes obeying
-$$
-\E[ \xij | T ]
+$\mathbf{U}_r$ is an $n \times r$ matrix of PCs,
+$\boldsymbol{\gamma}_r$ is the length-$r$ vector of PC coefficients,
+$\mathbf{s}$ is a length-$n$ vector of random effects,
+$\mathbf{\Phi}^T = (\kt)$ is the $n \times n$ kinship matrix conditioned on the ancestral population $T$,
+and $\sigma^2_s$ is a variance factor (do not confuse the ancestral population superscript $T$ with the matrix transposition symbol $\intercal$).
+Both models condition the regression of the focal locus $i$ on an approximation of the total polygenic effect $\mathbf{X}^\intercal \boldsymbol{\beta}$ (assumes the contribution of the test $i$ is infinitesimal) with the same covariance structure, which is parametrized by the kinship matrix.
+Under the kinship model, genotypes are random variables obeying
+\begin{equation}
+  \label{eq:kinship_model}
+\E[ \mathbf{x}_i | T ]
 =
-2 \pit,
+2 \pit \mathbf{1},
 \quad\quad
-\Cov( \xij, \xij[k] | T )
+\Cov( \mathbf{x}_i | T )
 =
-4 \pit ( 1 - \pit ) \kt,
+4 \pit ( 1 - \pit ) \mathbf{\Phi}^T,
+\end{equation}
+where \pit is the ancestral allele frequency of locus $i$ \citep{malecot_mathematiques_1948, wright_genetical_1951, jacquard_structures_1970}.
+Assuming independent loci, the covariance of the polygenic effect is
 $$
-where $T$ is the ancestral population (on which random variables are conditioned upon, usually the most recent common ancestor population), \pit is the ancestral allele frequency of locus $i$, and \kt is the kinship coefficient between individuals $j$ and $k$ \citep{malecot_mathematiques_1948, wright_genetical_1951, jacquard_structures_1970}.
-Thus, the genotype matrix can be theoretically standardized using \pit as
+\Cov( \mathbf{X}^\intercal \boldsymbol{\beta} ) = 2 \sigma^2_s \mathbf{\Phi}^T,
+\quad\quad
+\sigma^2_s = \sum_{i=1}^m 2 \pit ( 1 - \pit ) \beta_i^2,
 $$
-\mathbf{X}_S
-=
-\left(
-  \frac{
-    \xij - 2 \pit
-  }{
-    \sqrt{4 \pit \left( 1 - \pit \right)}
-  }
-\right)
+which is readily modeled by the LMM random effect $\mathbf{s}$.
+(The difference in mean is absorbed by the intercept.)
+Alternatively, considering the eigendecomposition of the kinship matrix $\mathbf{\Phi}^T = \mathbf{U} \mathbf{\Lambda} \mathbf{U}^\intercal$ where $\mathbf{U}$ is the $n \times n$ eigenvector matrix and $\mathbf{\Lambda}$ is the $n \times n$ diagonal matrix of eigenvalues.
+The random effect can be written as
+$$
+\mathbf{s} = \mathbf{U} \boldsymbol{\gamma}_\text{LMM},
+\quad\quad
+\boldsymbol{\gamma}_\text{LMM}
+\sim \text{Normal}( \mathbf{0}, 2 \sigma_s^2 \boldsymbol{\Lambda})
 ,
 $$
-which results in the kinship estimator
-$$
-\E
-\left[
-\frac{1}{m}
-\mathbf{X}_S^\intercal
-\mathbf{X}_S
-\right]
-=
-\mathbf{\Phi}^T
-,
-$$
-where $\mathbf{\Phi}^T = ( \kt )$ is the $n \times n$ kinship matrix (do not confuse the ancestral population superscript $T$ with the matrix transposition symbol $\intercal$).
-Replacing $\mathbf{X}$ with the standardized $\mathbf{X}_S$ in the trait model of \cref{eq:trait} results in an equivalent model that differs only by a linear transformation.
-Thus, starting from standardized genotypes, the PCs of interest are equal in expectation to the top eigenvectors of the kinship matrix.
+which follows from the affine transformation property of multivariate normal distributions.
+Therefore, the PCA term $\mathbf{U}_r \boldsymbol{\gamma}_r$ can be derived from the above equation under the additional assumption that the kinship matrix has rank $r$ (is low dimensional) and the coefficients $\boldsymbol{\gamma}_r$ are fit without constraints.
+In contrast, the LMM uses all eigenvectors, while effectively shrinking their coefficients $\boldsymbol{\gamma}_\text{LMM}$ as all random effects models do, although these parameters are marginalized \citep{astle_population_2009, hoffman_correcting_2013}.
+Thus, LMM has fewer parameters to fit compared to PCA: ignoring the shared terms in \cref{eq:pca_gwas} and \cref{eq:lmm_gwas}, PCA has $r$ parameters to fit (length of $\boldsymbol{\gamma}$), whereas LMMs fit only one ($\sigma^2_s$).
+Therefore, PCA may overfit more than LMM---and thus lose power---when $r$ is very large and the sample size small.
 
-\subsubsection{Estimation of PCs from genotype data}
+The null hypothesis of $\beta_j = 0$ (no association) is evaluated in PCA with a standard regression t-test, yielding a two-sided p-value.
+Some PCA implementations trade this t-test for an asymptotic $\chi^2$ test, which requires the number of parameters to be much smaller than the number of individuals.
+Statistical significance in LMMs has been performed with various tests, including likelihood ratio tests, F tests, score tests, and Wald tests.
 
-In practice, the matrix of PCs $\mathbf{U}_r$ in \cref{eq:pca_gwas} is calculated from an estimate of $\mathbf{X}_S$, namely
-\begin{equation*}
-  \mathbf{\hat{X}}_S
+\subsubsection{Kinship estimates from genotype data}
+
+In practice, given the kinship model of \cref{eq:kinship_model}, the kinship matrix used for PCA and LMM is estimated with the method-of-moments formula applied to standardized genotypes $\mathbf{X}_S$:
+\begin{equation}
+  \label{eq:kinship_std}
+  \mathbf{X}_S
   =
   \left(
     \frac{
@@ -715,104 +704,35 @@ In practice, the matrix of PCs $\mathbf{U}_r$ in \cref{eq:pca_gwas} is calculate
     }
   \right)
   ,
-\end{equation*}
-where \pit is replaced by the estimate
-$
-\pith = \frac{1}{2n} \sum_{j = 1}^n \xij,
-$
-and results in the kinship estimate
-\begin{equation}
-  \label{eq:kinship_std}
+  \quad\quad
   \mathbf{\hat{\Phi}}^T
   =
   \frac{1}{m}
-  \mathbf{\hat{X}}_S^\intercal
-  \mathbf{\hat{X}}_S
-  .
+  \mathbf{X}_S^\intercal
+  \mathbf{X}_S
+  ,
 \end{equation}
-This kinship estimate and minor variants are also employed in all modern LMMs \citep{yang_gcta:_2011}.
-However, this kinship estimator has a complex bias that differs for every individual pair \citep{ochoa_estimating_2021, ochoa_human}.
+where the unknown \pit is replaced by the estimate
+$
+\pith = \frac{1}{2n} \sum_{j = 1}^n \xij,
+$
+as well as minor variations \citep{price_principal_2006, kang_efficient_2008, kang_variance_2010, yang_gcta:_2011, zhou_genome-wide_2012, loh_efficient_2015, sul_population_2018, zhou_efficiently_2018}.
+However, this kinship estimator has a complex bias that differs for every individual pair, which arises due to the use of the estimated \pith \citep{ochoa_estimating_2021, ochoa_human}.
 Nevertheless, in PCA and LMM these biased estimates perform as well as using unbiased estimates, an observation that will be explored in future work (data not shown).
 %[TODO: cite BIAS GWAS]
 
-\subsubsection{The LMM approximation}
-
-The LMM is another approximation to the complex trait model in \cref{eq:trait}, given by
-\begin{equation}
-  \label{eq:lmm_gwas}
-  \mathbf{y}
-  =
-  \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{s} + \boldsymbol{\epsilon}
-  ,
-\end{equation}
-which compared to PCA (\cref{eq:pca_gwas}) replaces the PCs $\mathbf{U}_r \boldsymbol{\gamma}_r$ with the random effect $\mathbf{s}$, which is a length-$n$ vector drawn from \citep{sul_population_2018}
-$$
-\mathbf{s} \sim \text{Normal} \left( \mathbf{0}, \sigma^2_s \mathbf{\Phi}^T \right),
-$$
-where $\mathbf{\Phi}^T$ is the kinship matrix and $\sigma^2_s$ is a variance factor.
-This model is derived from treating the standardized genotype matrix $\mathbf{X}_S$ as random, so the standardized genetic effect
-$\mathbf{X}_S^\intercal \boldsymbol{\beta}_S$
-has mean zero and covariance
-$$
-\Cov \left( \mathbf{X}_S^\intercal \boldsymbol{\beta}_S \right)
-=
-|| \boldsymbol{\beta}_S ||^2 \mathbf{\Phi}^T
-.
-$$
-The above $\mathbf{s}$ satisfies those equations with $\sigma^2_s = || \boldsymbol{\beta}_S ||^2$.
-Thus, PCA is the fixed model equivalent of LMM under the additional approximation that only the top $r$ eigenvectors are used, whereas LMM uses all eigenvectors (see next subsection).
-
-LMM has fewer parameters to fit compared to PCA: ignoring the shared terms in \cref{eq:pca_gwas} and \cref{eq:lmm_gwas}, PCA has $r$ parameters to fit (length of $\boldsymbol{\gamma}$), whereas LMMs fit only one ($\sigma^2_s$).
-Therefore, PCA may overfit more than LMM---and thus lose power---when $r$ is very large and the sample size small.
-Statistical significance in LMMs has been performed with various tests, including F tests, score tests, and Wald tests.
-
-\subsubsection{Connection between LMM and PCA}
-
-The LMM of \cref{eq:lmm_gwas} can be written to better resemble PCA of \cref{eq:pca_gwas}, as \citep{astle_population_2009, hoffman_correcting_2013}:
-\begin{equation}
-  \label{eq:lmm_gwas_evd}
-  \mathbf{y}
-  =
-  \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{U} \boldsymbol{\gamma}_\text{LMM} + \boldsymbol{\epsilon}
-  , \quad\quad
-  \boldsymbol{\gamma}_\text{LMM} = \sigma_s \boldsymbol{\Lambda}^{1/2} \mathbf{r}
-  ,
-\end{equation}
-where $\mathbf{U}$ is the PCs matrix (all $n$ of them), $\boldsymbol{\Lambda}$ is the diagonal eigenvalue matrix of the kinship matrix ($\mathbf{\Phi}^T = \mathbf{U} \boldsymbol{\Lambda} \mathbf{U}^\intercal$), and $\mathbf{r} \sim \text{Normal}(\mathbf{0},\mathbf{I})$.
-The connection follows since $\mathbf{s} = \sigma_s \mathbf{U} \boldsymbol{\Lambda}^{1/2} \mathbf{r}$ satisfies
-$$
-\mathbf{s} \sim \text{Normal} \left( \mathbf{0}, \left( \sigma_s \mathbf{U} \boldsymbol{\Lambda}^{1/2} \right) \left( \sigma_s \mathbf{U} \boldsymbol{\Lambda}^{1/2} \right)^\intercal \right)
-= \text{Normal}( \mathbf{0}, \sigma_s^2 \mathbf{\Phi}^T ),
-$$
-which itself follows from the affine transformation property of multivariate normal distributions.
-$\mathbf{U}$ also equals in the limit the right singular vectors of the standardized genotype matrix $\mathbf{X}_S = \mathbf{V}_S \mathbf{D}_S \mathbf{U}_S^\intercal$, which is how we originally motivated PCA, since
-$$
-\frac{1}{m} \mathbf{X}_S^\intercal \mathbf{X}_S
-%= \frac{1}{m} \mathbf{U}_S \mathbf{D}_S \mathbf{V}_S^\intercal \mathbf{V}_S \mathbf{D}_S \mathbf{U}_S^\intercal
-= \mathbf{U}_S \mathbf{\Lambda}_S \mathbf{U}_S^\intercal
-\toas
-\mathbf{U} \mathbf{\Lambda} \mathbf{U}^\intercal
-=
-\mathbf{\Phi}^T
-$$
-since $\mathbf{V}_S$ is orthonormal, and where $\mathbf{\Lambda}_S = \frac{1}{m} \mathbf{D}_S^2$.
-
-Therefore, when the kinship matrix is low-dimensional, the LMM fits the same low-dimensional space as PCA, except that the coefficients $\boldsymbol{\gamma}_\text{LMM}$ are shrunk by the likelihood model, whereas PCA's $\boldsymbol{\gamma}_r$ are unconstrained.
-On the other hand, when the kinship matrix is high-dimensional then LMM fits this space better than PCA with any number of PCs $r$, since large $r$ will overfit.
-
-\subsubsection{Software}
+\subsubsection{PCA and LMM implementations}
 
 We selected fast and robust software implementing the basic PCA and LMM models based on internal benchmarks.
 
 PCA association was performed with \texttt{plink2} \citep{chang_second-generation_2015}.
 The quantitative trait association model is a linear regression with covariates, evaluated using the t-test.
 PCs were calculated with \texttt{plink2}, which equal the top eigenvectors of \cref{eq:kinship_std} after removing loci with $\text{MAF} < 0.1$.
-KING-robust estimates and removal of related individuals were also done with \texttt{plink2}.
 
-LMM association was performed using GCTA \citep{yang_gcta:_2011}.
-Kinship equals \cref{eq:kinship_std} except self-kinship uses a different formula \citep{yang_gcta:_2011}.
+LMM association was performed using GCTA \citep{yang_gcta:_2011,yang_advantages_2014}.
+Kinship equals \cref{eq:kinship_std} except self-kinship uses a different formula.
 PCs were calculated using GCTA from its kinship estimate.
-Association significance is evaluated with a score test \citep{yang_advantages_2014}.
+Association significance is evaluated with a score test.
 GCTA with large numbers of PCs in the small simulation only had convergence and singularity errors in some replicates, where $\rmsd$ and $\auc$ were treated as missing.
 % such as ``the information matrix is not invertible'', ``analysis stopped because more than half of the variance components are constrained'', and ``Log-likelihood not converged (stop after 100 iteractions)'' (sic),
 
