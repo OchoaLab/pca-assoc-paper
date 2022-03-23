@@ -103,7 +103,7 @@ Here we focus on extensively evaluating the two most popular association models:
 Genetic association with PCA consists of including the top eigenvectors of the population kinship matrix as covariates in a generalized linear model \citep{zhang_semiparametric_2003, price_principal_2006, bouaziz_accounting_2011}.
 These top eigenvectors are commonly referred to as PCs in genetics \citep{patterson_population_2006}, the convention adopted here, but it is worth noting that in other fields PCs instead denote the projections of loci onto eigenvectors \citep{jolliffe_principal_2002}.
 The direct ancestor of PCA association is structured association, in which inferred ancestry or admixture proportions are used as regression covariates \citep{pritchard_association_2000}.
-These models are deeply connected because PCs map to ancestry empirically (\textit{e.g.}, \cite{alexander_fast_2009, zhou_strong_2016}) and theoretically \citep{mcvean_genealogical_2009,zheng_eigenanalysis_2016,cabreros_likelihood-free_2019,chiu_inferring_2022}, and they work as well as global ancestry in association studies but are estimated more easily \citep{patterson_population_2006, zhao_arabidopsis_2007, alexander_fast_2009, bouaziz_accounting_2011}.
+These models are deeply connected because PCs map to ancestry empirically \citep{alexander_fast_2009, zhou_strong_2016} and theoretically \citep{mcvean_genealogical_2009,zheng_eigenanalysis_2016,cabreros_likelihood-free_2019,chiu_inferring_2022}, and they work as well as global ancestry in association studies but are estimated more easily \citep{patterson_population_2006, zhao_arabidopsis_2007, alexander_fast_2009, bouaziz_accounting_2011}.
 The strength of PCA is its simplicity, which as covariates can be readily integrated into more complex models, such as haplotype association \citep{xu_detecting_2014} and polygenic models \citep{qian_fast_2020}.
 However, PCA fundamentally assumes that relatedness is low-dimensional, which may limit its applicability.
 PCA is known to be inadequate for data containing family structure \citep{patterson_population_2006, thornton_roadtrips:_2010, price_new_2010}, which is called ``cryptic relatedness'' when it is unknown to the researchers, but no other specific troublesome scenarios have been confidently identified.
@@ -137,21 +137,21 @@ It is worth noting that early LMMs had a different arrangement, as their kinship
                 & \multicolumn{3}{c|}{Sim. Genotypes} & \\
     Publication & Type\textsuperscript{a} & $K$\textsuperscript{b} & \Fst\textsuperscript{c} & Real\textsuperscript{d} & Trait\textsuperscript{e} & Power & PCs ($r$) & Best \\
     \midrule
-    % Publication                & Sim &    K &     Fst &       Re & Ph &      Pow & PCAr & Best\\
-    \cite{zhao_arabidopsis_2007} &     &      &         &\checkmark&  Q &\checkmark&    8 & LMM \\
-    \cite{astle_population_2009} &   I &    3 &    0.10 &          & CC &\checkmark&   10 & Tie \\
-    \cite{kang_variance_2010}    &     &      &         &\checkmark&Both&          &2-100 & LMM \\
-    \cite{price_new_2010}        &I, F &    2 &    0.01 &          & CC &          &    1 & Mixed \\
-    \cite{wu_comparison_2011}    &I, A &  2-4 &    0.01 &          & CC &\checkmark&   10 & Mixed \\
-    \cite{liu_controlling_2011}  &S, A &  2-3 &       R &          &  Q &\checkmark&   10 & Tie \\
-    \cite{sul_mixed_2013}        &   I &    2 &    0.01 &          & CC &          &    1 & Tie \\
-    \cite{tucker_improving_2014} &   I &    2 &    0.05 &\checkmark&Both&\checkmark&    5 & Tie \\
-    \cite{yang_advantages_2014}  &     &      &         &\checkmark& CC &\checkmark&    5 & Tie \\
-    \cite{song_testing_2015}     &S, A &  2-3 &       R &          &  Q &          &    3 & LMM \\
-    \cite{loh_efficient_2015}    &     &      &         &\checkmark&  Q &\checkmark&   10 & LMM \\
-    \cite{liu_iterative_2016}    &     &      &         &\checkmark&  Q &\checkmark&  3-6 & LMM \\ 
-    \cite{sul_population_2018}   &     &      &         &\checkmark&  Q &          &  100 & LMM \\
-    This work                    &A, T, F&10-243&$\le$0.25&\checkmark&  Q &\checkmark& 0-90 & LMM \\
+    % Publication                    & Sim &    K &     Fst &       Re & Ph &      Pow & PCAr & Best\\
+    \textcite{zhao_arabidopsis_2007} &     &      &         &\checkmark&  Q &\checkmark&    8 & LMM \\
+    \textcite{astle_population_2009} &   I &    3 &    0.10 &          & CC &\checkmark&   10 & Tie \\
+    \textcite{kang_variance_2010}    &     &      &         &\checkmark&Both&          &2-100 & LMM \\
+    \textcite{price_new_2010}        &I, F &    2 &    0.01 &          & CC &          &    1 & Mixed \\
+    \textcite{wu_comparison_2011}    &I, A &  2-4 &    0.01 &          & CC &\checkmark&   10 & Mixed \\
+    \textcite{liu_controlling_2011}  &S, A &  2-3 &       R &          &  Q &\checkmark&   10 & Tie \\
+    \textcite{sul_mixed_2013}        &   I &    2 &    0.01 &          & CC &          &    1 & Tie \\
+    \textcite{tucker_improving_2014} &   I &    2 &    0.05 &\checkmark&Both&\checkmark&    5 & Tie \\
+    \textcite{yang_advantages_2014}  &     &      &         &\checkmark& CC &\checkmark&    5 & Tie \\
+    \textcite{song_testing_2015}     &S, A &  2-3 &       R &          &  Q &          &    3 & LMM \\
+    \textcite{loh_efficient_2015}    &     &      &         &\checkmark&  Q &\checkmark&   10 & LMM \\
+    \textcite{liu_iterative_2016}    &     &      &         &\checkmark&  Q &\checkmark&  3-6 & LMM \\ 
+    \textcite{sul_population_2018}   &     &      &         &\checkmark&  Q &          &  100 & LMM \\
+    This work                        &A, T, F&10-243&$\le$0.25&\checkmark&  Q &\checkmark& 0-90 & LMM \\
     \bottomrule
   \end{tabular}
   \begin{flushleft} 
@@ -358,7 +358,7 @@ Random ancestral allele frequencies \pit, subpopulation allele frequencies $p_i^
     \text{Binomial}(2, \pi_{ij})
     ,
 \end{align*}
-where Beta is the Balding-Nichols distribution with mean \pit and variance $\pit \left( 1 - \pit \right) \ft[S_u]$ \citep{balding_method_1995}.
+where Beta is the Balding-Nichols distribution \citep{balding_method_1995} with mean \pit and variance $\pit \left( 1 - \pit \right) \ft[S_u]$.
 Fixed loci ($i$ where $\xij = 0$ for all $j$, or $\xij = 2$ for all $j$) are drawn again from the model, starting from \pit, iterating until no loci are fixed.
 Each replicate draws a new genotype matrix starting from \pit.
 
@@ -463,7 +463,7 @@ $
 which succeeds due to the monotonic relationship between node depth and coancestry (\cref{eq:coanc_tree_additive}).
 This algorithm recovers the true topology from the true coancestry values, and performs well for estimates from genotypes.
 
-To estimate tree edge lengths, first $\delta_w$ are estimated from $\hat{\vartheta}_{uv}^T$ and the topology using \cref{eq:coanc_tree_additive} and non-negative least squares linear regression \citep{lawson_solving_1974} (implemented in \texttt{nnls}; \cite{mullen_nnls_2012}) to yield non-negative $\delta_w$, and $\f{P_w}{S_w}$ are calculated from $\delta_w$ by reversing \cref{eq:inbr_total_additive}.
+To estimate tree edge lengths, first $\delta_w$ are estimated from $\hat{\vartheta}_{uv}^T$ and the topology using \cref{eq:coanc_tree_additive} and non-negative least squares linear regression \citep{lawson_solving_1974} (implemented in \texttt{nnls} \cite{mullen_nnls_2012}) to yield non-negative $\delta_w$, and $\f{P_w}{S_w}$ are calculated from $\delta_w$ by reversing \cref{eq:inbr_total_additive}.
 To account for small biases in coancestry estimation, an intercept term $\delta_0$ is included ($I_0(u,v) = 1$ for all $u,v$), and when converting $\delta_w$ to $\f{P_w}{S_w}$, $\delta_0$ is treated as an additional edge to the root, but is ignored when drawing allele frequencies from the tree.
 
 \subsubsection{Trait Simulation}
