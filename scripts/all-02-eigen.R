@@ -158,7 +158,7 @@ varexpcum_eigensoft <- lapply( varexp_eigensoft, cumsum )
 plot_ranks <- function( tw_rank, cex_leg = 1 ) {
     barplot(
         unlist( tw_rank ),
-        ylab = 'Kinship Rank Est.',
+        ylab = 'Dimensionality Estimate',
         las = 2,
         cex.names = cex_leg, # reduce bar labels too
         col = datasets$col,
