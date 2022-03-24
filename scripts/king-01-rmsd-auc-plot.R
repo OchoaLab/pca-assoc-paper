@@ -31,6 +31,7 @@ method_to_label <- list(
 )
 # extract methods from table itself
 methods <- names( method_to_label ) # not from table, but from hardcoded map, always lists PCA first!
+n_methods <- length( methods )
 # hardcoded same order as method_to_label
 method_cols <- c(
     'red',
@@ -205,23 +206,36 @@ for ( index_dataset in 1 : nrow( datasets ) ) {
     # top panel: RMSD
     # set margin for titles
     par( mar = mar1 )
-    # main plot
-    boxplot(
-        data_i$rmsd,
+    # start blank plot
+    plot(
+        NA,
         main = datasets$name_paper[ index_dataset ],
         xlab = '',
         ylab = '',
-        ylim = ylim_rmsd, # range( -srmsd_cut, srmsd_cut, unlist( data_i$rmsd ) ), # include tolerance band
-        range = 0, # wiskers extend to outliers
-        border = method_cols,
-        col = alpha( method_cols, alpha_q ) # inside box, to match big plots in transparency
+        xlim = c(0.5, n_methods + 0.5), # this is boxplot's default
+        ylim = ylim_rmsd,
+        axes = FALSE # boxplot(add=TRUE) overplots these, let it
     )
     # add y-label on leftmost panels only, make sure it can go on outer margin space
     if ( index_dataset == 1 )
         mtext( lab_rmsd, side = 2, line = 1.5, xpd = NA )
+    # mark zero line
+    abline( h = 0, lty = 2, col = 'gray' )
     # mark band where inflation is practically low enough
-    abline( h = srmsd_cut, lty = 2, col = 'gray' )
-    abline( h = -srmsd_cut, lty = 2, col = 'gray' )
+    polygon(
+        c(0, n_methods + 1, n_methods + 1, 0),
+        c( srmsd_cut, srmsd_cut, -srmsd_cut, -srmsd_cut ),
+        col = alpha( 'gray', alpha_q ), # the darker of the two areas to see it more easily
+        border = FALSE # no border lines
+    )
+    # main plot add after bg gray bands
+    boxplot(
+        data_i$rmsd,
+        range = 0, # wiskers extend to outliers
+        border = method_cols,
+        col = alpha( method_cols, alpha_q ), # inside box, to match big plots in transparency
+        add = TRUE
+    )
     # add panel letter
     panel_letter( toupper( letters[ index_dataset ] ) )
 
@@ -238,6 +252,8 @@ for ( index_dataset in 1 : nrow( datasets ) ) {
         border = method_cols,
         col = alpha( method_cols, alpha_q ) # inside box, to match big plots in transparency
     )
+    # mark zero line
+    abline( h = 0, lty = 2, col = 'gray' )
     # add y-label on leftmost panels only, make sure it can go on outer margin space
     if ( index_dataset == 1 )
         mtext( lab_auc, side = 2, line = 1.5, xpd = NA )
