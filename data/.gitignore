@@ -5,27 +5,31 @@
 *.grm.*
 *.king.*
 */rep-*/
-bad/
+pops-annot.txt
 sum-num-reps.pdf
 sum-pca-num-reps.pdf
 sum-pca-rmsd-vs-lambda.pdf
 sum-pca-rmsd-auc.pdf
 pca-comparison2.pdf
+
 # these are very bad unrefined plots, not suitable for presentations/etc
 tree.pdf
 popkin_subpops.pdf
 causal-maf-mins.pdf
 trait-normality.pdf
 fits/
+
 # files I'm just ignoring cause they were uninteresting tangents
 eigen_twrank_eigensoft.pdf
 eigen_varexp10_eigensoft.pdf
 eigen_varexpcum_eigensoft.pdf
 eigensoft-tw.txt
 eigensoft.eval
+
 # and these were good but easy to recalculate
 popkin-tw.txt
 popkin.eval
+
 # variants of king-robust distributions with log-y, which muddle interpretability
 king_log-y.pdf
 king_log-xy.pdf

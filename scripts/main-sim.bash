@@ -1,39 +1,3 @@
-###################
-### SIMULATIONS ###
-###################
-
-# main simulations follow the real dataset analysis in parallel, so that we take advantage of its embarrasingly parallel structure (for potential cluster runs)
-
-# all have: -k 10 -f 0.1
-# this is like my older FST work
-# but unlike my main gas-rgls sim (instead has: -k 3 -f 0.3)
-
-# params shared across reps
-# use right set for each case
-
-## LARGE SAMPLE SIZE
-# sample size (normal n=1000, small n=100)
-n=1000
-# to create family structure (g=20) or not (g=1)
-g=1
-# hacks to use "real" data scripts on simulations
-name="sim-n$n-k10-f0.1-s0.5-g$g"
-
-## SMALL SAMPLE SIZE
-# sample size (normal n=1000, small n=100)
-n=100
-# to create family structure (g=20) or not (g=1)
-g=1
-# hacks to use "real" data scripts on simulations
-name="sim-n$n-k10-f0.1-s0.5-g$g"
-
-## FAMILY STRUCTURE
-# sample size (normal n=1000, small n=100)
-n=1000
-# to create family structure (g=20) or not (g=1)
-g=20
-# hacks to use "real" data scripts on simulations
-name="sim-n$n-k10-f0.1-s0.5-g$g"
 
 # construct admixture proportions, ancestral inbreeding, and family structure if needed
 # done once, shared across replicates
