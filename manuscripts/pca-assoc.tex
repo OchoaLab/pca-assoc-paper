@@ -76,7 +76,7 @@ $^*$ Correspondence: \texttt{alejandro.ochoa@duke.edu}
   In this work, we thoroughly evaluate PCA and LMM both with varying number of PCs in new realistic genotype and complex trait simulations including admixed families, trees, and large real multiethnic human genotype datasets (1000 Genomes Project, the Human Genome Diversity Panel, and Human Origins) with simulated traits.
   We find that LMM without PCs performs best in all cases, with the largest effects in the family simulation and all real human datasets.
   We determined that the large gaps in PCA to LMM performance on the real human datasets is due to the high-dimensional family structure stemming from large numbers of distant relatives, and not from the smaller number of highly related pairs.
-  While it was known that PCA fails on family data, here we report a strong effect on association of cryptic family relatedness in several genetically diverse human datasets, a problem that is not avoided with the common practice of pruning high-relatedness individual pairs.
+  While it was known that PCA fails on family data, here we report a strong effect on association of cryptic family relatedness in several genetically diverse human datasets, a problem that is not avoided with the common practice of pruning highly related individual pairs.
   Overall, this work better characterizes the severe limitations of PCA compared to LMM in modeling the complex relatedness structures present in real multiethnic human data and its impact in association studies.
 \end{abstract}
 
@@ -499,7 +499,7 @@ $$
 
 The three datasets were processed as before \citep{ochoa_human} (summarized below), except with an additional filter so loci are in approximate linkage equilibrium and rare variants are removed.
 All processing was performed with \texttt{plink2} \citep{chang_second-generation_2015}, and analysis was uniquely enabled by the R packages \texttt{BEDMatrix} \citep{grueneberg_bgdata_2019} and \texttt{genio}.
-Each dataset groups individuals in a two-level hierarchy, which we call continental and fine-grained subpopulations, respectively.
+Each dataset groups individuals in a two-level hierarchy: continental and fine-grained subpopulations.
 Final dataset sizes are in \cref{tab:human_sum}.
 
 We obtained the full (including non-public) Human Origins by contacting the authors and agreeing to their usage restrictions.
@@ -547,7 +547,7 @@ $$
 0.577
 .
 $$
-The same worst-case value (with negative sign) occurs for all p-values of 1.
+The same value (with negative sign) occurs for all p-values of 1.
 
 Precision and recall are standard performance measures for binary classifiers that do not require calibrated p-values \citep{grau_prroc:_2015}.
 Given the total numbers of true positives (TP), false positives (FP) and false negatives (FN) at some threshold or parameter $t$, precision and recall are
@@ -613,7 +613,7 @@ Last are tree simulations (\cref{fig:kinship}F,I,L) fit to the kinship (\cref{fi
   \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{kinship.pdf}
   \caption{
     {\bf Population structures of simulated and real human genotype datasets.}
-    First two columns are population kinship matrices as heatmaps: individuals along x- and y-axes, kinship as color.
+    First two columns are population kinship matrices as heatmaps: individuals along x- and y-axis, kinship as color.
     Diagonal shows inbreeding values.
     \textbf{A.}
     Admixture scenario for both Large and Small simulations.
@@ -1178,7 +1178,7 @@ The 1000 Genomes data were generated at the New York Genome Center with funds pr
 \section*{Web resources}
 plink2, \url{https://www.cog-genomics.org/plink/2.0/}\\
 GCTA, \url{https://yanglab.westlake.edu.cn/software/gcta/}\\
-Eigensoft, \url{https://github.com/DReichLab/EIG}\\g
+Eigensoft, \url{https://github.com/DReichLab/EIG}\\
 bnpsd, \url{https://cran.r-project.org/package=bnpsd}\\
 simfam, \url{https://cran.r-project.org/package=simfam}\\
 simtrait, \url{https://cran.r-project.org/package=simtrait}\\
