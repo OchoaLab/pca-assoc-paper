@@ -17,7 +17,7 @@
 \usepackage[utf8]{inputenc}
 
 % import biblatex with prefered settings
-\input{headerBiblatexHarvard.tex}
+\input{headerBiblatexAjhg.tex}
 \bibliography{zotero, dummy}
 
 % path of images
@@ -57,7 +57,7 @@
 \title{\Large \textbf{
     Limitations of principal components in quantitative genetic association models for human studies
   }}
-\author{Yiqi Yao$^{1,2}$, Alejandro Ochoa$^{1,3,*}$}
+\author{Yiqi Yao,$^{1,3}$ Alejandro Ochoa$^{1,2,*}$}
 \date{}
 
 \begin{document}
@@ -65,12 +65,13 @@
 
 \noindent
 $^1$ Department of Biostatistics and Bioinformatics, Duke University, Durham, NC 27705, USA \\
-$^2$ BenHealth Consulting, Huangpu Mengzi Road 395 1-601, Shanghai, China \\
-$^3$ Duke Center for Statistical Genetics and Genomics, Duke University, Durham, NC 27705, USA \\
-$^*$ Corresponding author: \texttt{alejandro.ochoa@duke.edu}
+$^2$ Duke Center for Statistical Genetics and Genomics, Duke University, Durham, NC 27705, USA \\
+$^3$ Present address: BenHealth Consulting, Shanghai, Shanghai, 200023, China \\
+% department(s) or subunit(s), institution, city, state or region, zip code or postal code, country.
+$^*$ Correspondence: \texttt{alejandro.ochoa@duke.edu}
 
 \begin{abstract}
-  Principal Component Analysis (PCA) and the Linear Mixed-Effects Model (LMM), sometimes in combination, are the most common modern models for genetic association.
+  Principal Component Analysis (PCA) and the Linear Mixed-effects Model (LMM), sometimes in combination, are the most common modern models for genetic association.
   Previous PCA-LMM comparisons give mixed results and unclear guidance, and have several limitations, including not varying the number of principal components (PCs), simulating overly simple population structures, and inconsistent use of real data and power evaluations.
   In this work, we thoroughly evaluate PCA and LMM both with varying number of PCs in new realistic genotype and complex trait simulations including admixed families, trees, and large real multiethnic human genotype datasets (1000 Genomes Project, the Human Genome Diversity Panel, and Human Origins) with simulated traits.
   We find that LMM without PCs performs best in all cases, with the largest effects in the family simulation and all real human datasets.
@@ -86,8 +87,8 @@ $^*$ Corresponding author: \texttt{alejandro.ochoa@duke.edu}
 PCA: principal component analysis;
 PCs: principal components;
 LMM: linear mixed-effects model;
-FES: fixed effect sizes;
-RC: random coefficients;
+FES: fixed effect sizes (trait model);
+RC: random coefficients (trait model);
 MAF: minor allele frequency;
 WGS: whole genome sequencing.
 
@@ -303,7 +304,7 @@ Nevertheless, in PCA and LMM these biased estimates perform as well as unbiased 
 We selected fast and robust software implementing the basic PCA and LMM models.
 PCA association was performed with \texttt{plink2} \citep{chang_second-generation_2015}.
 The quantitative trait association model is a linear regression with covariates, evaluated using the t-test.
-PCs were calculated with \texttt{plink2}, which equal the top eigenvectors of \cref{eq:kinship_std} after removing loci with $\text{MAF} < 0.1$.
+PCs were calculated with \texttt{plink2}, which equal the top eigenvectors of \cref{eq:kinship_std} after removing loci with minor allele frequency $\text{MAF} < 0.1$.
 
 LMM association was performed using GCTA \citep{yang_gcta:_2011,yang_advantages_2014}.
 Kinship equals \cref{eq:kinship_std} except self-kinship uses a different formula.
@@ -453,7 +454,7 @@ $
 which succeeds due to the monotonic relationship between node depth and coancestry (\cref{eq:coanc_tree_additive}).
 This algorithm recovers the true topology from the true coancestry values, and performs well for estimates from genotypes.
 
-To estimate tree edge lengths, first $\delta_w$ are estimated from $\hat{\vartheta}_{uv}^T$ and the topology using \cref{eq:coanc_tree_additive} and non-negative least squares linear regression \citep{lawson_solving_1974} (implemented in \texttt{nnls} \cite{mullen_nnls_2012}) to yield non-negative $\delta_w$, and $\f{P_w}{S_w}$ are calculated from $\delta_w$ by reversing \cref{eq:inbr_total_additive}.
+To estimate tree edge lengths, first $\delta_w$ are estimated from $\hat{\vartheta}_{uv}^T$ and the topology using \cref{eq:coanc_tree_additive} and non-negative least squares linear regression \citep{lawson_solving_1974} (implemented in \texttt{nnls} \citep{mullen_nnls_2012}) to yield non-negative $\delta_w$, and $\f{P_w}{S_w}$ are calculated from $\delta_w$ by reversing \cref{eq:inbr_total_additive}.
 To account for small biases in coancestry estimation, an intercept term $\delta_0$ is included ($I_0(u,v) = 1$ for all $u,v$), and when converting $\delta_w$ to $\f{P_w}{S_w}$, $\delta_0$ is treated as an additional edge to the root, but is ignored when drawing allele frequencies from the tree.
 
 \subsubsection{Trait Simulation}
@@ -505,7 +506,7 @@ We obtained the full (including non-public) Human Origins by contacting the auth
 The Pacific data \citep{skoglund_genomic_2016} was obtained separately from the rest \citep{lazaridis_ancient_2014,lazaridis_genomic_2016}, and datasets were merged using the intersection of loci.
 We removed ancient individuals, and individuals from singleton and non-native subpopulations.
 Non-autosomal loci were removed.
-Our analysis of the WGS version of HGDP \citep{bergstrom_insights_2020} was restricted to autosomal biallelic SNP loci with filter ``PASS''.
+Our analysis of the whole-genome sequencing (WGS) version of HGDP \citep{bergstrom_insights_2020} was restricted to autosomal biallelic SNP loci with filter ``PASS''.
 Our analysis of the high-coverage NYGC version of 1000 Genomes \citep{fairley_international_2020} was restricted to autosomal biallelic SNP loci with filter ``PASS''.
 
 Since our evaluations assume uncorrelated loci, we filtered each dataset with \texttt{plink2} using parameters ``\texttt{-{}-indep-pairwise 1000kb 0.3}'', which iteratively removes loci that have a greater than 0.3 correlation coefficient with another locus that is within 1000kb, stopping until no such loci remain.
@@ -692,19 +693,19 @@ Lastly, LMM with its best $r$ always had significantly greater $\auc$ than PCA w
   separator = tab,
   table head = 
   % header row 1
-  \toprule & & \multicolumn{3}{c|}{$|\rmsd|$} & \multicolumn{3}{c}{$\auc$} \\
+  \toprule & & \multicolumn{3}{c|}{$|\rmsd|$\textsuperscript{a}} & \multicolumn{3}{c}{$\auc$} \\
   % header row 2
-  \midrule & & \multicolumn{2}{c}{Best (min\textsuperscript{b}) PCs} & & \multicolumn{2}{c}{Best (min\textsuperscript{b}) PCs} & \\
+  \midrule & & \multicolumn{2}{c}{Best (min\textsuperscript{c}) PCs} & & \multicolumn{2}{c}{Best (min\textsuperscript{c}) PCs} & \\
   % header row 3
-  Dataset & {Trait model\textsuperscript{a}} & PCA & LMM & {Best\textsuperscript{c}} & PCA & LMM & {Best\textsuperscript{c}} \\\midrule,
+  Dataset & {Trait model\textsuperscript{b}} & PCA & LMM & {Best\textsuperscript{d}} & PCA & LMM & {Best\textsuperscript{d}} \\\midrule,
   late after last line = \\\bottomrule
   ]{../data/stats.txt}{}{\csvlinetotablerow}
   \begin{flushleft}
-    \textsuperscript{a}FES: Fixed Effect Sizes, RC: Random Coefficients.\\
-    \textsuperscript{b}Smallest $r$ (number of PCs) whose distribution ($|\rmsd|$ or $\auc$) was not significantly different (Wilcoxon paired 1-tailed $p > 0.01$) from best $r$ (if any).\\
-    \textsuperscript{c}Tie if distributions of best PCA and LMM version did not differ significantly (Wilcoxon paired 1-tailed $p > 0.01$).
-    Same result for ``min'' except cases in parentheses.\\
-    *$r$ for which mean $|\rmsd| < 0.01$.
+    \textsuperscript{a}$r$ for which mean $|\rmsd| < 0.01$ marked with asterisk.\\
+    \textsuperscript{b}FES: Fixed Effect Sizes, RC: Random Coefficients.\\
+    \textsuperscript{c}Smallest $r$ (number of PCs) whose distribution ($|\rmsd|$ or $\auc$) was not significantly different (Wilcoxon paired 1-tailed $p > 0.01$) from best $r$ (if any).\\
+    \textsuperscript{d}Tie if distributions of best PCA and LMM version did not differ significantly (Wilcoxon paired 1-tailed $p > 0.01$).
+    Same result for ``min'' except cases in parentheses.
   \end{flushleft}
 \end{table}
 
@@ -750,11 +751,11 @@ Rather than increase $r$ beyond 90, we reduce individuals to $n = 100$, which is
 To compensate for the loss of power due to reducing $n$, we also reduce the number of causal loci (fixed ratio $n / m_1 = 10$), which increases per-locus effect sizes.
 We found a large decrease in performance for both models as $r$ increases, and best performance for $r=1$ for PCA and $r=0$ for LMM (\cref{fig:rmsd-auc-sim}B).
 Remarkably, LMM attains much larger negative $\rmsd$ values than in our other evaluations.
-LMM with $r=0$ is significantly better than PCA ($r=1$ to 4) in both metrics (\cref{tab:human_sum_pcs}), but qualitatively the difference is negligible.
+LMM with $r=0$ is significantly better than PCA ($r=1$ to 4) in both measures (\cref{tab:human_sum_pcs}), but qualitatively the difference is negligible.
 
 The family simulation adds a 20-generation random family to our large admixture simulation.
 Only the last generation is studied for association, which contains numerous siblings, first cousins, etc., with the initial admixture structure preserved by geographically-biased mating.
-Our evaluation reveals a sizable gap in both metrics between LMM and PCA across all $r$ (\cref{fig:rmsd-auc-sim}C).
+Our evaluation reveals a sizable gap in both measures between LMM and PCA across all $r$ (\cref{fig:rmsd-auc-sim}C).
 LMM again performs best with $r=0$ and achieves mean $|\rmsd| < 0.01$.
 However, PCA does not achieve mean $|\rmsd| < 0.01$ at any $r$, and its best mean $\auc$ is considerably worse than that of LMM.
 Thus, LMM is conclusively superior to PCA, and the only calibrated model, when there is family structure.
@@ -765,7 +766,7 @@ Next we repeat our evaluations with real human genotype data, which differs from
 
 Human Origins has the greatest number and diversity of subpopulations.
 The $\rmsd$ and $\auc$ distributions in this dataset and FES traits (\cref{fig:rmsd-auc-real}A) most resemble those from the family simulation (\cref{fig:rmsd-auc-sim}C).
-In particular, while LMM with $r=0$ performed optimally (both metrics) and satisfies mean $|\rmsd| < 0.01$, PCA maintained $\rmsd > 0.01$ for all $r$ and its $\auc$ were all considerably smaller than the best $\auc$ of LMM.
+In particular, while LMM with $r=0$ performed optimally (both measures) and satisfies mean $|\rmsd| < 0.01$, PCA maintained $\rmsd > 0.01$ for all $r$ and its $\auc$ were all considerably smaller than the best $\auc$ of LMM.
 
 \begin{figure}[bp!]
   \centering
@@ -798,7 +799,7 @@ Thus, although this dataset has the simplest subpopulation structure among the r
 
 Our results are qualitatively different for RC traits, which had smaller $\auc$ gaps between LMM and PCA (\cref{fig:rmsd-auc-real-rc}).
 Maximum $\auc$ were smaller in RC compared to FES in Human Origins and 1000 Genomes, suggesting lower power for RC traits across association models.
-Nevertheless, LMM with $r=0$ was significantly better than PCA for all metrics in the real datasets and RC traits (\cref{tab:human_sum_pcs}).
+Nevertheless, LMM with $r=0$ was significantly better than PCA for all measures in the real datasets and RC traits (\cref{tab:human_sum_pcs}).
 
 \subsection{Evaluations in tree simulations fit to human data}
 
@@ -854,7 +855,7 @@ However, these highly related pairs are vastly outnumbered by more distant pairs
   \centering
   \includegraphics[width=\textwidth]{king_log-x.pdf}
   \caption{
-    {\bf Local kinship distribution.}
+    {\bf Local kinship distributions.}
     Curves are complementary cumulative distribution of lower triangular kinship matrix (self kinship excluded) from KING-robust estimator.
     Note log x-axis; negative estimates are counted but not shown.
     Most values are below 4th degree relative threshold.
@@ -874,10 +875,10 @@ Therefore, the removal of the small number of highly related individual pairs ha
   \centering
   \includegraphics[width=\textwidth]{fes/rmsd-auc_king-cutoff-4.pdf}
   \caption{
-    {\bf LMM and PCA performance in real datasets excluding 4th degree relatives.}
+    {\bf Evaluation in real datasets excluding 4th degree relatives.}
     LMM had $r=0$ PCs and PCA had $r=20$.
     FES traits only.
-    Each dataset is a column, rows are metrics.
+    Each dataset is a column, rows are measures.
     First row has $|\rmsd| < 0.01$ band marked as gray area.
   }
   \label{fig:king_cutoff}
@@ -900,13 +901,13 @@ Cryptic relatedness strongly favors LMM, an advantage that probably outweighs th
 Relative to LMM, the behavior of PCA fell between two extremes.
 When PCA performed well, there was a small number of PCs with both calibrated p-values and $\auc$ near that of LMM without PCs.
 Conversely, PCA performed poorly when no number of PCs had either calibrated p-values or acceptably large $\auc$.
-There were no PCA cases where high numbers of PCs optimized an acceptable $\auc$, or miscalibrated p-values but high $\auc$.
+There were no cases where high numbers of PCs optimized an acceptable $\auc$, or cases with miscalibrated p-values but high $\auc$.
 PCA performed well in the admixture simulations (without families, both trait models), real human genotypes with RC traits, and, to a lesser extent, the tree simulations (both trait models).
 Conversely, PCA performed poorly in the admixed family simulation (both trait models) and the real human genotypes with FES traits.
 
 % PCA vs dimensionality, local kinship
 PCA assumes that genetic relatedness is low-dimensional, whereas LMM can handle high-dimensional relatedness.
-Thus, PCA performs well in the admixture simulation, which is explicitly low-dimensional (see Models and Methods), and our tree simulations, which had few nodes with long branches so a low-dimensional approximation suffices.
+Thus, PCA performs well in the admixture simulation, which is explicitly low-dimensional (see Models and Methods), and our tree simulations, which, although complex in principle due to the large number of nodes, had few long branches so a low-dimensional approximation suffices.
 Conversely, PCA performs poorly under family structure because its kinship matrix is high-dimensional (\cref{fig:eigen}).
 However, estimating the dimensionality of real datasets is challenging because estimated eigenvalues have biased distributions.
 Dimensionality estimated using the Tracy-Widom test \citep{patterson_population_2006} did not fully predict the datasets that PCA performs well on.
@@ -1206,7 +1207,7 @@ The high-coverage version of the 1000 Genomes Project was downloaded from \url{f
 
 \beginsupplement
 
-\section{Supplementary figures}
+\section{Supplemental figures}
 
 \begin{figure}[hp!]
   \centering
@@ -1225,7 +1226,7 @@ The high-coverage version of the 1000 Genomes Project was downloaded from \url{f
   \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{rmsd-auc-sim.pdf}
   \caption{
     {\small 
-      {\bf Evaluations in admixture simulations.}
+      {\bf Evaluations in admixture simulations with RC traits.}
       Traits simulated from RC model, otherwise the same as \cref{fig:rmsd-auc-sim}.
     }
   }
@@ -1237,7 +1238,7 @@ The high-coverage version of the 1000 Genomes Project was downloaded from \url{f
   \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{rmsd-auc-real.pdf}
   \caption{
     {\small 
-      {\bf Evaluations in real human genotype datasets.}
+      {\bf Evaluations in real human genotype datasets with RC traits.}
       Traits simulated from RC model, otherwise the same as \cref{fig:rmsd-auc-real}.
     }
   }
@@ -1249,7 +1250,7 @@ The high-coverage version of the 1000 Genomes Project was downloaded from \url{f
   \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{rmsd-auc-real-sim.pdf}
   \caption{
     {\small 
-      {\bf Evaluations in tree simulations fit to human data.}
+      {\bf Evaluations in tree simulations fit to human data with RC traits.}
       Traits simulated from RC model, otherwise the same as \cref{fig:rmsd-auc-real-sim}.
     }
   }
@@ -1273,7 +1274,7 @@ The high-coverage version of the 1000 Genomes Project was downloaded from \url{f
 
 \clearpage
 
-\section{Supplementary tables}
+\section{Supplemental tables}
 
 \begin{table}[hb!]
   \centering
