@@ -8,6 +8,5 @@ Each dataset has results for the "random coefficients" RC trait model in their b
 Likewise, main figures for RC traits are in the current directory, and for FES traits they are in the `fes/` subdirectory.
 
 Raw genotype data is not available in this repository, due to its size.
-The real datasets (1000 Genomes, HGDP, and Human Origins) are available in full elsewhere.
+The real datasets (1000 Genomes, HGDP, and Human Origins) are available in full elsewhere, see [real data processing instructions](https://github.com/OchoaLab/data) for download and pre-processing instructions.
 All of the genotype and phenotype simulations were performed with publicly-available software, including data and code provided in this repository.
-
