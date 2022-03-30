@@ -81,7 +81,7 @@ $^*$ Correspondence: \texttt{alejandro.ochoa@duke.edu}
 \end{abstract}
 
 % used for ASHG abstract
-% \textbf{Keywords:} genetic association, statistical genetics, population structure, complex traits, genetic diversity.
+% \textbf{Keywords:} genetic association; statistical genetics; population structure; cryptic relatedness; complex quantitative traits; simulations; multiethnic human data.
 
 \textbf{Abbreviations:}
 PCA: principal component analysis;
@@ -513,7 +513,7 @@ Since our evaluations assume uncorrelated loci, we filtered each dataset with \t
 Since all real datasets have numerous rare variants, while PCA and LMM are not able to detect associations involving rare variants, we removed all loci with $\text{MAF} < 0.01$.
 Kinship dimensionality and eigenvalues were calculated from \texttt{popkin} kinship estimates.
 Eigenvalues were assigned p-values with \texttt{twstats} of the Eigensoft package \citep{patterson_population_2006}, and dimensionality was estimated as the largest number of consecutive eigenvalue from the start that all satisfy $p < 0.01$ (p-values did not increase monotonically).
-For the evaluation with close relatives removed, each dataset was filtered with \texttt{plink2} with option ``\texttt{-{}-king-cutoff}'' with cutoff 0.02209709 ($= 2^{-11/2}$) for removing up to 4th degree relatives using KING-robust \citep{manichaikul_robust_2010}, and $\text{MAF} < 0.01$ is reapplied (\cref{tab:king_cutoff}).
+For the evaluation with close relatives removed, each dataset was filtered with \texttt{plink2} with option ``\texttt{-{}-king-cutoff}'' with cutoff 0.02209709 ($= 2^{-11/2}$) for removing up to 4th degree relatives using KING-robust \citep{manichaikul_robust_2010}, and $\text{MAF} < 0.01$ filter is reapplied (\cref{tab:king_cutoff}).
 
 \subsection{Evaluation of performance}
 
@@ -902,12 +902,12 @@ Relative to LMM, the behavior of PCA fell between two extremes.
 When PCA performed well, there was a small number of PCs with both calibrated p-values and $\auc$ near that of LMM without PCs.
 Conversely, PCA performed poorly when no number of PCs had either calibrated p-values or acceptably large $\auc$.
 There were no cases where high numbers of PCs optimized an acceptable $\auc$, or cases with miscalibrated p-values but high $\auc$.
-PCA performed well in the admixture simulations (without families, both trait models), real human genotypes with RC traits, and, to a lesser extent, the tree simulations (both trait models).
+PCA performed well in the admixture simulations (without families, both trait models), real human genotypes with RC traits, and the tree simulations (both trait models).
 Conversely, PCA performed poorly in the admixed family simulation (both trait models) and the real human genotypes with FES traits.
 
 % PCA vs dimensionality, local kinship
 PCA assumes that genetic relatedness is low-dimensional, whereas LMM can handle high-dimensional relatedness.
-Thus, PCA performs well in the admixture simulation, which is explicitly low-dimensional (see Models and Methods), and our tree simulations, which, although complex in principle due to the large number of nodes, had few long branches so a low-dimensional approximation suffices.
+Thus, PCA performs well in the admixture simulation, which is explicitly low-dimensional (see Materials and Methods), and our tree simulations, which, although complex in principle due to the large number of nodes, had few long branches so a low-dimensional approximation suffices.
 Conversely, PCA performs poorly under family structure because its kinship matrix is high-dimensional (\cref{fig:eigen}).
 However, estimating the dimensionality of real datasets is challenging because estimated eigenvalues have biased distributions.
 Dimensionality estimated using the Tracy-Widom test \citep{patterson_population_2006} did not fully predict the datasets that PCA performs well on.
@@ -1173,6 +1173,7 @@ Thus, $\auc$ ranks calibrated models according to power.
 The authors declare no competing interests.
 
 \section*{Acknowledgments}
+This work was funded in part by the Duke University School of Medicine Whitehead Scholars Program, a gift from the Whitehead Charitable Foundation.
 The 1000 Genomes data were generated at the New York Genome Center with funds provided by NHGRI Grant 3UM1HG008901-03S1.
 
 \section*{Web resources}
