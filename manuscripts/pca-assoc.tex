@@ -679,7 +679,7 @@ Comparing LMM with $r=0$ to PCA with its best $r$, LMM always had significantly 
 %
 For $\auc$ and PCA, the best $r$ was always smaller than the best $r$ for $|\rmsd|$, so there is often a tradeoff between calibrated p-values versus classification performance.
 For LMM there is no tradeoff, as $r=0$ had $\auc$ not significantly different from the best $r$ in all cases except two (the min $r$ was 2 for both 1000 Genomes simulation with FES trait and 1000 Genomes real dataset with RC trait).
-Lastly, LMM with its best $r$ always had significantly greater $\auc$ than PCA with its best $r$ except for one tie (HGDP with RC trait).
+Lastly, LMM with its best $r$ always had significantly greater $\auc$ than PCA with its best $r$.
 
 \begin{table}[hb!]
   \centering
@@ -789,9 +789,8 @@ In particular, while LMM with $r=0$ performed optimally (both measures) and sati
 \end{figure}
 
 HGDP has the fewest individuals among real datasets, but compared to Human Origins contains more loci and low-frequency variants.
-Performance (\cref{fig:rmsd-auc-real}B) was intermediate between the admixture and family simulations.
-In particular, here both LMM ($r=0$) and PCA ($r \ge 31$) achieve mean $|\rmsd| < 0.01$ (p-values are calibrated).
-However, there is a sizable $\auc$ gap between LMM and PCA.
+Performance (\cref{fig:rmsd-auc-real}B) again most resembled the family simulations.
+In particular, LMM with $r=0$ achieves mean $|\rmsd| < 0.01$ (p-values are calibrated), while PCA does not, and there is a sizable $\auc$ gap between LMM and PCA.
 Maximum $\auc$ values were lowest in HGDP compared to the two other real datasets.
 
 1000 Genomes has the fewest subpopulations but largest number of individuals per subpopulation.
@@ -838,7 +837,7 @@ In principle, PCA performance should be determined by the dimensionality of rela
 We used the Tracy-Widom test \citep{patterson_population_2006} with $p < 0.01$ to estimate dimensionality as the number of significant PCs (\cref{fig:eigen}A).
 The true dimensionality of our simulations is slightly underestimated (\cref{tab:human_sum}), but we confirm that the family simulation has the greatest dimensionality, and real datasets have greater estimates than their respective tree simulations, which confirms our hypothesis to some extent.
 However, estimated dimensionalities do not separate real datasets from tree simulations, as required to predict the observed PCA performance.
-Moreover, the HGDP and 1000 Genomes dimensionality estimates are 46 and 61, respectively, yet PCA performed poorly for all $r \le 90$ numbers of PCs (\cref{fig:rmsd-auc-real}).
+Moreover, the HGDP and 1000 Genomes dimensionality estimates are 45 and 61, respectively, yet PCA performed poorly for all $r \le 90$ numbers of PCs (\cref{fig:rmsd-auc-real}).
 The top eigenvalue explained a proportion of variance proportional to \Fst (\cref{tab:human_sum}), but the rest of the top 10 eigenvalues show no clear differences between datasets, except the small simulation had larger variances explained per eigenvalue (expected since it has fewer eigenvalues; \cref{fig:eigen}C).
 Comparing cumulative variance explained versus rank fraction across all eigenvalues, all datasets increase from their starting point almost linearly until they reach 1, except the family simulation has much greater variance explained by mid-rank eigenvalues (\cref{fig:eigen}B).
 Overall, there is no separation between real datasets (where PCA performed poorly) and tree simulations (where PCA performed relatively well) in terms of their eigenvalues or dimensionality estimates.
@@ -867,7 +866,7 @@ However, these highly related pairs are vastly outnumbered by more distant pairs
 To try to improve PCA performance, we followed the standard practice of removing 4th degree relatives, which reduced sample sizes between 5\% and 10\% (\cref{tab:king_cutoff}).
 Only $r=0$ for LMM and $r=20$ for PCA were tested, as these performed well in our earlier evaluation, and only FES traits were tested because they previously displayed the large PCA-LMM performance gap.
 LMM significantly outperforms PCA in all these cases (Wilcoxon paired 1-tailed $p < 0.01$; \cref{fig:king_cutoff}).
-Notably, PCA still had miscalibrated p-values in Human Origins and 1000 Genomes ($|\rmsd| > 0.01$).
+Notably, PCA still had miscalibrated p-values in all real datasets ($|\rmsd| > 0.01$).
 Otherwise, $\auc$ and $\rmsd$ ranges were similar here as in our earlier evaluation.
 Therefore, the removal of the small number of highly related individual pairs had a negligible effect in PCA performance, so the larger number of more distantly related pairs explain the poor PCA performance in the real datasets.
 
@@ -1091,7 +1090,7 @@ $$
 % \rmsd
 % = a \frac{ e^{-bx} - 1 }{ e^{-bx} + 1 }
 % = a \frac{ 1 - e^{bx} }{ 1 + e^{bx} }
-We fit this model to $\lambda > 1$ only since it was less noisy and of greater interest, and obtained the curve shown in \cref{fig:rmsd_lambda} with $a = 0.566$ and $b = 0.616$.
+We fit this model to $\lambda > 1$ only since it was less noisy and of greater interest, and obtained the curve shown in \cref{fig:rmsd_lambda} with $a = 0.563$ and $b = 0.622$.
 % Using this model, we also produced a log-linear approximation based on its Taylor series with respect to $x = \log( \lambda )$ about $x=0$, resulting in
 % \begin{equation}
 %   \label{eq:rmsd_lambda_log_linear}
