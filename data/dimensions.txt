@@ -3,8 +3,8 @@ Admix. Large sim.	Admix.	100000	1000	10	100	0.1
 Admix. Small sim.	Admix.	100000	100	10	10	0.1
 Admix. Family sim.	Admix.+Pedig.	100000	1000	10	100	0.1
 Human Origins	Real	190394	2922	11-243	292	0.28
-HGDP	Real	924892	929	7-54	93	0.28
+HGDP	Real	771322	929	7-54	93	0.28
 1000 Genomes	Real	1111266	2504	5-26	250	0.22
 Human Origins sim.	Tree	190394	2922	243	292	0.23
-HGDP sim.	Tree	924892	929	54	93	0.25
+HGDP sim.	Tree	771322	929	54	93	0.25
 1000 Genomes sim.	Tree	1111266	2504	26	250	0.21

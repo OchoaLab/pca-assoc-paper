@@ -1,4 +1,4 @@
 name_paper	m_loci	n_ind	ind_rm_pc
 Human Origins	189722	2636	9.8
-HGDP	905838	842	9.4
+HGDP	758009	847	8.8
 1000 Genomes	1097415	2390	4.6

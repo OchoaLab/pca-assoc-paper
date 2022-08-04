@@ -52,7 +52,7 @@ DATA_DIR='/home/viiia/dbs/humanOrigins'
 
 
 # version for HGDP WGS
-name='hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01'
+name='hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1'
 DATA_DIR='/home/viiia/dbs/hgdp_wgs'
 # run shared steps
 . main-real.bash
@@ -76,7 +76,7 @@ DATA_DIR='/home/viiia/dbs/tgp-nygc'
 # (validates every replicate too! for m_causal compares both FES and RC!)
 # writes data/dimensions.txt
 time Rscript real-14-dimensions.R
-# 0m24.674s viiiaR5
+# 0m17.481s viiiaR5
 
 # MAF plot code
 time Rscript real-17-mafs-plot.R
@@ -115,7 +115,7 @@ time Rscript real-11-inflation-across-datasets.R
 # model fit:
 # rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
 #         a         b 
-# 0.5629478 0.6208654 
+# 0.5627754 0.6215759 
 # threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00853
 # Inverse threshold map (sigmoidal): RMSD = 0.01, lambda = 1.06
 

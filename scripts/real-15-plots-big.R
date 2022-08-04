@@ -51,7 +51,7 @@ names_dir <- c(
 )
 names_dir_real <- c(
     'HoPacAll_ld_prune_1000kb_0.3_maf-0.01',
-    'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
+    'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1',
     'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01'
 )
 names_dir_real_sim <- paste0( names_dir_real, '_sim' )

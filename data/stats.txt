@@ -3,17 +3,17 @@ Admix. Large sim.	FES	84* (3*)	0*	tie	3	3 (0)	LMM
 Admix. Small sim.	FES	4* (2*)	0*	LMM	4 (1)	0	LMM
 Admix. Family sim.	FES	90 (87)	0*	LMM	83 (34)	0	LMM
 Human Origins	FES	90 (87)	0*	LMM	34 (9)	1 (0)	LMM
-HGDP	FES	87* (34*)	0*	LMM	19 (16)	1 (0)	LMM
+HGDP	FES	54 (27)	0*	LMM	16 (14)	1 (0)	LMM
 1000 Genomes	FES	39 (32)	0*	LMM	8	1 (0)	LMM
 Human Origins sim.	FES	90* (80*)	0*	tie	47 (36)	0	LMM
-HGDP sim.	FES	43* (20*)	0*	LMM	17 (15)	0	LMM
+HGDP sim.	FES	52* (20*)	0*	tie	18 (14)	0	LMM
 1000 Genomes sim.	FES	77* (15*)	0*	LMM	16 (6)	2	LMM
 Admix. Large sim.	RC	89* (3*)	0*	tie	3	2 (0)	LMM
 Admix. Small sim.	RC	8* (2*)	0*	tie (LMM)	1 (0)	0	LMM
 Admix. Family sim.	RC	90 (88)	0*	LMM	74 (28)	0	LMM
 Human Origins	RC	89* (79*)	0*	LMM	34 (18)	5 (0)	LMM
-HGDP	RC	77* (30*)	0*	LMM	19 (13)	3 (0)	tie (LMM)
+HGDP	RC	68* (21*)	0*	LMM	17 (8)	0	LMM
 1000 Genomes	RC	37* (27*)	0*	LMM	19 (4)	9 (2)	LMM
 Human Origins sim.	RC	89* (85*)	0*	tie	45 (25)	0	LMM
-HGDP sim.	RC	30* (23*)	0*	LMM	18 (15)	5 (0)	LMM
+HGDP sim.	RC	33* (19*)	0*	LMM	17 (15)	3 (0)	LMM
 1000 Genomes sim.	RC	90* (16)	0*	LMM	10 (6)	2 (0)	LMM

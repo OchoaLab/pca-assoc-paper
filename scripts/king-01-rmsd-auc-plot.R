@@ -41,7 +41,7 @@ method_cols <- c(
 # base is real datasets (for getting "paper" names), but we're really looking at king-cutoff versions
 names_dir <- c(
     'HoPacAll_ld_prune_1000kb_0.3_maf-0.01',
-    'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01',
+    'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1',
     'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01'
 )
 # suffix to actual dirs

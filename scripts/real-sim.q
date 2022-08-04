@@ -12,7 +12,7 @@
 module load R/4.0.0
 module load Plink/2.00a3LM
 
-#name=hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_sim
+#name=hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1_sim
 #name=HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim
 name=tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_sim
 rep=$SLURM_ARRAY_TASK_ID

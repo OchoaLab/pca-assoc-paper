@@ -43,24 +43,24 @@ cd ../../scripts/
 # preprocess with GCTA (makes GRM and max PCs)
 time Rscript real-00-preprocess-gcta.R --bfile $name
 # 0m36.076s ideapad HO
-# 6m17.134s/66m7.781s viiiaR5 HGDP
+# 0m11.685s/1m15.669s viiiaR5 HGDP
 # 0m49.143s/5m39.546s viiiaR5 TGP
 
 # get PCs using plink2
 time Rscript real-01-pcs-plink.R --bfile $name
 # 0m19.751s ideapad HO
-# 0m9.476s/0m47.619s viiiaR5 HGDP
+# 0m04.303s/0m22.975s viiiaR5 HGDP
 # 0m31.934s/3m10.264s viiiaR5 TGP
 
 # calculates kinship matrix with popkin, to get mean kinship to pass to simtrait
 time Rscript real-03-popkin.R --bfile $name
 # 4m28.038s ideapad HO
-# 2m25.247s viiiaR5 HGDP
+# 1m13.881s viiiaR5 HGDP
 # 13m20.287s viiiaR5 TGP
 
 # draws random traits
 # 0m2.166s ideapad HO (each rep)
-# 0m9.504s viiiaR5 HGDP (each rep)
+# 0m7.475s viiiaR5 HGDP (each rep)
 # 0m18.936s viiiaR5 TGP (each rep)
 for rep in {1..50}; do
     time Rscript real-04-simtrait.R --bfile $name -r $rep
@@ -99,7 +99,7 @@ time Rscript real-02-subset-eigenvec.R --bfile $name --clean
 time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90
 # all are plink + GCTA
 # 25m13.604s HO viiiaX6 6 threads
-# 39m51.574s/407m5.064s HGDP viiiaR5
+# 38m5.081s/314m0.706s HGDP viiiaR5
 # 48m4.522s/460m21.524s TGP viiiaR5
 
 # read all individual summary tables (tiny files), gather into a master table
@@ -135,7 +135,6 @@ time Rscript real-16-mafs.R --bfile $name
 ###########
 
 # addition to complement existing analysis with alternative trait from FES model
-# not sure if it will make a meaningful difference
 # NOTE: many steps that depend on genotypes only aren't redone (are shared from prev run)
 
 for rep in {1..50}; do
@@ -165,7 +164,7 @@ done
 time Rscript real-02-subset-eigenvec.R --bfile $name --clean
 
 time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90 --fes
-# 56m22.873s/342m28.028s viiiaR5 HGDP
+# 39m7.919s/313m59.966s viiiaR5 HGDP
 # 46m48.381s/468m21.550s viiiaR5 TGP
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 --fes
 time Rscript real-09-figs.R --bfile $name --fes
@@ -225,12 +224,13 @@ name=$name"_sim"
 # # 72m39.955s viiiaR5 TGP
 # time Rscript fit-07-bigger-fitting-plot.R --bfile $name -m 100000
 
-# draw genotypes on DCC
+# draw genotypes on DCC, necessary for WGS datasets due to high mem usage
 # this is example using "arrays" for replicates
 # NOTE: dataset/partition/account/etc are hardcoded here
 # sbatch -a 1-50 real-sim.q
+# follow up with batch.R runs
 
-# actually simulate data
+# below loop equivalent to real-sim.q/batch.R but run locally
 for rep in {1..50}; do
     time Rscript fit-04-draw-geno.R --bfile $name -r $rep --maf_real
     time Rscript sim-02-sim-trait.R --bfile $name -r $rep
@@ -266,10 +266,9 @@ rm data.log
 cd ../../../scripts/
 
 time Rscript real-07-auc-rmsd.R --sim --bfile $name -r 50 --n_pcs 90
-# 7m28.614s/38m52.149s viiiaR5 12 threads HGDP-sim
-# 39m0.437s/408m46.361s viiiaR5 HGDP-sim full-m
-# 9m23.831s/88m18.253s viiiaR5 HO-sim full-m
-# 46m13.416s/467m16.427s viiiaR5 TGP-sim full-m
+# 34m53.484s/335m40.180s viiiaR5 HGDP-sim
+# 9m23.831s/88m18.253s viiiaR5 HO-sim
+# 46m13.416s/467m16.427s viiiaR5 TGP-sim
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90
 time Rscript real-09-figs.R --bfile $name
 time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --final
@@ -277,6 +276,7 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 -t # test fi
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
 
 ### FES ###
+# below loop equivalent to real-sim.q/batch.R but run locally
 for rep in {1..50}; do
     time Rscript sim-02-sim-trait.R --bfile $name -r $rep --fes
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink
