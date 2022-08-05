@@ -18,7 +18,7 @@
 
 % import biblatex with prefered settings
 \input{headerBiblatexAjhg.tex}
-\bibliography{zotero, dummy}
+\bibliography{zotero}
 
 % path of images
 \graphicspath{ {../data/} }
@@ -297,7 +297,7 @@ $
 \pith = \frac{1}{2n} \sum_{j = 1}^n \xij
 $
 \citep{price_principal_2006, kang_efficient_2008, kang_variance_2010, yang_gcta:_2011, zhou_genome-wide_2012, loh_efficient_2015, sul_population_2018, zhou_efficiently_2018}.
-However, this kinship estimator has a complex bias that differs for every individual pair, which arises due to the use of this estimated \pith \citep{ochoa_estimating_2021, ochoa_human}.
+However, this kinship estimator has a complex bias that differs for every individual pair, which arises due to the use of this estimated \pith \citep{ochoa_estimating_2021, ochoa_new_2019}.
 Nevertheless, in PCA and LMM these biased estimates perform as well as unbiased ones, an observation that will be explored in future work (data not shown).
 %[TODO: cite BIAS GWAS]
 
@@ -497,7 +497,7 @@ $$
 
 \subsection{Real human genotype datasets}
 
-The three datasets were processed as before \citep{ochoa_human} (summarized below), except with an additional filter so loci are in approximate linkage equilibrium and rare variants are removed.
+The three datasets were processed as before \citep{ochoa_new_2019} (summarized below), except with an additional filter so loci are in approximate linkage equilibrium and rare variants are removed.
 All processing was performed with \texttt{plink2} \citep{chang_second-generation_2015}, and analysis was uniquely enabled by the R packages \texttt{BEDMatrix} \citep{grueneberg_bgdata_2019} and \texttt{genio}.
 Each dataset groups individuals in a two-level hierarchy: continental and fine-grained subpopulations.
 Final dataset sizes are in \cref{tab:human_sum}.
