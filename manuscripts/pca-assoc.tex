@@ -211,7 +211,7 @@ and $\intercal$ denotes matrix transposition.
 The residuals follow $\epsilon_j \sim \text{Normal}(0, \sigma^2)$ independently per individual $j$, for some $\sigma^2$.
 For simplicity, non-genetic covariates are omitted from this model (and the PCA and LMM counterparts) but are trivial to include without changing any of our theoretical results.
 
-The full model of \cref{eq:trait}, which has a coefficient for each of the $m$ loci, is overdetermined in current datasets where $m \gg n$.
+The full model of \cref{eq:trait}, which has a coefficient for each of the $m$ loci, is underdetermined in current datasets where $m \gg n$.
 The PCA and LMM models, respectively, approximate the full model fit at a single locus $i$:
 \begin{align}
   \label{eq:pca_gwas}
@@ -296,7 +296,7 @@ where the unknown \pit is estimated by
 $
 \pith = \frac{1}{2n} \sum_{j = 1}^n \xij
 $
-\citep{price_principal_2006, kang_efficient_2008, kang_variance_2010, yang_gcta:_2011, zhou_genome-wide_2012, loh_efficient_2015, sul_population_2018, zhou_efficiently_2018}.
+\citep{price_principal_2006, kang_efficient_2008, kang_variance_2010, yang_gcta:_2011, zhou_genome-wide_2012, yang_advantages_2014, loh_efficient_2015, sul_population_2018, zhou_efficiently_2018}.
 However, this kinship estimator has a complex bias that differs for every individual pair, which arises due to the use of this estimated \pith \citep{ochoa_estimating_2021, ochoa_new_2019}.
 Nevertheless, in PCA and LMM these biased estimates perform as well as unbiased ones, an observation that will be explored in future work (data not shown).
 %[TODO: cite BIAS GWAS]
@@ -307,7 +307,7 @@ The quantitative trait association model is a linear regression with covariates,
 PCs were calculated with \texttt{plink2}, which equal the top eigenvectors of \cref{eq:kinship_std} after removing loci with minor allele frequency $\text{MAF} < 0.1$.
 
 LMM association was performed using GCTA \citep{yang_gcta:_2011,yang_advantages_2014}.
-Kinship equals \cref{eq:kinship_std} except self-kinship uses a different formula.
+Its kinship estimator equals \cref{eq:kinship_std}.
 PCs were calculated using GCTA from its kinship estimate.
 Association significance is evaluated with a score test.
 GCTA with large numbers of PCs (small simulation only) had convergence and singularity errors in some replicates, which were treated as missing data.
