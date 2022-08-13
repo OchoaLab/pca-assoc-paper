@@ -27,6 +27,8 @@ option_list = list(
                 help = "number of threads (default use all cores if not DCC, 1 core if DCC)", metavar = "int"),
     make_option("--fes", action = "store_true", default = FALSE, 
                 help = "Use FES instead of RC trait model"),
+    make_option("--herit", type = "double", default = 0.8, 
+                help = "heritability", metavar = "double"),
     make_option("--m_causal_fac", type = "double", default = 10,
                 help = "Proportion of individuals to causal loci", metavar = "double")
 )
@@ -41,6 +43,7 @@ n_pcs <- opt$n_pcs
 threads <- opt$threads
 fes <- opt$fes
 m_causal_fac <- opt$m_causal_fac
+herit <- opt$herit
 
 # figure out what threads should be
 # above default should be modified if --dcc and if the threads aren't zero (default, means use all, which we should never do on a cluster!)
@@ -63,6 +66,13 @@ setwd( name )
 # new level to this hierarchy
 if ( m_causal_fac != 10 ) {
     dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
+    # now move in there
+    setwd( dir_out )
+}
+
+# new level to this hierarchy
+if ( herit != 0.8 ) {
+    dir_out <- paste0( 'h', herit )
     # now move in there
     setwd( dir_out )
 }
@@ -91,6 +101,8 @@ message(
 name_in_lower <- if ( opt$sim ) name_in else paste0( '../', name_in )
 # data is even lower still in this mode
 if ( !opt$sim && m_causal_fac != 10 )
+    name_in_lower <- paste0( '../', name_in_lower )
+if ( !opt$sim && herit != 0.8 )
     name_in_lower <- paste0( '../', name_in_lower )
 
 # path to GCTA PCs

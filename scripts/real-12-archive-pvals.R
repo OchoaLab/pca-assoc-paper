@@ -29,6 +29,10 @@ option_list = list(
                 help = "Method to process (pca or lmm; default both)", metavar = "character"),
     make_option(c("-t", "--test"), action = "store_true", default = FALSE, 
                 help = "Test run (makes sure no files are missing, but doesn't actually move anything.  However, output directories are created.)"),
+    make_option("--herit", type = "double", default = 0.8, 
+                help = "heritability", metavar = "double"),
+    make_option("--m_causal_fac", type = "double", default = 10,
+                help = "Proportion of individuals to causal loci", metavar = "double"),
     make_option("--fes", action = "store_true", default = FALSE, 
                 help = "Use FES instead of RC trait model")
 )
@@ -41,6 +45,8 @@ name <- opt$bfile
 rep_max <- opt$rep
 n_pcs_max <- opt$n_pcs
 fes <- opt$fes
+m_causal_fac <- opt$m_causal_fac
+herit <- opt$herit
 
 # stop if name is missing
 if ( is.na(name) )
@@ -67,6 +73,27 @@ setwd( name )
 dir_dest <- paste0( dir_dest, name )
 if ( !dir.exists( dir_dest ) )
     dir.create( dir_dest )
+
+# new level to this hierarchy
+if ( m_causal_fac != 10 ) {
+    dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
+    # now move in there
+    setwd( dir_out )
+    # create same `dir_out` in output, if needed
+    dir_dest <- paste0( dir_dest, dir_out )
+    if ( !dir.exists( dir_dest ) )
+        dir.create( dir_dest )
+}
+# new level to this hierarchy
+if ( herit != 0.8 ) {
+    dir_out <- paste0( 'h', herit )
+    # now move in there
+    setwd( dir_out )
+    # create same `dir_out` in output, if needed
+    dir_dest <- paste0( dir_dest, dir_out )
+    if ( !dir.exists( dir_dest ) )
+        dir.create( dir_dest )
+}
 
 dir_phen <- if ( fes ) 'fes' else NA
 

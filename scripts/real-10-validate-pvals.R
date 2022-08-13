@@ -24,6 +24,10 @@ option_list = list(
                 help = "Genotypes are simulated (rather than real; alters location only)"),
     make_option("--final", action = "store_true", default = FALSE, 
                 help = "Dies if files are missing (otherwise they are skipped silently)"),
+    make_option("--herit", type = "double", default = 0.8, 
+                help = "heritability", metavar = "double"),
+    make_option("--m_causal_fac", type = "double", default = 10,
+                help = "Proportion of individuals to causal loci", metavar = "double"),
     make_option("--fes", action = "store_true", default = FALSE, 
                 help = "Use FES instead of RC trait model")
 )
@@ -36,6 +40,8 @@ name <- opt$bfile
 rep_max <- opt$rep
 n_pcs_max <- opt$n_pcs
 fes <- opt$fes
+m_causal_fac <- opt$m_causal_fac
+herit <- opt$herit
 
 # stop if name is missing
 if ( is.na(name) )
@@ -50,6 +56,19 @@ if (opt$sim)
     name_in <- paste0( 'rep-1/', name_in )
 # get number of loci
 m_loci <- count_lines( name_in, 'bim' )
+
+# new level to this hierarchy
+if ( m_causal_fac != 10 ) {
+    dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
+    # now move in there
+    setwd( dir_out )
+}
+# new level to this hierarchy
+if ( herit != 0.8 ) {
+    dir_out <- paste0( 'h', herit )
+    # now move in there
+    setwd( dir_out )
+}
 
 for ( rep in 1 : rep_max ) {
     # move higher to the "reps" location

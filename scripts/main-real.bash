@@ -339,3 +339,38 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes 
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_lmm --fes -s -m lmm -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_lmm --fes -s -m lmm
 
+
+#################
+### herit 0.3 ###
+#################
+
+# use king-cutoff data (same $name as last), and same limited PCs
+# so genotypes/pcs/grm are already made
+h=0.3
+mcf=27 # 10*8/3 rounded, adjusts expected coefficient size for decrease in heritability
+
+# minimal work to get AUCs and RMSDs
+# simulate new traits
+for rep in {1..50}; do
+    time Rscript real-04-simtrait.R --bfile $name -r $rep --fes --herit $h --m_causal_fac $mcf
+done
+# a bit overkill making all PCs, but faster than rewriting the code for this special case
+time Rscript real-02-subset-eigenvec.R --bfile $name --plink
+for rep in {1..50}; do
+    time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs_pca --fes --herit $h --m_causal_fac $mcf
+done
+time Rscript real-02-subset-eigenvec.R --bfile $name --clean --plink
+# no PCS for GCTA here only
+for rep in {1..50}; do
+    time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs_lmm --fes --herit $h --m_causal_fac $mcf
+done
+
+# gather results into a single table (again overkill but meh)
+time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs $pcs_pca --fes --herit $h --m_causal_fac $mcf
+time Rscript real-08-table.R --bfile $name -r 50 --n_pcs $pcs_pca --fes --herit $h --m_causal_fac $mcf
+time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes --herit $h --m_causal_fac $mcf # NOTE not --final
+# note extra flags for partial data
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes -s -m pca --herit $h --m_causal_fac $mcf -t # test first!
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes -s -m pca --herit $h --m_causal_fac $mcf
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_lmm --fes -s -m lmm --herit $h --m_causal_fac $mcf -t # test first!
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_lmm --fes -s -m lmm --herit $h --m_causal_fac $mcf

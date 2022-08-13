@@ -95,6 +95,16 @@ if ( m_causal_fac != 10 ) {
     setwd( dir_out )
 }
 
+# new level to this hierarchy
+if ( herit != 0.8 ) {
+    dir_out <- paste0( 'h', herit )
+    # create if it didn't already exist
+    if( !dir.exists( dir_out ) )
+        dir.create( dir_out )
+    # now move in there
+    setwd( dir_out )
+}
+
 dir_out <- paste0( 'rep-', rep )
 # create if it didn't already exist
 if( !dir.exists( dir_out ) )

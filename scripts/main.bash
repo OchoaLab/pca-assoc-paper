@@ -127,3 +127,15 @@ time Rscript king-00-dimensions.R
 
 # make AUC/RMSD plot and stats tests for the limited king-cutoff test
 time Rscript king-01-rmsd-auc-plot.R
+
+# same for low herit tests
+time Rscript king-01-rmsd-auc-plot.R --herit 0.3 --m_causal_fac 27
+# HoPacAll_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
+# RMSD: LMM
+# AUC: LMM
+# hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1_king-cutoff-4
+# RMSD: LMM
+# AUC: LMM
+# tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
+# RMSD: LMM
+# AUC: LMM

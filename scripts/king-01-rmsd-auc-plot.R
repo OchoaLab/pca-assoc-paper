@@ -1,7 +1,7 @@
 # this script reads big table of AUC and RMSD estimates
 # version that combines three datasets in a single panel
 
-#library(optparse)
+library(optparse)
 library(scales) # for transparency
 library(readr)
 library(tibble)
@@ -9,6 +9,38 @@ library(ochoalabtools)
 # shared code with another plotting function that spans several datasets
 # here merely for lab_rmsd and lab_auc
 source('plot-auc-rmsd.R')
+
+############
+### ARGV ###
+############
+
+# define options
+option_list = list(
+    make_option(c("-r", "--rep"), type = "integer", default = 50,
+                help = "Max replicates", metavar = "int"),
+    make_option("--herit", type = "double", default = 0.8, 
+                help = "heritability", metavar = "double"),
+    make_option("--m_causal_fac", type = "double", default = 10,
+                help = "Proportion of individuals to causal loci", metavar = "double")
+)
+
+opt_parser <- OptionParser(option_list = option_list)
+opt <- parse_args(opt_parser)
+
+# get values
+rep_max <- opt$rep
+m_causal_fac <- opt$m_causal_fac
+herit <- opt$herit
+
+# some dependent params
+# new levels to this hierarchy
+dir_out_m_causal_fac <- NA
+dir_out_herit <- NA
+if ( m_causal_fac != 10 )
+    dir_out_m_causal_fac <- paste0( 'm_causal_fac-', m_causal_fac )
+if ( herit != 0.8 )
+    dir_out_herit <- paste0( 'h', herit )
+
 
 #################
 ### CONSTANTS ###
@@ -18,7 +50,6 @@ source('plot-auc-rmsd.R')
 file_table <- 'sum.txt'
 dir_phen <- 'fes'
 # hardcoded params
-rep_max <- 50
 r_pca <- 20
 r_lmm <- 0
 fes <- TRUE
@@ -133,6 +164,11 @@ for ( index_dataset in 1 : nrow( datasets ) ) {
     # add suffix to actually read king-cutoff filtered version's data
     name <- paste0( name, suffix )
     setwd( name )
+    # new level to this hierarchy
+    if ( !is.na( dir_out_m_causal_fac ) )
+        setwd( dir_out_m_causal_fac )
+    if ( !is.na( dir_out_herit ) )
+        setwd( dir_out_herit )
     # move in one more level in this case
     if ( fes )
         setwd( dir_phen )
@@ -156,8 +192,12 @@ for ( index_dataset in 1 : nrow( datasets ) ) {
     
     # go back down, for next dataset
     setwd( '..' )
-    # move back one more level in this case
+    # move back more levels in these cases
     if ( fes )
+        setwd( '..' )
+    if ( herit != 0.8 )
+        setwd( '..' )
+    if ( m_causal_fac != 10 )
         setwd( '..' )
 }
 
@@ -168,6 +208,24 @@ for ( index_dataset in 1 : nrow( datasets ) ) {
 # calculate shared ylim's
 ylim_rmsd <- range( -srmsd_cut, srmsd_cut, sapply( data, function (x) range( unlist( x$rmsd ) ) ) ) # include tolerance band
 ylim_auc <- range( 0, sapply( data, function (x) range( unlist( x$auc ) ) ) ) # include zero
+
+# new level to this hierarchy
+if ( !is.na( dir_out_m_causal_fac ) ) {
+    # create if it didn't already exist
+    if( !dir.exists( dir_out_m_causal_fac ) )
+        dir.create( dir_out_m_causal_fac )
+    # now move in there
+    setwd( dir_out_m_causal_fac )
+}
+
+# new level to this hierarchy
+if ( !is.na( dir_out_herit ) ) {
+    # create if it didn't already exist
+    if( !dir.exists( dir_out_herit ) )
+        dir.create( dir_out_herit )
+    # now move in there
+    setwd( dir_out_herit )
+}
 
 # move in an additional level in this case, for final plot location
 if ( fes ) {

@@ -30,6 +30,8 @@ option_list = list(
                 help = "number of threads (default use all cores, but may consume excessive memory)", metavar = "int"),
     make_option("--fes", action = "store_true", default = FALSE, 
                 help = "Use FES instead of RC trait model"),
+    make_option("--herit", type = "double", default = 0.8, 
+                help = "heritability", metavar = "double"),
     make_option("--m_causal_fac", type = "double", default = 10,
                 help = "Proportion of individuals to causal loci", metavar = "double")
 )
@@ -44,6 +46,7 @@ n_pcs_max <- opt$n_pcs
 threads <- opt$threads
 fes <- opt$fes
 m_causal_fac <- opt$m_causal_fac
+herit <- opt$herit
 
 # stop if name is missing
 if ( is.na(name) )
@@ -62,6 +65,12 @@ m_loci <- count_lines( name_in, 'bim' )
 # new level to this hierarchy
 if ( m_causal_fac != 10 ) {
     dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
+    # now move in there
+    setwd( dir_out )
+}
+# new level to this hierarchy
+if ( herit != 0.8 ) {
+    dir_out <- paste0( 'h', herit )
     # now move in there
     setwd( dir_out )
 }
