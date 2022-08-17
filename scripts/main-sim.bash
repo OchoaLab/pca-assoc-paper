@@ -15,7 +15,7 @@ for rep in {1..50}; do
     # 0m50.744s viiiaR5 family 26% max mem with Rcpp!
 
     # draws a random trait
-    time Rscript sim-02-sim-trait.R --bfile $name -r $rep
+    time Rscript real-04-simtrait.R --bfile $name -r $rep --sim
 
     # preprocess with GCTA (makes GRM and max PCs)
     time Rscript real-00-preprocess-gcta.R --bfile $name/rep-$rep
@@ -96,7 +96,7 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
 # NOTE: steps that depend only on genotypes aren't redone (are shared from prev run)
 
 for rep in {1..50}; do
-    time Rscript sim-02-sim-trait.R --bfile $name -r $rep --fes
+    time Rscript real-04-simtrait.R --bfile $name -r $rep --sim --fes
 
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink
     for pcs in {0..90}; do

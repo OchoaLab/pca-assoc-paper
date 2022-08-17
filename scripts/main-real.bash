@@ -233,7 +233,7 @@ name=$name"_sim"
 # below loop equivalent to real-sim.q/batch.R but run locally
 for rep in {1..50}; do
     time Rscript fit-04-draw-geno.R --bfile $name -r $rep --maf_real
-    time Rscript sim-02-sim-trait.R --bfile $name -r $rep
+    time Rscript real-04-simtrait.R --bfile $name -r $rep --sim
     time Rscript real-00-preprocess-gcta.R --bfile $name/rep-$rep
     time Rscript real-01-pcs-plink.R --bfile $name/rep-$rep
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink
@@ -278,7 +278,7 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90
 ### FES ###
 # below loop equivalent to real-sim.q/batch.R but run locally
 for rep in {1..50}; do
-    time Rscript sim-02-sim-trait.R --bfile $name -r $rep --fes
+    time Rscript real-04-simtrait.R --bfile $name -r $rep --sim --fes
     time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink
     for pcs in {0..90}; do
 	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs --fes

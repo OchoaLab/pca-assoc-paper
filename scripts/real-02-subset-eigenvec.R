@@ -6,7 +6,7 @@ library(readr)
 # NOTE: a second file, with my version of PCA, is ignored here (easier to test in R instead of here)
 
 # number of PCs to explore
-n_pcs_max <- 90
+n_pcs_max <- 90L
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
 
@@ -62,7 +62,7 @@ file_eigenvec <- function( name, n_pcs ) {
 if ( opt$clean ) {
     # remove all derivative files
     # quick move, no sanity checks... (no loss here really)
-    for ( n_pcs in 1 : (n_pcs_max - 1 ) )
+    for ( n_pcs in 1L : (n_pcs_max - 1L ) )
         file.remove(
             file_eigenvec( name_in, n_pcs )
         )
@@ -73,13 +73,13 @@ if ( opt$clean ) {
         col_names = col_names
     )
     # now navigate PCs in output, backwards so subsetting makes sense
-    for ( n_pcs in (n_pcs_max - 1 ) : 1 ) {
+    for ( n_pcs in (n_pcs_max - 1L ) : 1L ) {
         # remove the previous column (shifted by 2 because of FAM and ID columns)
-        tib <- tib[ , -( n_pcs + 3 ) ]
+        tib <- tib[ , -( n_pcs + 3L ) ]
         # make sure number of columns is as expected
         # +2 because of FAM and ID columns in the beginning
         stopifnot(
-            ncol( tib ) == n_pcs + 2 
+            ncol( tib ) == n_pcs + 2L 
         )
         # write output, in the same format as before!
         write_tsv(

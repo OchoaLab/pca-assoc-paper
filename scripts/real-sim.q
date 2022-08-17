@@ -17,8 +17,8 @@ module load Plink/2.00a3LM
 name=tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_sim
 rep=$SLURM_ARRAY_TASK_ID
 time Rscript fit-04-draw-geno.R --bfile $name -r $rep --maf_real
-time Rscript sim-02-sim-trait.R --bfile $name -r $rep
-time Rscript sim-02-sim-trait.R --bfile $name -r $rep --fes
+time Rscript real-04-simtrait.R --bfile $name -r $rep --sim
+time Rscript real-04-simtrait.R --bfile $name -r $rep --sim --fes
 time Rscript real-00-preprocess-gcta.R --bfile $name/rep-$rep
 time Rscript real-01-pcs-plink.R --bfile $name/rep-$rep
 time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink

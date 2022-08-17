@@ -68,20 +68,6 @@ if ( opt$dcc ) {
 }
 setwd( name )
 
-# new level to this hierarchy
-if ( m_causal_fac != 10 ) {
-    dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
-    # now move in there
-    setwd( dir_out )
-}
-
-# new level to this hierarchy
-if ( herit != 0.8 ) {
-    dir_out <- paste0( 'h', herit )
-    # now move in there
-    setwd( dir_out )
-}
-
 # move higher to the "reps" location
 # this is so GCTA's temporary files don't overwrite files from other parallel runs
 dir_out <- paste0( 'rep-', rep )
@@ -102,11 +88,6 @@ message(
 # - in real data, are all in lower level (shared across reps)
 # - in simulated data, are all in current level (not shared across reps)
 name_in_lower <- if ( opt$sim ) name_in else paste0( '../', name_in )
-# data is even lower still in this mode
-if ( !opt$sim && m_causal_fac != 10 )
-    name_in_lower <- paste0( '../', name_in_lower )
-if ( !opt$sim && herit != 0.8 )
-    name_in_lower <- paste0( '../', name_in_lower )
 
 file_covar <- paste0( name_in_lower, '-', name_pcs, '-n_pcs_', n_pcs, '.eigenvec' )
 # there's no covariates file to pass if we want zero PCs
@@ -114,11 +95,15 @@ file_covar <- paste0( name_in_lower, '-', name_pcs, '-n_pcs_', n_pcs, '.eigenvec
 if ( n_pcs == 0 )
     file_covar <- NULL
 
-# adjust paths if using fes model
+# adjust paths if using fes model or non-default m_causal_fac or herit
 dir_phen <- '' # current dir
 # use subdir instead in this case
 if ( fes )
     dir_phen <- 'fes/'
+if ( m_causal_fac != 10 )
+    dir_phen <- paste0( dir_phen, 'm_causal_fac-', m_causal_fac, '/' )
+if ( herit != 0.8 )
+    dir_phen <- paste0( dir_phen, 'h', herit, '/' )
 
 # only these are in dir_phen
 name_phen <- paste0( dir_phen, name_in )

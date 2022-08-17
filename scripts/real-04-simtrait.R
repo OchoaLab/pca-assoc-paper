@@ -1,5 +1,4 @@
 # this scripts simulates a random trait for the given real dataset, storing key values
-# NOTE: m_causal = n_ind / 10 is hardcoded
 
 library(optparse)
 library(simtrait)
@@ -26,7 +25,9 @@ option_list = list(
     make_option(c("-r", "--rep"), type = "integer", default = 1,
                 help = "Replicate number", metavar = "int"),
     make_option("--fes", action = "store_true", default = FALSE, 
-                help = "Use FES instead of RC trait model")
+                help = "Use FES instead of RC trait model"),
+    make_option("--sim", action = "store_true", default = FALSE, 
+                help = "Genotypes are simulated (rather than real; alters paths only)")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -46,13 +47,24 @@ if ( is.na(name) )
 # move to where the data is
 setwd( '../data/' )
 setwd( name )
+if ( opt$sim )
+    setwd( paste0( '/rep-', rep ) )
 
 ################
 ### simtrait ###
 ################
 
-# load precalculated popkin kinship matrix
-kinship <- read_grm( 'popkin' )$kinship
+# set p_anc and kinship, as needed for sim and real cases
+if ( opt$sim ) {
+    # load true ancestral allele frequencies of simulation
+    load( 'p_anc.RData' )
+    # loads: p_anc
+    kinship <- NULL
+} else {
+    # load precalculated popkin kinship matrix
+    kinship <- read_grm( 'popkin' )$kinship
+    p_anc <- NULL
+}
 
 # load FAM table, for phen output
 fam <- read_fam( name_in )
@@ -65,10 +77,12 @@ message( 'm_causal: ', m_causal )
 X <- BEDMatrix( name_in, simple_names = TRUE )
 
 # simulate trait
+# sim genotypes use p_anc version, real data use kinship version
 obj_trait <- sim_trait(
     X = X,
     m_causal = m_causal,
     herit = herit,
+    p_anc = p_anc,
     kinship = kinship,
     fes = fes,
     maf_cut = min_maf_causal
@@ -81,50 +95,45 @@ causal_indexes = obj_trait$causal_indexes
 # locus coefficient vector (for causal loci only)
 causal_coeffs = obj_trait$causal_coeffs
 
-#########################################
-### write data in rep-specific subdir ###
-#########################################
+#############
+### WRITE ###
+#############
 
-# new level to this hierarchy
-if ( m_causal_fac != 10 ) {
-    dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
-    # create if it didn't already exist
+# in simulation, rep-*/ already exist and we're already in it
+# in real data, rep-*/ doesn't exist, so create then move in there
+if ( !opt$sim ) {
+    dir_out <- paste0( 'rep-', rep )
     if( !dir.exists( dir_out ) )
         dir.create( dir_out )
-    # now move in there
     setwd( dir_out )
 }
-
-# new level to this hierarchy
-if ( herit != 0.8 ) {
-    dir_out <- paste0( 'h', herit )
-    # create if it didn't already exist
-    if( !dir.exists( dir_out ) )
-        dir.create( dir_out )
-    # now move in there
-    setwd( dir_out )
-}
-
-dir_out <- paste0( 'rep-', rep )
-# create if it didn't already exist
-if( !dir.exists( dir_out ) )
-    dir.create( dir_out )
-# now move in there
-setwd( dir_out )
 
 # if fes is true, create a new directory and move there, where the new data will go (so nothing gets overwritten, have both versions together)
+# ditto non-default m_causal_fac and herit
 if ( fes ) {
     dir_out <- 'fes'
-    # let's not overwrite things, under the assumption that the simulations are very expensive to redo
-    # if the output directory exists, assume all the files we want are there too.  Only a non-existent output directory will work
-    if ( dir.exists( dir_out ) ) {
-        stop('Output exists, will not overwrite: ', dir_out)
-    } else {
-        # create directory and move into there
+    if ( !dir.exists( dir_out ) )
         dir.create( dir_out )
-        setwd( dir_out )
-    }
+    setwd( dir_out )
 }
+if ( m_causal_fac != 10 ) {
+    dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
+    if( !dir.exists( dir_out ) )
+        dir.create( dir_out )
+    setwd( dir_out )
+}
+if ( herit != 0.8 ) {
+    dir_out <- paste0( 'h', herit )
+    if( !dir.exists( dir_out ) )
+        dir.create( dir_out )
+    setwd( dir_out )
+}
+
+# check that outputs don't exist already
+if ( file.exists( 'simtrait.RData' ) )
+    stop( 'Output exists, will not overwrite: simtrait.RData' )
+if ( file.exists( 'data.fam' ) )
+    stop( 'Output exists, will not overwrite: data.fam' )
 
 # now save, as R data
 save(
@@ -134,6 +143,6 @@ save(
     file = 'simtrait.RData'
 )
 
-# save trait as phen file too, for GCTA
+# save trait as phen file too, for GCTA and plink
 fam$pheno <- trait
 write_phen( name_in, fam )

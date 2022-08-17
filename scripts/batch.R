@@ -9,16 +9,17 @@ account <- 'ochoalab'; partition <- 'ochoalab'
 
 # shared items for all runs
 plink <- TRUE # FALSE
-fes <- FALSE # TRUE
+fes <- TRUE # FALSE
+herit_low <- FALSE # TRUE
 #bfile <- 'sim-n100-k10-f0.1-s0.5-g1'; short <- 's'
-#bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short <- 'l'
+bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short <- 'l'
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'; short <- 'f'
 #bfile <- 'HoPacAll_ld_prune_1000kb_0.3_maf-0.01'; short <- 'h'
 #bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1'; short <- 'd'
 #bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01'; short <- 'k'
 #bfile <- 'HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim'; short <- 'H'
 #bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1_sim'; short <- 'D'
-bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_sim'; short <- 'K'
+#bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_sim'; short <- 'K'
 
 # needed to make sure each process gets enough memory if all my jobs saturate the machines
 # (didn't have to change last time, but before TGP was thinned I needed 4 threads for GCTA runs)
@@ -62,6 +63,10 @@ submit_rep_pcs <- function( rep ) {
     # infer if this is a simulation or not (indicates genotype file locations)
     if ( grepl( 'sim', bfile ) )
         commands <- paste0( commands, ' --sim' )
+
+    # a pair of parameters for low heritability simulations
+    if ( herit_low )
+        commands <- paste0( commands, ' --herit 0.3 --m_causal_fac 27' )
     
     # load plink module if needed
     if ( plink ) {
