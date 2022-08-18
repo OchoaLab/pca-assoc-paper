@@ -58,45 +58,28 @@ if ( archived ) {
 }
 setwd( name )
 
-# new level to this hierarchy
-if ( m_causal_fac != 10 ) {
-    dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
-    # now move in there
-    setwd( dir_out )
-}
-# new level to this hierarchy
-if ( herit != 0.8 ) {
-    dir_out <- paste0( 'h', herit )
-    # now move in there
-    setwd( dir_out )
-}
+# remember this location, using global path, for easily returning across multiple levels when done
+dir_base <- getwd()
 
 # big table of interest
 # initialize this way, it'll grow correctly
 tib_main <- NULL
 
 for ( rep in 1 : rep_max ) {
-    # move higher to the "reps" location
-    # this is so GCTA's temporary files don't overwrite files from other parallel runs
-    dir_out <- paste0( 'rep-', rep )
+    # specify location of files to process, as many levels as needed
+    dir_out <- paste0( 'rep-', rep, '/' )
+    if ( fes )
+        dir_out <- paste0( dir_out, 'fes/' )
+    if ( m_causal_fac != 10 )
+        dir_out <- paste0( dir_out, 'm_causal_fac-', m_causal_fac, '/' )
+    if ( herit != 0.8 )
+        dir_out <- paste0( dir_out, 'h', herit, '/' )
+
     # skip reps that we haven't calculated at all
     if ( !dir.exists( dir_out ) )
         next
+    # else move to that destination
     setwd( dir_out )
-    
-    # move in an additional level in this case
-    if ( fes ) {
-        dir_phen <- 'fes/'
-        # directory can be missing, skip in that case
-        if ( !dir.exists( dir_phen ) ) {
-            # just move down from rep-* case
-            setwd( '..' )
-            # skip rest
-            next
-        }
-        # else move in
-        setwd( dir_phen )
-    }
     
     # start a big loop
     for ( method in methods ) {
@@ -117,40 +100,30 @@ for ( rep in 1 : rep_max ) {
         }
     }
     
-    # move back down when done with this rep
-    setwd( '..' )
-    # move back an additional level in this case
-    if ( fes )
-        setwd( '..' )
+    # return to base when done with this rep
+    setwd( dir_base )
 }
 
 if ( archived ) {
     # just switch back to ordinary data location
     setwd( dir_orig )
     setwd( name )
-    # new level to this hierarchy
-    if ( m_causal_fac != 10 ) {
-        dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
-        # now move in there
-        setwd( dir_out )
-    }
-    # new level to this hierarchy
-    if ( herit != 0.8 ) {
-        dir_out <- paste0( 'h', herit )
-        # now move in there
-        setwd( dir_out )
-    }
 }
 
-# if fes is true, create a new directory (if it doesn't already exist) and move there
-if ( fes ) {
-    dir_out <- 'fes'
-    # create first time, if needed
-    if ( !dir.exists( dir_out ) )
-        dir.create( dir_out )
-    # move there
-    setwd( dir_out )
-}
+# define destination directory
+dir_out <- ''
+if ( fes )
+    dir_out <- paste0( dir_out, 'fes/' )
+if ( m_causal_fac != 10 )
+    dir_out <- paste0( dir_out, 'm_causal_fac-', m_causal_fac, '/' )
+if ( herit != 0.8 )
+    dir_out <- paste0( dir_out, 'h', herit, '/' )
+
+# create first time, if needed
+if ( !dir.exists( dir_out ) )
+    dir.create( dir_out, recursive = TRUE )
+# move there
+setwd( dir_out )
 
 # write the big table to file!
 write_tsv(

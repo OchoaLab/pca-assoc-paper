@@ -69,51 +69,30 @@ if ( !is.na( opt$method ) ) {
 setwd( '../data/' )
 setwd( name )
 
-# create same `name` dir in output, if needed
+# remember this location, using global path, for easily returning across multiple levels when done
+dir_base <- getwd()
+
+# add same `name` dir to destination
 dir_dest <- paste0( dir_dest, name )
-if ( !dir.exists( dir_dest ) )
-    dir.create( dir_dest )
-
-# new level to this hierarchy
-if ( m_causal_fac != 10 ) {
-    dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
-    # now move in there
-    setwd( dir_out )
-    # create same `dir_out` in output, if needed
-    dir_dest <- paste0( dir_dest, dir_out )
-    if ( !dir.exists( dir_dest ) )
-        dir.create( dir_dest )
-}
-# new level to this hierarchy
-if ( herit != 0.8 ) {
-    dir_out <- paste0( 'h', herit )
-    # now move in there
-    setwd( dir_out )
-    # create same `dir_out` in output, if needed
-    dir_dest <- paste0( dir_dest, dir_out )
-    if ( !dir.exists( dir_dest ) )
-        dir.create( dir_dest )
-}
-
-dir_phen <- if ( fes ) 'fes' else NA
 
 for ( rep in 1 : rep_max ) {
-    # move higher to the "reps" location
-    dir_rep <- paste0( 'rep-', rep )
-    setwd( dir_rep )
+    # specify location of files to process, as many levels as needed
+    dir_in <- paste0( 'rep-', rep, '/' )
     if ( fes )
-        setwd( dir_phen )
-    
+        dir_in <- paste0( dir_in, 'fes/' )
+    if ( m_causal_fac != 10 )
+        dir_in <- paste0( dir_in, 'm_causal_fac-', m_causal_fac, '/' )
+    if ( herit != 0.8 )
+        dir_in <- paste0( dir_in, 'h', herit, '/' )
+    # stop if missing
+    if ( !dir.exists( dir_in ) )
+        stop( 'whole rep ', rep, ' MISSING!' )
+    setwd( dir_in )
+
     # create the same dir in the destination, if needed
-    # do both levels as separate steps in case "fes" is run before "rc"
-    dir_out <- paste0( dir_dest, '/', dir_rep )
+    dir_out <- paste0( dir_dest, '/', dir_in )
     if ( !dir.exists( dir_out ) )
-        dir.create( dir_out )
-    if ( fes ) {
-        dir_out <- paste0( dir_dest, '/', dir_rep, '/', dir_phen )
-        if ( !dir.exists( dir_out ) )
-            dir.create( dir_out )
-    }
+        dir.create( dir_out, recursive = TRUE )
     
     # start a big loop
     for ( method in methods ) {
@@ -135,11 +114,8 @@ for ( rep in 1 : rep_max ) {
         }
     }
     
-    # move back down when done with this rep
-    setwd( '..' )
-    # move back one more level in this case
-    if ( fes )
-        setwd( '..' )
+    # return to base when done with this rep
+    setwd( dir_base )
 }
 
 warns <- warnings()

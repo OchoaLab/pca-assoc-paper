@@ -32,14 +32,14 @@ rep_max <- opt$rep
 m_causal_fac <- opt$m_causal_fac
 herit <- opt$herit
 
-# some dependent params
-# new levels to this hierarchy
-dir_out_m_causal_fac <- NA
-dir_out_herit <- NA
+# specify location of files to process, as many levels as needed
+dir_out <- ''
+if ( fes )
+    dir_out <- paste0( dir_out, 'fes/' )
 if ( m_causal_fac != 10 )
-    dir_out_m_causal_fac <- paste0( 'm_causal_fac-', m_causal_fac )
+    dir_out <- paste0( dir_out, 'm_causal_fac-', m_causal_fac, '/' )
 if ( herit != 0.8 )
-    dir_out_herit <- paste0( 'h', herit )
+    dir_out <- paste0( dir_out, 'h', herit, '/' )
 
 
 #################
@@ -48,7 +48,6 @@ if ( herit != 0.8 )
 
 # input file name (big table), per dataset
 file_table <- 'sum.txt'
-dir_phen <- 'fes'
 # hardcoded params
 r_pca <- 20
 r_lmm <- 0
@@ -150,6 +149,9 @@ report_cross_method_king <- function( method_to_vals, metric ) {
 # move to where the data is
 setwd( '../data/' )
 
+# remember this location, using global path, for easily returning across multiple levels when done
+dir_base <- getwd()
+
 # get panel names from here
 datasets <- read_tsv( 'datasets.txt', col_types = 'cccii' )
 # subset and reorder as desired
@@ -164,14 +166,9 @@ for ( index_dataset in 1 : nrow( datasets ) ) {
     # add suffix to actually read king-cutoff filtered version's data
     name <- paste0( name, suffix )
     setwd( name )
-    # new level to this hierarchy
-    if ( !is.na( dir_out_m_causal_fac ) )
-        setwd( dir_out_m_causal_fac )
-    if ( !is.na( dir_out_herit ) )
-        setwd( dir_out_herit )
     # move in one more level in this case
-    if ( fes )
-        setwd( dir_phen )
+    if ( dir_out != '' )
+        setwd( dir_out )
 
     # read the big table!
     tib <- read_tsv(
@@ -190,15 +187,8 @@ for ( index_dataset in 1 : nrow( datasets ) ) {
 
     data[[ index_dataset ]] <- data_i
     
-    # go back down, for next dataset
-    setwd( '..' )
-    # move back more levels in these cases
-    if ( fes )
-        setwd( '..' )
-    if ( herit != 0.8 )
-        setwd( '..' )
-    if ( m_causal_fac != 10 )
-        setwd( '..' )
+    # return to base when done with this dataset
+    setwd( dir_base )
 }
 
 ############
@@ -210,30 +200,12 @@ ylim_rmsd <- range( -srmsd_cut, srmsd_cut, sapply( data, function (x) range( unl
 ylim_auc <- range( 0, sapply( data, function (x) range( unlist( x$auc ) ) ) ) # include zero
 
 # new level to this hierarchy
-if ( !is.na( dir_out_m_causal_fac ) ) {
+if ( dir_out != '' ) {
     # create if it didn't already exist
-    if( !dir.exists( dir_out_m_causal_fac ) )
-        dir.create( dir_out_m_causal_fac )
+    if( !dir.exists( dir_out ) )
+        dir.create( dir_out, recursive = TRUE )
     # now move in there
-    setwd( dir_out_m_causal_fac )
-}
-
-# new level to this hierarchy
-if ( !is.na( dir_out_herit ) ) {
-    # create if it didn't already exist
-    if( !dir.exists( dir_out_herit ) )
-        dir.create( dir_out_herit )
-    # now move in there
-    setwd( dir_out_herit )
-}
-
-# move in an additional level in this case, for final plot location
-if ( fes ) {
-    # create directory if it didn't already exist
-    if ( !dir.exists( dir_phen ) )
-        dir.create( dir_phen )
-    # now move in
-    setwd( dir_phen )
+    setwd( dir_out )
 }
 
 # start PDF

@@ -47,8 +47,9 @@ if ( is.na(name) )
 # move to where the data is
 setwd( '../data/' )
 setwd( name )
+dir_out <- paste0( 'rep-', rep )
 if ( opt$sim )
-    setwd( paste0( '/rep-', rep ) )
+    setwd( dir_out )
 
 ################
 ### simtrait ###
@@ -102,32 +103,23 @@ causal_coeffs = obj_trait$causal_coeffs
 # in simulation, rep-*/ already exist and we're already in it
 # in real data, rep-*/ doesn't exist, so create then move in there
 if ( !opt$sim ) {
-    dir_out <- paste0( 'rep-', rep )
     if( !dir.exists( dir_out ) )
         dir.create( dir_out )
     setwd( dir_out )
 }
 
-# if fes is true, create a new directory and move there, where the new data will go (so nothing gets overwritten, have both versions together)
-# ditto non-default m_causal_fac and herit
-if ( fes ) {
-    dir_out <- 'fes'
-    if ( !dir.exists( dir_out ) )
-        dir.create( dir_out )
-    setwd( dir_out )
-}
-if ( m_causal_fac != 10 ) {
-    dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
-    if( !dir.exists( dir_out ) )
-        dir.create( dir_out )
-    setwd( dir_out )
-}
-if ( herit != 0.8 ) {
-    dir_out <- paste0( 'h', herit )
-    if( !dir.exists( dir_out ) )
-        dir.create( dir_out )
-    setwd( dir_out )
-}
+# specify location of outputs, as many levels as needed
+dir_out <- ''
+if ( fes )
+    dir_out <- paste0( dir_out, 'fes/' )
+if ( m_causal_fac != 10 )
+    dir_out <- paste0( dir_out, 'm_causal_fac-', m_causal_fac, '/' )
+if ( herit != 0.8 )
+    dir_out <- paste0( dir_out, 'h', herit, '/' )
+# create if needed
+if ( !dir.exists( dir_out ) )
+    dir.create( dir_out, recursive = TRUE )
+setwd( dir_out )
 
 # check that outputs don't exist already
 if ( file.exists( 'simtrait.RData' ) )

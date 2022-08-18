@@ -62,19 +62,6 @@ if (opt$sim)
 # get number of loci
 m_loci <- count_lines( name_in, 'bim' )
 
-# new level to this hierarchy
-if ( m_causal_fac != 10 ) {
-    dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
-    # now move in there
-    setwd( dir_out )
-}
-# new level to this hierarchy
-if ( herit != 0.8 ) {
-    dir_out <- paste0( 'h', herit )
-    # now move in there
-    setwd( dir_out )
-}
-
 # function to process one n_pcs
 # note every other parameter is a global variable
 auc_rmsd_one_pcs <- function(n_pcs) {
@@ -144,29 +131,24 @@ auc_rmsd_one_pcs <- function(n_pcs) {
     )
 }
 
-for ( rep in 1 : rep_max ) {
+# remember this location, using global path, for easily returning across multiple levels when done
+dir_base <- getwd()
 
-    # move higher to the "reps" location
-    # this is so GCTA's temporary files don't overwrite files from other parallel runs
-    dir_out <- paste0( 'rep-', rep )
+for ( rep in 1 : rep_max ) {
+    # specify location of files to process, as many levels as needed
+    dir_out <- paste0( 'rep-', rep, '/' )
+    if ( fes )
+        dir_out <- paste0( dir_out, 'fes/' )
+    if ( m_causal_fac != 10 )
+        dir_out <- paste0( dir_out, 'm_causal_fac-', m_causal_fac, '/' )
+    if ( herit != 0.8 )
+        dir_out <- paste0( dir_out, 'h', herit, '/' )
+
     # skip reps that we haven't calculated at all
     if ( !dir.exists( dir_out ) )
         next
+    # else move to that destination
     setwd( dir_out )
-
-    # move in an additional level in this case
-    if ( fes ) {
-        dir_phen <- 'fes/'
-        # directory can be missing, skip in that case
-        if ( !dir.exists( dir_phen ) ) {
-            # just move down from rep-* case
-            setwd( '..' )
-            # skip rest
-            next
-        }
-        # else move in
-        setwd( dir_phen )
-    }
     
     # load trait info we need
     load( 'simtrait.RData' )
@@ -185,9 +167,6 @@ for ( rep in 1 : rep_max ) {
         )
     }
     
-    # move back down when done with this rep
-    setwd( '..' )
-    # move back an additional level in this case
-    if ( fes )
-        setwd( '..' )
+    # return to base when done with this rep
+    setwd( dir_base )
 }

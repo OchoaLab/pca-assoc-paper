@@ -24,6 +24,8 @@ option_list = list(
                 help = "Plot only complete replicates (useful for partial runs)"),
     make_option("--fes", action = "store_true", default = FALSE, 
                 help = "Use FES instead of RC trait model"),
+    make_option("--herit", type = "double", default = 0.8, 
+                help = "heritability", metavar = "double"),
     make_option("--m_causal_fac", type = "double", default = 10,
                 help = "Proportion of individuals to causal loci", metavar = "double")
 )
@@ -35,6 +37,7 @@ opt <- parse_args(opt_parser)
 name <- opt$bfile
 fes <- opt$fes
 m_causal_fac <- opt$m_causal_fac
+herit <- opt$herit
 
 # stop if name is missing
 if ( is.na(name) )
@@ -57,16 +60,16 @@ method_cols <- c(
 setwd( '../data/' )
 setwd( name )
 
-# new level to this hierarchy
-if ( m_causal_fac != 10 ) {
-    dir_out <- paste0( 'm_causal_fac-', m_causal_fac )
-    # now move in there
-    setwd( dir_out )
-}
-
 # if fes is true, move to directory containing input and outputs
+dir_out <- ''
 if ( fes )
-    setwd( 'fes' )
+    dir_out <- paste0( dir_out, 'fes/' )
+if ( m_causal_fac != 10 )
+    dir_out <- paste0( dir_out, 'm_causal_fac-', m_causal_fac, '/' )
+if ( herit != 0.8 )
+    dir_out <- paste0( dir_out, 'h', herit, '/' )
+# move there
+setwd( dir_out )
 
 # read the big table!
 tib <- read_tsv(
