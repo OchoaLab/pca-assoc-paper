@@ -29,6 +29,8 @@ option_list = list(
                 help = "Method to process (pca or lmm; default both)", metavar = "character"),
     make_option(c("-t", "--test"), action = "store_true", default = FALSE, 
                 help = "Test run (makes sure no files are missing, but doesn't actually move anything.  However, output directories are created.)"),
+    make_option(c("-u", "--unarchive"), action = "store_true", default = FALSE, 
+                help = "Move files back from archive to original location."),
     make_option("--herit", type = "double", default = 0.8, 
                 help = "heritability", metavar = "double"),
     make_option("--m_causal_fac", type = "double", default = 10,
@@ -74,6 +76,13 @@ dir_base <- getwd()
 
 # add same `name` dir to destination
 dir_dest <- paste0( dir_dest, name )
+
+if ( opt$unarchive ) {
+    # if we want to unarchive, simply reverse source and destinations
+    dir_base <- dir_dest
+    dir_dest <- getwd()
+    setwd( dir_base )
+}
 
 for ( rep in 1 : rep_max ) {
     # specify location of files to process, as many levels as needed

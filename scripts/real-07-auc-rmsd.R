@@ -92,12 +92,7 @@ auc_rmsd_one_pcs <- function(n_pcs) {
 
     # special case is a single line with the word NULL, which occurs particularly with GCTA outputs when model does not converge/is underdetermined
     if ( length(pvals) == 1 && pvals == 'NULL' ) {
-        # when pvals are NULL, they get printed as an empty file
-        # this is what we get from pval_srmsd, pval_aucpr if we had set pvals==NULL
-        rmsdp <- NA
-        aucpr <- NA
-        # this special case wasn't handled below, I think
-        lambda <- NA
+        pvals <- NULL
     } else {
         # make sure length is correct!
         # since we're in parallelized code, skip instead of dying (return early without generating output)
@@ -105,16 +100,20 @@ auc_rmsd_one_pcs <- function(n_pcs) {
             message( 'File has ', length(pvals), ' p-values, expected ', m_loci, '.  SKIPPING!' )
             return()
         }
-        
         # convert strings to numeric
         pvals <- as.numeric( pvals )
-        # calculate RMSD_p
-        rmsdp <- pval_srmsd(pvals, causal_indexes)
-        # calculate AUC_PR
-        aucpr <- pval_aucpr(pvals, causal_indexes)
-        # calculate inflation factor from p-values (map back to Chi-Sq)
-        lambda <- pval_infl( pvals )
     }
+    
+    # calculate RMSD_p
+    rmsdp <- pval_srmsd( pvals, causal_indexes )
+    # calculate AUC_PR
+    aucpr <- pval_aucpr( pvals, causal_indexes )
+    # calculate inflation factor from p-values (map back to Chi-Sq)
+    lambda <- pval_infl( pvals )
+    # calculate traditional type I error and calibrated power stats
+    type_1_err <- pval_type_1_err( pvals, causal_indexes )
+    power_calib <- pval_power_calib( pvals, causal_indexes )
+
     # put everything into a tibble, with all the info we want conveniently in place
     tib <- tibble(
         method = method,
@@ -122,7 +121,9 @@ auc_rmsd_one_pcs <- function(n_pcs) {
         rep = rep,
         rmsd = rmsdp,
         auc = aucpr,
-        lambda = lambda
+        lambda = lambda,
+        type_1_err = type_1_err,
+        power_calib = power_calib
     )
     # save this one row to output file
     write_tsv(
@@ -143,7 +144,7 @@ for ( rep in 1 : rep_max ) {
         dir_out <- paste0( dir_out, 'm_causal_fac-', m_causal_fac, '/' )
     if ( herit != 0.8 )
         dir_out <- paste0( dir_out, 'h', herit, '/' )
-
+    
     # skip reps that we haven't calculated at all
     if ( !dir.exists( dir_out ) )
         next

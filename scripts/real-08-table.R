@@ -92,7 +92,7 @@ for ( rep in 1 : rep_max ) {
                 # read table
                 tib <- read_tsv(
                     file_sum,
-                    col_types = 'ciiddd'
+                    col_types = 'ciiddddd'
                 )
                 # concatenate into bigger table
                 tib_main <- bind_rows( tib_main, tib )
@@ -119,11 +119,13 @@ if ( m_causal_fac != 10 )
 if ( herit != 0.8 )
     dir_out <- paste0( dir_out, 'h', herit, '/' )
 
-# create first time, if needed
-if ( !dir.exists( dir_out ) )
-    dir.create( dir_out, recursive = TRUE )
-# move there
-setwd( dir_out )
+if ( dir_out != '' ) {
+    # create first time, if needed
+    if ( !dir.exists( dir_out ) )
+        dir.create( dir_out, recursive = TRUE )
+    # move there
+    setwd( dir_out )
+}
 
 # write the big table to file!
 write_tsv(
