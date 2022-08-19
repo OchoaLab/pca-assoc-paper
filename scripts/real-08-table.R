@@ -92,7 +92,7 @@ for ( rep in 1 : rep_max ) {
                 # read table
                 tib <- read_tsv(
                     file_sum,
-                    col_types = 'ciiddddd'
+                    col_types = 'ciiddddddddddd'
                 )
                 # concatenate into bigger table
                 tib_main <- bind_rows( tib_main, tib )

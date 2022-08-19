@@ -28,6 +28,8 @@ option_list = list(
                 help = "Genotypes are simulated (rather than real; alters location only)"),
     make_option(c("-t", "--threads"), type = "integer", default = detectCores(), 
                 help = "number of threads (default use all cores, but may consume excessive memory)", metavar = "int"),
+    make_option("--force", action = "store_true", default = FALSE, 
+                help = "Overwrite all outputs (default is to keep existing outputs)"),
     make_option("--fes", action = "store_true", default = FALSE, 
                 help = "Use FES instead of RC trait model"),
     make_option("--herit", type = "double", default = 0.8, 
@@ -70,8 +72,8 @@ auc_rmsd_one_pcs <- function(n_pcs) {
     file_pvals <- paste0( 'pvals_', method, '_', n_pcs, '.txt.gz' )
     file_sum <- paste0( 'sum_', method, '_', n_pcs, '.txt.gz' )
     
-    # if output is already there, don't do anything (don't recalculate)
-    if ( file.exists( file_sum ) )
+    # if output is already there and not forcing overwrite, don't do anything (don't recalculate)
+    if ( !opt$force && file.exists( file_sum ) )
         return()
     # if there's no input file, also skip silently
     if ( !file.exists( file_pvals ) )
@@ -103,27 +105,28 @@ auc_rmsd_one_pcs <- function(n_pcs) {
         # convert strings to numeric
         pvals <- as.numeric( pvals )
     }
-    
-    # calculate RMSD_p
-    rmsdp <- pval_srmsd( pvals, causal_indexes )
-    # calculate AUC_PR
-    aucpr <- pval_aucpr( pvals, causal_indexes )
-    # calculate inflation factor from p-values (map back to Chi-Sq)
-    lambda <- pval_infl( pvals )
-    # calculate traditional type I error and calibrated power stats
-    type_1_err <- pval_type_1_err( pvals, causal_indexes )
-    power_calib <- pval_power_calib( pvals, causal_indexes )
 
-    # put everything into a tibble, with all the info we want conveniently in place
+    # calculate type I error and calibrated power at a range of significance values
+    alpha <- c(1e-2, 1e-4, 1e-6, 1e-8)
+    type_1_err  <- pval_type_1_err(  pvals, causal_indexes, alpha = alpha )
+    power_calib <- pval_power_calib( pvals, causal_indexes, alpha = alpha )
+    
+    # calculate all other desired statistics, put everything into a tibble
     tib <- tibble(
-        method = method,
-        pc = n_pcs,
-        rep = rep,
-        rmsd = rmsdp,
-        auc = aucpr,
-        lambda = lambda,
-        type_1_err = type_1_err,
-        power_calib = power_calib
+        method       = method,
+        pc           = n_pcs,
+        rep          = rep,
+        rmsd         = pval_srmsd( pvals, causal_indexes ),
+        auc          = pval_aucpr( pvals, causal_indexes ),
+        lambda       = pval_infl( pvals ),
+        type_1_err2  = type_1_err[1],
+        type_1_err4  = type_1_err[2],
+        type_1_err6  = type_1_err[3],
+        type_1_err8  = type_1_err[4],
+        power_calib2 = power_calib[1],
+        power_calib4 = power_calib[2],
+        power_calib6 = power_calib[3],
+        power_calib8 = power_calib[4]
     )
     # save this one row to output file
     write_tsv(
