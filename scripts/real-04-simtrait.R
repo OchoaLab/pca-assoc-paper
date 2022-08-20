@@ -4,6 +4,7 @@ library(optparse)
 library(simtrait)
 library(genio)
 library(BEDMatrix)
+library(readr)
 
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
@@ -26,6 +27,10 @@ option_list = list(
                 help = "Replicate number", metavar = "int"),
     make_option("--fes", action = "store_true", default = FALSE, 
                 help = "Use FES instead of RC trait model"),
+    make_option("--env1", type = "double", default = NA,
+                help = "Variance of 1st (coarsest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
+    make_option("--env2", type = "double", default = NA,
+                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
     make_option("--sim", action = "store_true", default = FALSE, 
                 help = "Genotypes are simulated (rather than real; alters paths only)")
 )
@@ -39,6 +44,8 @@ herit <- opt$herit
 m_causal_fac <- opt$m_causal_fac
 rep <- opt$rep
 fes <- opt$fes
+env1 <- opt$env1
+env2 <- opt$env2
 
 # stop if name is missing
 if ( is.na(name) )
@@ -70,6 +77,38 @@ if ( opt$sim ) {
 # load FAM table, for phen output
 fam <- read_fam( name_in )
 
+# defaults for no env effects
+labs <- NULL
+labs_sigma_sq <- NULL
+if ( !is.na( env1 ) ) {
+    # check that both are defined
+    if ( is.na( env2 ) )
+        stop( 'If --env1 is specified, must also specify --env2!' )
+    
+    # shared for all cases!
+    labs_sigma_sq <- c(env1, env2)
+    
+    # this section defines `labs` only
+    if ( opt$sim ) {
+        # there's no labels here, but use geographic order for grouping individuals
+        # this structure resembles TGP in the number of its two suubpop levels
+        k_subpops1 <- 5  # hardcoded!  n/k = 200
+        k_subpops2 <- 25 # hardcoded!  n/k =  40
+        n_ind <- nrow( fam )
+        labs <- cbind(
+            ceiling( ( 1 : n_ind ) * k_subpops1 / n_ind ),
+            ceiling( ( 1 : n_ind ) * k_subpops2 / n_ind )
+        )
+    } else {
+        # read annotations
+        subpop_info <- read_tsv( 'pops-annot.txt', comment = '#', show_col_types = FALSE )
+        # map subpopulations using sub-subpopulations
+        fam$superpop <- subpop_info$superpop[ match( fam$fam, subpop_info$pop ) ]
+        # first level is coarsest!
+        labs <- cbind( fam$superpop, fam$fam )
+    }
+}
+
 # now that we have number of individuals, use a tenth of that for m_causal, rounding
 m_causal <- round( nrow( fam ) / m_causal_fac )
 message( 'm_causal: ', m_causal )
@@ -79,12 +118,15 @@ X <- BEDMatrix( name_in, simple_names = TRUE )
 
 # simulate trait
 # sim genotypes use p_anc version, real data use kinship version
+# env also simulated if desired
 obj_trait <- sim_trait(
     X = X,
     m_causal = m_causal,
     herit = herit,
     p_anc = p_anc,
     kinship = kinship,
+    labs = labs,
+    labs_sigma_sq = labs_sigma_sq,
     fes = fes,
     maf_cut = min_maf_causal
 )
@@ -116,6 +158,8 @@ if ( m_causal_fac != 10 )
     dir_out <- paste0( dir_out, 'm_causal_fac-', m_causal_fac, '/' )
 if ( herit != 0.8 )
     dir_out <- paste0( dir_out, 'h', herit, '/' )
+if ( !is.na( env1 ) )
+    dir_out <- paste0( dir_out, 'env', env1, '-', env2, '/' )
 # create if needed
 if ( !dir.exists( dir_out ) )
     dir.create( dir_out, recursive = TRUE )

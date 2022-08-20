@@ -35,7 +35,11 @@ option_list = list(
     make_option("--herit", type = "double", default = 0.8, 
                 help = "heritability", metavar = "double"),
     make_option("--m_causal_fac", type = "double", default = 10,
-                help = "Proportion of individuals to causal loci", metavar = "double")
+                help = "Proportion of individuals to causal loci", metavar = "double"),
+    make_option("--env1", type = "double", default = NA,
+                help = "Variance of 1st (coarsest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
+    make_option("--env2", type = "double", default = NA,
+                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -49,6 +53,12 @@ threads <- opt$threads
 fes <- opt$fes
 m_causal_fac <- opt$m_causal_fac
 herit <- opt$herit
+env1 <- opt$env1
+env2 <- opt$env2
+
+# do this consistency check early
+if ( !is.na( env1 ) && is.na( env2 ) )
+    stop( 'If --env1 is specified, must also specify --env2!' )
 
 # figure out what threads should be
 # above default should be modified if --dcc and if the threads aren't zero (default, means use all, which we should never do on a cluster!)
@@ -104,6 +114,8 @@ if ( m_causal_fac != 10 )
     dir_phen <- paste0( dir_phen, 'm_causal_fac-', m_causal_fac, '/' )
 if ( herit != 0.8 )
     dir_phen <- paste0( dir_phen, 'h', herit, '/' )
+if ( !is.na( env1 ) )
+    dir_phen <- paste0( dir_phen, 'env', env1, '-', env2, '/' )
 
 # only these are in dir_phen
 name_phen <- paste0( dir_phen, name_in )

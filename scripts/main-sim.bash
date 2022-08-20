@@ -163,3 +163,52 @@ time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --her
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --fes -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --fes
 
+###########
+### ENV ###
+###########
+
+# start from prev low-herit sim
+h=0.3
+mcf=27 # 10*8/3 rounded, adjusts expected coefficient size for decrease in heritability
+# and add env variance
+env1=0.3
+env2=0.2
+
+# do both RC and FES, instructions together here
+for rep in {1..50}; do
+    # trait simulations were performed locally
+    time Rscript real-04-simtrait.R --bfile $name -r $rep --sim --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+    time Rscript real-04-simtrait.R --bfile $name -r $rep --sim --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --fes
+
+    # PCA and LMM runs were actually performed on DCC (see batch.R)
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink
+    for pcs in {0..90}; do
+	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+	time Rscript real-06-pca-plink.R --sim --bfile $name -r $rep --n_pcs $pcs --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --fes
+    done
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --plink --clean
+
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep
+    for pcs in {0..90}; do
+	time Rscript real-05-gcta.R --sim --bfile $name -r $rep --n_pcs $pcs --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+	time Rscript real-05-gcta.R --sim --bfile $name -r $rep --n_pcs $pcs --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --fes
+    done
+    time Rscript real-02-subset-eigenvec.R --bfile $name/rep-$rep --clean
+done
+
+# RC
+time Rscript real-07-auc-rmsd.R --sim --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+time Rscript real-09-figs.R --bfile $name --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --final
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -t # test first!
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+
+# FES
+time Rscript real-07-auc-rmsd.R --sim --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --fes --env1 $env1 --env2 $env2
+time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --fes --env1 $env1 --env2 $env2
+time Rscript real-09-figs.R --bfile $name --herit $h --m_causal_fac $mcf --fes --env1 $env1 --env2 $env2
+time Rscript real-10-validate-pvals.R --sim --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --final --fes
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --fes --env1 $env1 --env2 $env2 -t # test first!
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --fes --env1 $env1 --env2 $env2
+

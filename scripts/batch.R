@@ -11,6 +11,7 @@ account <- 'ochoalab'; partition <- 'ochoalab'
 plink <- TRUE # FALSE
 fes <- TRUE # FALSE
 herit_low <- FALSE # TRUE
+env <- FALSE
 #bfile <- 'sim-n100-k10-f0.1-s0.5-g1'; short <- 's'
 bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short <- 'l'
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'; short <- 'f'
@@ -28,6 +29,10 @@ threads <- 1
 #############################
 
 # set some settings/etc automatically fron here down
+
+# env only makes sense in combination with low heritability
+if (env)
+    herit_low <- TRUE
 
 # add trait type marker to output
 short <- paste0( short, if ( fes ) 'f' else 'r' )
@@ -67,6 +72,10 @@ submit_rep_pcs <- function( rep ) {
     # a pair of parameters for low heritability simulations
     if ( herit_low )
         commands <- paste0( commands, ' --herit 0.3 --m_causal_fac 27' )
+    
+    # a pair of parameters for env simulations
+    if ( env )
+        commands <- paste0( commands, ' --env1 0.3 --env2 0.2' )
     
     # load plink module if needed
     if ( plink ) {
