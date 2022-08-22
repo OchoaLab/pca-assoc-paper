@@ -36,7 +36,11 @@ option_list = list(
     make_option("--m_causal_fac", type = "double", default = 10,
                 help = "Proportion of individuals to causal loci", metavar = "double"),
     make_option("--fes", action = "store_true", default = FALSE, 
-                help = "Use FES instead of RC trait model")
+                help = "Use FES instead of RC trait model"),
+    make_option("--env1", type = "double", default = NA,
+                help = "Variance of 1st (coarsest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
+    make_option("--env2", type = "double", default = NA,
+                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -49,6 +53,12 @@ n_pcs_max <- opt$n_pcs
 fes <- opt$fes
 m_causal_fac <- opt$m_causal_fac
 herit <- opt$herit
+env1 <- opt$env1
+env2 <- opt$env2
+
+# do this consistency check early
+if ( !is.na( env1 ) && is.na( env2 ) )
+    stop( 'If --env1 is specified, must also specify --env2!' )
 
 # stop if name is missing
 if ( is.na(name) )
@@ -93,6 +103,8 @@ for ( rep in 1 : rep_max ) {
         dir_in <- paste0( dir_in, 'm_causal_fac-', m_causal_fac, '/' )
     if ( herit != 0.8 )
         dir_in <- paste0( dir_in, 'h', herit, '/' )
+    if ( !is.na( env1 ) )
+        dir_in <- paste0( dir_in, 'env', env1, '-', env2, '/' )
     # stop if missing
     if ( !dir.exists( dir_in ) )
         stop( 'whole rep ', rep, ' MISSING!' )

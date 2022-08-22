@@ -27,7 +27,11 @@ option_list = list(
     make_option("--herit", type = "double", default = 0.8, 
                 help = "heritability", metavar = "double"),
     make_option("--m_causal_fac", type = "double", default = 10,
-                help = "Proportion of individuals to causal loci", metavar = "double")
+                help = "Proportion of individuals to causal loci", metavar = "double"),
+    make_option("--env1", type = "double", default = NA,
+                help = "Variance of 1st (coarsest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
+    make_option("--env2", type = "double", default = NA,
+                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -38,6 +42,12 @@ name <- opt$bfile
 fes <- opt$fes
 m_causal_fac <- opt$m_causal_fac
 herit <- opt$herit
+env1 <- opt$env1
+env2 <- opt$env2
+
+# do this consistency check early
+if ( !is.na( env1 ) && is.na( env2 ) )
+    stop( 'If --env1 is specified, must also specify --env2!' )
 
 # stop if name is missing
 if ( is.na(name) )
@@ -68,8 +78,11 @@ if ( m_causal_fac != 10 )
     dir_out <- paste0( dir_out, 'm_causal_fac-', m_causal_fac, '/' )
 if ( herit != 0.8 )
     dir_out <- paste0( dir_out, 'h', herit, '/' )
+if ( !is.na( env1 ) )
+    dir_out <- paste0( dir_out, 'env', env1, '-', env2, '/' )
 # move there
-setwd( dir_out )
+if ( dir_out != '' )
+    setwd( dir_out )
 
 # read the big table!
 tib <- read_tsv(

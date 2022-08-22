@@ -161,15 +161,17 @@ if ( herit != 0.8 )
 if ( !is.na( env1 ) )
     dir_out <- paste0( dir_out, 'env', env1, '-', env2, '/' )
 # create if needed
-if ( !dir.exists( dir_out ) )
-    dir.create( dir_out, recursive = TRUE )
-setwd( dir_out )
+if ( dir_out != '' ) {
+    if ( !dir.exists( dir_out ) )
+        dir.create( dir_out, recursive = TRUE )
+    setwd( dir_out )
+}
 
 # check that outputs don't exist already
 if ( file.exists( 'simtrait.RData' ) )
     stop( 'Output exists, will not overwrite: simtrait.RData' )
-if ( file.exists( 'data.fam' ) )
-    stop( 'Output exists, will not overwrite: data.fam' )
+if ( file.exists( 'data.phen' ) )
+    stop( 'Output exists, will not overwrite: data.phen' )
 
 # now save, as R data
 save(
