@@ -8,48 +8,35 @@ library(ochoalabtools)
 account <- 'ochoalab'; partition <- 'ochoalab'
 
 # shared items for all runs
-plink <- TRUE # FALSE
-fes <- TRUE # FALSE
-herit_low <- FALSE # TRUE
+herit_low <- TRUE
 env <- FALSE
-#bfile <- 'sim-n100-k10-f0.1-s0.5-g1'; short <- 's'
-bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short <- 'l'
-#bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'; short <- 'f'
-#bfile <- 'HoPacAll_ld_prune_1000kb_0.3_maf-0.01'; short <- 'h'
-#bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1'; short <- 'd'
-#bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01'; short <- 'k'
-#bfile <- 'HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim'; short <- 'H'
-#bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1_sim'; short <- 'D'
-#bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_sim'; short <- 'K'
+#bfile <- 'sim-n100-k10-f0.1-s0.5-g1'; short_orig <- 's'
+#bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short_orig <- 'l'
+bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'; short_orig <- 'f'
+#bfile <- 'HoPacAll_ld_prune_1000kb_0.3_maf-0.01'; short_orig <- 'h'
+#bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1'; short_orig <- 'd'
+#bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01'; short_orig <- 'k'
+#bfile <- 'HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim'; short_orig <- 'H'
+#bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1_sim'; short_orig <- 'D'
+#bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_sim'; short_orig <- 'K'
 
 # needed to make sure each process gets enough memory if all my jobs saturate the machines
 # (didn't have to change last time, but before TGP was thinned I needed 4 threads for GCTA runs)
-threads <- 1
+threads <- 1L
+# setup loop
+reps_max <- 50L
 
 #############################
 
-# set some settings/etc automatically fron here down
-
-# env only makes sense in combination with low heritability
-if (env)
-    herit_low <- TRUE
-
-# add trait type marker to output
-short <- paste0( short, if ( fes ) 'f' else 'r' )
-
-# GCTA uses more memory, this works for the largest cases
-mem <- if ( plink ) '4G' else '16G'
-
-# select script automatically from boolean
-script <- if ( plink ) 'real-06-pca-plink.R' else 'real-05-gcta.R'
-
-# so names don't overlap between plink and gcta runs
-short <- paste0( short, if (plink) 'p' else 'g' )
-
 # main submission steps
-# global vars: script, bfile, short, mem, plink
-# new version uses array jobs, arraying over PCs
-submit_rep_pcs <- function( rep ) {
+# uses array jobs, arraying over PCs
+submit_rep_pcs <- function( rep, bfile, threads, fes, herit_low, env, plink, account, partition ) {
+    # GCTA uses more memory, this works for the largest cases
+    mem <- if ( plink ) '4G' else '16G'
+
+    # select script automatically from boolean
+    script <- if ( plink ) 'real-06-pca-plink.R' else 'real-05-gcta.R'
+
     # pass params to command
     # first do core set of parameters, more to be added below as needed
     commands <- paste0(
@@ -94,7 +81,7 @@ submit_rep_pcs <- function( rep ) {
         commands,
         name,
         mem = mem,
-   	threads = threads,
+        threads = threads,
         account = account,
         partition = partition,
         array = '0-90' # number of PCs hardcoded here
@@ -107,24 +94,56 @@ submit_rep_pcs <- function( rep ) {
     batch_cleanup( name )
 }
 
-# setup loop
-reps_max <- 50
 
-# I
-# test one rep
-rep <- 1
-submit_rep_pcs( rep )
+# automatically loop through main sims
+for ( plink in c(TRUE, FALSE) ) {
+    for ( fes in c(FALSE, TRUE) ) {
+        # set some settings/etc automatically fron here down
 
-## # II
-## # finish rest of reps
-## for ( rep in 2 : reps_max ) {
-##     submit_rep_pcs( rep )
-## }
+        ############
+        ### NAME ###
+        ############
 
-########################
+        # reset `short` name after every loop, otherwise it gets messed up!
+        short <- short_orig
+        
+        # set one of the levels of type of simulation in output name, so they don't overlap
+        if ( env ) {
+            # env only makes sense in combination with low heritability
+            herit_low <- TRUE
+            short <- paste0( short, 'e' ) # env (+ low-herit implied)
+        } else if ( herit_low ) {
+            short <- paste0( short, 'l' ) # low herit
+        } else {
+            short <- paste0( short, 'h' ) # high herit
+        }
+        
+        # add trait type marker to output
+        short <- paste0( short, if ( fes ) 'f' else 'r' )
 
-## # start loop
-## for ( rep in 1 : reps_max ) {
-##     submit_rep_pcs( rep )
-## }
+        # so names don't overlap between plink and gcta runs
+        short <- paste0( short, if ( plink ) 'p' else 'g' )
 
+        ###########
+        ### ETC ###
+        ###########
+        
+        ## # I
+        ## # test one rep
+        ## rep <- 1L
+        ## submit_rep_pcs( rep, bfile, threads, fes, herit_low, env, plink, account, partition )
+
+        ## # II
+        ## # finish rest of reps
+        ## for ( rep in 2L : reps_max ) {
+        ##     submit_rep_pcs( rep, bfile, threads, fes, herit_low, env, plink, account, partition )
+        ## }
+
+        ########################
+
+        # start loop
+        for ( rep in 1L : reps_max ) {
+            submit_rep_pcs( rep, bfile, threads, fes, herit_low, env, plink, account, partition )
+        }
+    }
+}
