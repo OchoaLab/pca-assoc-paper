@@ -3,19 +3,22 @@ library(ochoalabtools)
 # slurm job submission script for DCC
 
 # using biostats server
-#account <- NA; partition <- 'biostat'
+#partition <- 'biostat'
 # using ochoalab server
-account <- 'ochoalab'; partition <- 'ochoalab'
+#partition <- 'ochoalab'
+# draw partitions probabilistically!
+partitions <- c( 'ochoalab', 'biostat' )
+partitions_probs <- c(0.5, 0.5)
 
 # shared items for all runs
-herit_low <- TRUE
+herit_low <- FALSE
 env <- FALSE
 #bfile <- 'sim-n100-k10-f0.1-s0.5-g1'; short_orig <- 's'
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short_orig <- 'l'
-bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'; short_orig <- 'f'
+#bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'; short_orig <- 'f'
 #bfile <- 'HoPacAll_ld_prune_1000kb_0.3_maf-0.01'; short_orig <- 'h'
 #bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1'; short_orig <- 'd'
-#bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01'; short_orig <- 'k'
+bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01'; short_orig <- 'k'
 #bfile <- 'HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim'; short_orig <- 'H'
 #bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1_sim'; short_orig <- 'D'
 #bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_sim'; short_orig <- 'K'
@@ -30,7 +33,7 @@ reps_max <- 50L
 
 # main submission steps
 # uses array jobs, arraying over PCs
-submit_rep_pcs <- function( rep, bfile, threads, fes, herit_low, env, plink, account, partition ) {
+submit_rep_pcs <- function( rep, bfile, threads, fes, herit_low, env, plink, partition ) {
     # GCTA uses more memory, this works for the largest cases
     mem <- if ( plink ) '4G' else '16G'
 
@@ -82,7 +85,7 @@ submit_rep_pcs <- function( rep, bfile, threads, fes, herit_low, env, plink, acc
         name,
         mem = mem,
         threads = threads,
-        account = account,
+        account = partition, # account == partition in both cases that apply to me
         partition = partition,
         array = '0-90' # number of PCs hardcoded here
     )
@@ -131,19 +134,20 @@ for ( plink in c(TRUE, FALSE) ) {
         ## # I
         ## # test one rep
         ## rep <- 1L
-        ## submit_rep_pcs( rep, bfile, threads, fes, herit_low, env, plink, account, partition )
+        ## submit_rep_pcs( rep, bfile, threads, fes, herit_low, env, plink, partition )
 
         ## # II
         ## # finish rest of reps
         ## for ( rep in 2L : reps_max ) {
-        ##     submit_rep_pcs( rep, bfile, threads, fes, herit_low, env, plink, account, partition )
+        ##     submit_rep_pcs( rep, bfile, threads, fes, herit_low, env, plink, partition )
         ## }
 
         ########################
 
         # start loop
         for ( rep in 1L : reps_max ) {
-            submit_rep_pcs( rep, bfile, threads, fes, herit_low, env, plink, account, partition )
+            partition <- sample( partitions, 1L, prob = partitions_probs )
+            submit_rep_pcs( rep, bfile, threads, fes, herit_low, env, plink, partition )
         }
     }
 }
