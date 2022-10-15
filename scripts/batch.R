@@ -8,17 +8,18 @@ library(ochoalabtools)
 #partition <- 'ochoalab'
 # draw partitions probabilistically!
 partitions <- c( 'ochoalab', 'biostat' )
-partitions_probs <- c(0.5, 0.5)
+partitions_probs <- c(0.4, 0.6)
 
 # shared items for all runs
 herit_low <- FALSE
 env <- FALSE
+king_cutoff <- TRUE
 #bfile <- 'sim-n100-k10-f0.1-s0.5-g1'; short_orig <- 's'
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g1'; short_orig <- 'l'
 #bfile <- 'sim-n1000-k10-f0.1-s0.5-g20'; short_orig <- 'f'
-#bfile <- 'HoPacAll_ld_prune_1000kb_0.3_maf-0.01'; short_orig <- 'h'
+bfile <- 'HoPacAll_ld_prune_1000kb_0.3_maf-0.01'; short_orig <- 'h'
 #bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1'; short_orig <- 'd'
-bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01'; short_orig <- 'k'
+#bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01'; short_orig <- 'k'
 #bfile <- 'HoPacAll_ld_prune_1000kb_0.3_maf-0.01_sim'; short_orig <- 'H'
 #bfile <- 'hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1_sim'; short_orig <- 'D'
 #bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_sim'; short_orig <- 'K'
@@ -28,6 +29,10 @@ bfile <- 'tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01'; short_orig <- 'k'
 threads <- 1L
 # setup loop
 reps_max <- 50L
+
+# automatically fix dataset name for this case
+if ( king_cutoff )
+    bfile <- paste0( bfile, '_king-cutoff-4' )
 
 #############################
 
@@ -40,6 +45,12 @@ submit_rep_pcs <- function( rep, bfile, threads, fes, herit_low, env, plink, par
     # select script automatically from boolean
     script <- if ( plink ) 'real-06-pca-plink.R' else 'real-05-gcta.R'
 
+    # default number of PCs hardcoded here
+    pcs <- '0-90'
+    # only king_cutoff has obvious special cases (hack of "array" notation for a single value)
+    if ( king_cutoff )
+        pcs <- if ( plink ) 20 else 0
+    
     # pass params to command
     # first do core set of parameters, more to be added below as needed
     commands <- paste0(
@@ -87,7 +98,7 @@ submit_rep_pcs <- function( rep, bfile, threads, fes, herit_low, env, plink, par
         threads = threads,
         account = partition, # account == partition in both cases that apply to me
         partition = partition,
-        array = '0-90' # number of PCs hardcoded here
+        array = pcs
     )
 
     # submit job!
