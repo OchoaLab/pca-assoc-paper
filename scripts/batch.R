@@ -30,9 +30,15 @@ threads <- 1L
 # setup loop
 reps_max <- 50L
 
-# automatically fix dataset name for this case
-if ( king_cutoff )
+plink_cases <- c(TRUE, FALSE)
+fes_cases <- c(FALSE, TRUE)
+
+if ( king_cutoff ) {
+    # automatically fix dataset name for this case
     bfile <- paste0( bfile, '_king-cutoff-4' )
+    # and only run FES
+    fes_cases <- TRUE
+}
 
 #############################
 
@@ -110,8 +116,8 @@ submit_rep_pcs <- function( rep, bfile, threads, fes, herit_low, env, plink, par
 
 
 # automatically loop through main sims
-for ( plink in c(TRUE, FALSE) ) {
-    for ( fes in c(FALSE, TRUE) ) {
+for ( plink in plink_cases ) {
+    for ( fes in fes_cases ) {
         # set some settings/etc automatically fron here down
 
         ############
