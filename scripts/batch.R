@@ -151,11 +151,13 @@ for ( plink in plink_cases ) {
         ## # I
         ## # test one rep
         ## rep <- 1L
+	## partition <- sample( partitions, 1L, prob = partitions_probs )
         ## submit_rep_pcs( rep, bfile, threads, fes, herit_low, env, plink, partition )
 
         ## # II
         ## # finish rest of reps
         ## for ( rep in 2L : reps_max ) {
+	##     partition <- sample( partitions, 1L, prob = partitions_probs )
         ##     submit_rep_pcs( rep, bfile, threads, fes, herit_low, env, plink, partition )
         ## }
 
