@@ -124,6 +124,10 @@ stopifnot( all( is.na( data$auc[ indexes_missing ] ) ) )
 # subset now
 data <- data[ !indexes_missing, ]
 
+# also remove infinities (observed once for lambda only)
+indexes_finite <- is.finite( data$lambda )
+data <- data[ indexes_finite, ]
+
 # NOTE: x and y are reversed from actual plot
 y <- data$rmsd
 #x <- log(data$lambda)

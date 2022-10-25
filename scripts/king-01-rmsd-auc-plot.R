@@ -10,38 +10,6 @@ library(ochoalabtools)
 # here merely for lab_rmsd and lab_auc
 source('plot-auc-rmsd.R')
 
-############
-### ARGV ###
-############
-
-# define options
-option_list = list(
-    make_option(c("-r", "--rep"), type = "integer", default = 50,
-                help = "Max replicates", metavar = "int"),
-    make_option("--herit", type = "double", default = 0.8, 
-                help = "heritability", metavar = "double"),
-    make_option("--m_causal_fac", type = "double", default = 10,
-                help = "Proportion of individuals to causal loci", metavar = "double")
-)
-
-opt_parser <- OptionParser(option_list = option_list)
-opt <- parse_args(opt_parser)
-
-# get values
-rep_max <- opt$rep
-m_causal_fac <- opt$m_causal_fac
-herit <- opt$herit
-
-# specify location of files to process, as many levels as needed
-dir_out <- ''
-if ( fes )
-    dir_out <- paste0( dir_out, 'fes/' )
-if ( m_causal_fac != 10 )
-    dir_out <- paste0( dir_out, 'm_causal_fac-', m_causal_fac, '/' )
-if ( herit != 0.8 )
-    dir_out <- paste0( dir_out, 'h', herit, '/' )
-
-
 #################
 ### CONSTANTS ###
 #################
@@ -78,6 +46,38 @@ names_dir <- c(
 suffix <- '_king-cutoff-4'
 # output name
 name_out <- paste0( 'rmsd-auc', suffix )
+
+############
+### ARGV ###
+############
+
+# define options
+option_list = list(
+    make_option(c("-r", "--rep"), type = "integer", default = 50,
+                help = "Max replicates", metavar = "int"),
+    make_option("--herit", type = "double", default = 0.8, 
+                help = "heritability", metavar = "double"),
+    make_option("--m_causal_fac", type = "double", default = 10,
+                help = "Proportion of individuals to causal loci", metavar = "double")
+)
+
+opt_parser <- OptionParser(option_list = option_list)
+opt <- parse_args(opt_parser)
+
+# get values
+rep_max <- opt$rep
+m_causal_fac <- opt$m_causal_fac
+herit <- opt$herit
+
+# specify location of files to process, as many levels as needed
+dir_out <- ''
+if ( fes )
+    dir_out <- paste0( dir_out, 'fes/' )
+if ( m_causal_fac != 10 )
+    dir_out <- paste0( dir_out, 'm_causal_fac-', m_causal_fac, '/' )
+if ( herit != 0.8 )
+    dir_out <- paste0( dir_out, 'h', herit, '/' )
+
 
 # hack version, originally `tibble_to_lists_rmsd_auc` from plot-auc-rmsd.R but simplified to single PC per method, plus check it's the expected value
 tibble_to_lists_rmsd_auc_king <- function( tib ) {

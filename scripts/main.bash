@@ -90,9 +90,9 @@ time Rscript all-01-kinship.R
 # a simple figure that illustrates the methods
 # (uses data from "Admix. Large sim." only)
 time Rscript sim-10-measures-fig.R 2
-# Inflation factor: pca-plink-pure: 2.96003533785624
-# Inflation factor: gcta: 0.87992175683473
-# Inflation factor: gcta: 0.984541944592377
+# Inflation factor: pca-plink-pure: 2.62753790231827
+# Inflation factor: gcta: 0.890044438627719
+# Inflation factor: gcta: 1.00079570634139
 
 # main statistical evaluations between methods
 time Rscript real-13-stats.R
@@ -114,9 +114,9 @@ time Rscript all-02-eigen.R
 time Rscript real-11-inflation-across-datasets.R
 # model fit:
 # rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
-#         a         b 
-# 0.5627754 0.6215759 
-# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00853
+#         a         b
+# 0.5664604 0.6165936 
+# threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00852
 # Inverse threshold map (sigmoidal): RMSD = 0.01, lambda = 1.06
 
 # look at kinship distributions in real and simulated datasets
@@ -127,6 +127,15 @@ time Rscript king-00-dimensions.R
 
 # make AUC/RMSD plot and stats tests for the limited king-cutoff test
 time Rscript king-01-rmsd-auc-plot.R
+# HoPacAll_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
+# RMSD: LMM
+# AUC: LMM
+# hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1_king-cutoff-4
+# RMSD: LMM
+# AUC: LMM
+# tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
+# RMSD: LMM
+# AUC: LMM
 
 # same for low herit tests
 time Rscript king-01-rmsd-auc-plot.R --herit 0.3 --m_causal_fac 27

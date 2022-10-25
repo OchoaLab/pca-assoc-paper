@@ -13,7 +13,9 @@ p_cut <- 0.01
 # threshold at which SRMSDs are essentially good enough
 srmsd_cut <- 0.01
 # hardcode for all datasets
-pcs <- 0 : 90
+pcs <- 0L : 90L
+# for a length validation
+n_reps <- 50L
 
 # final versions for papers
 # pure plink version is only PCA version, add LMM too
@@ -59,6 +61,8 @@ get_best_pcs <- function(tib, metric, method) {
     }
     # extract data corresponding to that PC only
     vals_best <- tib_metric[ tib$pc == pc_best ]
+    if( length( vals_best ) != n_reps )
+        stop( 'Length of `vals_best` not ', n_reps, ' for ', method, ', ', metric, ', pc_best = ', pc_best )
     
     # now we repeat tests again, but this time two-sample tests against the "best" one
     pvals <- vector( 'numeric', length(pcs) )
@@ -71,6 +75,8 @@ get_best_pcs <- function(tib, metric, method) {
             # subset table more
             # now this is just vector of values
             vals <- tib_metric[ tib$pc == pc ]
+            if( length( vals ) != n_reps )
+                stop( 'Length of `vals` not ', n_reps, ' for ', method, ', ', metric, ', pc = ', pc )
             # test if they are significantly different than the best or not
             # use paired version
             pvals[ pcs == pc ] <- wilcox.test( vals, vals_best, paired = TRUE, alternative = alternative )$p.value
@@ -230,7 +236,7 @@ datasets <- read_tsv( 'datasets.txt', col_types = 'cccii' )
 output <- tibble( .rows = 0 )
 
 for ( i in 1 : nrow( datasets ) ) {
-
+    message( datasets$name_dir[ i ], ' RC' )
     setwd( datasets$name_dir[ i ] )
     name_paper <- datasets$name_paper[ i ]
 
@@ -241,6 +247,7 @@ for ( i in 1 : nrow( datasets ) ) {
     )
     
     # now do `fes = TRUE` case
+    message( datasets$name_dir[ i ], ' FES' )
     setwd( 'fes' )
     
     # load local data, calculate row, add to final output immediately

@@ -31,6 +31,8 @@ mv data-king-cutoff.bed ../$name_king/data.bed
 mv data-king-cutoff.bim ../$name_king/data.bim
 mv data-king-cutoff.fam ../$name_king/data.fam
 cd ../$name_king
+# link annotations here too
+ln -s ../$name/pops-annot.txt pops-annot.txt
 # reapply MAF filter, important for consistency of simulated traits, treatment of fixed loci, etc!
 time plink2 --bfile data --maf 0.01 --make-bed --out data2
 rm data2.log # cleanup
@@ -309,6 +311,17 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes
 pcs_pca=20
 pcs_lmm=0
 
+h=0.3
+mcf=27 # 10*8/3 rounded, adjusts expected coefficient size for decrease in heritability
+env1=0.3
+env2=0.2
+#sim=true # change to true/false as needed!
+sim=false # change to true/false as needed!
+
+# this handles the biggest difference between real and sim in my scripts...
+simflag=''
+if [[ "$sim" == true ]]; then simflag='--sim'; fi
+
 # this was saved earlier, ignores "_sim" suffix of last $name
 name=$name_king
 # some minimal work to get AUCs and RMSDs
@@ -318,59 +331,40 @@ time Rscript real-01-pcs-plink.R --bfile $name
 time Rscript real-03-popkin.R --bfile $name
 for rep in {1..50}; do
     time Rscript real-04-simtrait.R --bfile $name -r $rep --fes
-done
-# a bit overkill making all PCs, but faster than rewriting the code for this special case
-time Rscript real-02-subset-eigenvec.R --bfile $name --plink
-for rep in {1..50}; do
-    time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs_pca --fes
-done
-time Rscript real-02-subset-eigenvec.R --bfile $name --clean --plink
-# no PCS for GCTA here only
-for rep in {1..50}; do
-    time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs_lmm --fes
-done
-# gather results into a single table (again overkill but meh)
-time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs $pcs_pca --fes
-time Rscript real-08-table.R --bfile $name -r 50 --n_pcs $pcs_pca --fes
-time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes # NOTE not --final
-# note extra flags for partial data
-time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes -s -m pca -t # test first!
-time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes -s -m pca
-time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_lmm --fes -s -m lmm -t # test first!
-time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_lmm --fes -s -m lmm
-
-
-#################
-### herit 0.3 ###
-#################
-
-# use king-cutoff data (same $name as last), and same limited PCs
-# so genotypes/pcs/grm are already made
-h=0.3
-mcf=27 # 10*8/3 rounded, adjusts expected coefficient size for decrease in heritability
-
-# minimal work to get AUCs and RMSDs
-# simulate new traits
-for rep in {1..50}; do
     time Rscript real-04-simtrait.R --bfile $name -r $rep --fes --herit $h --m_causal_fac $mcf
 done
 # a bit overkill making all PCs, but faster than rewriting the code for this special case
 time Rscript real-02-subset-eigenvec.R --bfile $name --plink
 for rep in {1..50}; do
+    time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs_pca --fes
     time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs_pca --fes --herit $h --m_causal_fac $mcf
 done
 time Rscript real-02-subset-eigenvec.R --bfile $name --clean --plink
 # no PCS for GCTA here only
 for rep in {1..50}; do
+    time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs_lmm --fes
     time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs_lmm --fes --herit $h --m_causal_fac $mcf
 done
 
+# FES h=0.8
 # gather results into a single table (again overkill but meh)
+time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs $pcs_pca --fes
+time Rscript real-08-table.R --bfile $name -r 50 --n_pcs $pcs_pca --fes
+time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes # NOTE not --final
+# note extra flags for partial data
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes -s -m pca
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_lmm --fes -s -m lmm
+
+# FES h=0.3
 time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs $pcs_pca --fes --herit $h --m_causal_fac $mcf
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs $pcs_pca --fes --herit $h --m_causal_fac $mcf
-time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes --herit $h --m_causal_fac $mcf # NOTE not --final
-# note extra flags for partial data
-time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes -s -m pca --herit $h --m_causal_fac $mcf -t # test first!
+time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes  --herit $h --m_causal_fac $mcf # NOTE not --final
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes -s -m pca --herit $h --m_causal_fac $mcf
-time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_lmm --fes -s -m lmm --herit $h --m_causal_fac $mcf -t # test first!
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_lmm --fes -s -m lmm --herit $h --m_causal_fac $mcf
+
+# FES h=0.3 env
+time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs $pcs_pca --fes --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+time Rscript real-08-table.R --bfile $name -r 50 --n_pcs $pcs_pca --fes --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes  --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 # NOTE not --final
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes -s -m pca --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_lmm --fes -s -m lmm --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
