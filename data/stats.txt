@@ -1,19 +1,19 @@
 name_paper	trait	rmsd_r_pca	rmsd_r_lmm	rmsd_method	auc_r_pca	auc_r_lmm	auc_method
-Admix. Large sim.	FES	84* (3*)	0*	tie	3	3 (0)	LMM
-Admix. Small sim.	FES	4* (2*)	0*	LMM	4 (1)	0	LMM
-Admix. Family sim.	FES	90 (87)	0*	LMM	83 (34)	0	LMM
-Human Origins	FES	90 (87)	0*	LMM	34 (9)	1 (0)	LMM
-HGDP	FES	54 (27)	0*	LMM	16 (14)	1 (0)	LMM
-1000 Genomes	FES	39 (32)	0*	LMM	8	1 (0)	LMM
-Human Origins sim.	FES	90* (80*)	0*	tie	47 (36)	0	LMM
-HGDP sim.	FES	52* (20*)	0*	tie	18 (14)	0	LMM
-1000 Genomes sim.	FES	77* (15*)	0*	LMM	16 (6)	2	LMM
-Admix. Large sim.	RC	89* (3*)	0*	tie	3	2 (0)	LMM
-Admix. Small sim.	RC	8* (2*)	0*	tie (LMM)	1 (0)	0	LMM
-Admix. Family sim.	RC	90 (88)	0*	LMM	74 (28)	0	LMM
-Human Origins	RC	89* (79*)	0*	LMM	34 (18)	5 (0)	LMM
-HGDP	RC	68* (21*)	0*	LMM	17 (8)	0	LMM
-1000 Genomes	RC	37* (27*)	0*	LMM	19 (4)	9 (2)	LMM
-Human Origins sim.	RC	89* (85*)	0*	tie	45 (25)	0	LMM
-HGDP sim.	RC	33* (19*)	0*	LMM	17 (15)	3 (0)	LMM
-1000 Genomes sim.	RC	90* (16)	0*	LMM	10 (6)	2 (0)	LMM
+Admix. Large sim.	FES	12* (4*)	0*	tie	3	0	LMM
+Admix. Small sim.	FES	4* (3*)	0*	tie	2 (0)	0	tie (LMM)
+Admix. Family sim.	FES	90 (88)	0*	LMM	22 (14)	1 (0)	LMM
+Human Origins	FES	89 (73)	0*	LMM	34 (16)	0	LMM
+HGDP	FES	87* (30*)	0*	LMM	16 (13)	1 (0)	LMM
+1000 Genomes	FES	90 (54)	0*	LMM	8 (7)	1 (0)	LMM
+Human Origins sim.	FES	88* (80*)	0*	tie	36 (21)	0	LMM
+HGDP sim.	FES	47* (21*)	0*	tie (LMM)	17 (8)	0	LMM
+1000 Genomes sim.	FES	78* (12*)	0*	LMM	10 (6)	0	LMM
+Admix. Large sim.	RC	26* (3*)	0*	tie	3	0	LMM
+Admix. Small sim.	RC	4* (2*)	0*	LMM	1 (0)	0	tie (LMM)
+Admix. Family sim.	RC	90 (89)	0*	LMM	34 (18)	0	LMM
+Human Origins	RC	90* (71*)	0*	LMM	36 (14)	3 (0)	LMM
+HGDP	RC	37* (26*)	0*	LMM	16 (5)	4 (0)	LMM
+1000 Genomes	RC	76* (23*)	0*	LMM	9 (4)	5 (2)	LMM
+Human Origins sim.	RC	85* (75*)	0*	tie	37 (29)	0	LMM
+HGDP sim.	RC	44* (17*)	0*	LMM	17 (15)	3 (0)	LMM
+1000 Genomes sim.	RC	90* (44*)	0*	LMM	10 (6)	3 (0)	LMM
