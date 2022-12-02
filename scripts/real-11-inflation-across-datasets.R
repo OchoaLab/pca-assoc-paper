@@ -19,6 +19,8 @@ fit_top_half_only <- TRUE
 file_table <- 'sum.txt'
 # directory name, needed in one mode (weird var name just stuck)
 dir_phen <- 'fes'
+dir_low <- 'm_causal_fac-27/h0.3'
+dir_env <- paste0( dir_low, '/env0.3-0.2' )
 # output name
 name_out <- 'sum-rmsd-vs-lambda'
 # methods to keep in analysis
@@ -73,31 +75,54 @@ for ( i in 1 : nrow( datasets ) ) {
         # move in one more level in this case
         if ( fes )
             setwd( dir_phen )
-        
-        # read the big table!
-        tib <- read_tsv(
-            file_table,
-            col_types = 'ciiddd'
-        )
 
-        # subset to use only the two methods we talk about in the paper
-        tib <- tib[ tib$method %in% methods, ]
+        for ( trait in c('hi', 'lo', 'env') ) {
+            # hi means do nothing
+            dir_trait <- ''
+            if ( trait == 'lo' ) {
+                dir_trait <- dir_low
+            } else if ( trait == 'env' ) {
+                dir_trait <- dir_env
+            }
+            if ( dir_trait != '' ) {
+                # stop if it doesn't exist (won't for real-sim)
+                if ( !dir.exists( dir_trait ) )
+                    next
+                # to get back easily
+                dir_pre_trait <- getwd()
+                # actually go there
+                setwd( dir_trait )
+            }
+            
+            # read the big table!
+            tib <- read_tsv(
+                file_table,
+                col_types = 'ciiddd'
+            )
 
-        # recall the dataset of origin
-        tib$dataset <- datasets$name_paper[ i ]
-        # and the trait simulation type (in a shorter-hand notation)
-        tib$trait <- if ( fes ) 'inv' else 'rand'
-        
-        ## # color by method
-        ## # (boring idea, obviously GCTA was always negative and PCA was always positive SRMSD)
-        ## tib$col <- 'blue' # default
-        ## tib$col[ tib$method == methods[2] ] <- 'red' # GCTA is red
+            # subset to use only the two methods we talk about in the paper
+            tib <- tib[ tib$method %in% methods, ]
 
-        # color by dataset
-        tib$col <- datasets$col[ i ]
-        
-        # concatenate into bigger table
-        data <- bind_rows( data, tib )
+            # recall the dataset of origin
+            tib$dataset <- datasets$name_paper[ i ]
+            # and the trait simulation type (in a shorter-hand notation)
+            tib$trait <- if ( fes ) 'inv' else 'rand'
+            
+            ## # color by method
+            ## # (boring idea, obviously GCTA was always negative and PCA was always positive SRMSD)
+            ## tib$col <- 'blue' # default
+            ## tib$col[ tib$method == methods[2] ] <- 'red' # GCTA is red
+
+            # color by dataset
+            tib$col <- datasets$col[ i ]
+            
+            # concatenate into bigger table
+            data <- bind_rows( data, tib )
+
+            # get back if needed
+            if ( dir_trait != '' )
+                setwd( dir_pre_trait )
+        }
         
         # move back one more level in this case
         if ( fes )

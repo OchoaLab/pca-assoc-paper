@@ -139,12 +139,11 @@ time Rscript all-02-eigen.R
 
 # a comparison of RMSD and lambda across ALL datasets (including FES and RC traits)
 # this version that fits top half only (makes most sense for our goal of talking mostly about inflation)
-# TODO: include low herit and env
 time Rscript real-11-inflation-across-datasets.R
 # model fit:
 # rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
 #         a         b
-# 0.5664604 0.6165936 
+# 0.5679157 0.6148027 
 # threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00852
 # Inverse threshold map (sigmoidal): RMSD = 0.01, lambda = 1.06
 
