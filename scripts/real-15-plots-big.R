@@ -71,7 +71,15 @@ option_list = list(
     make_option("--real_sim", action = "store_true", default = FALSE, 
                 help = "Process real-sim datasets (default: simulated datasets)"),
     make_option("--fes", action = "store_true", default = FALSE, 
-                help = "Use FES instead of RC trait model")
+                help = "Use FES instead of RC trait model"),
+    make_option("--herit", type = "double", default = 0.8, 
+                help = "heritability", metavar = "double"),
+    make_option("--m_causal_fac", type = "double", default = 10,
+                help = "Proportion of individuals to causal loci", metavar = "double"),
+    make_option("--env1", type = "double", default = NA,
+                help = "Variance of 1st (coarsest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
+    make_option("--env2", type = "double", default = NA,
+                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -91,11 +99,15 @@ if ( opt$real ) {
 }
 # get values
 fes <- opt$fes
+m_causal_fac <- opt$m_causal_fac
+herit <- opt$herit
+env1 <- opt$env1
+env2 <- opt$env2
 
 
-################
-### DATA/FIG ###
-################
+############
+### DATA ###
+############
 
 # move to where the data is
 setwd( '../data/' )
@@ -106,14 +118,54 @@ datasets <- read_tsv( 'datasets.txt', col_types = 'cccii' )
 indexes <- match( names_dir, datasets$name_dir )
 datasets <- datasets[ indexes, ]
 
-# move in an additional level in this case
-dir_phen <- 'fes'
-if ( fes ) {
+# to load real datasets and get back down easily
+dir_orig <- getwd()
+
+# store data here
+data <- list()
+
+# if fes is true, move to directory containing input and outputs
+dir_out <- ''
+if ( fes )
+    dir_out <- paste0( dir_out, 'fes/' )
+if ( m_causal_fac != 10 )
+    dir_out <- paste0( dir_out, 'm_causal_fac-', m_causal_fac, '/' )
+if ( herit != 0.8 )
+    dir_out <- paste0( dir_out, 'h', herit, '/' )
+if ( !is.na( env1 ) )
+    dir_out <- paste0( dir_out, 'env', env1, '-', env2, '/' )
+
+for ( name in datasets$name_dir ) {
+    setwd( name )
+    # move there in this case
+    if ( dir_out != '' )
+        setwd( dir_out )
+
+    # read the big table!
+    tib <- read_tsv(
+        file_table,
+        col_types = 'ciiddd'
+    )
+
+    # gather data into lists, best for boxplots
+    # store in bigger structure
+    data[[ name ]] <- tibble_to_lists_rmsd_auc( tib )
+    
+    # go back down, for next dataset
+    setwd( dir_orig )
+}
+
+###########
+### FIG ###
+###########
+
+# move there in this case
+if ( dir_out != '' ) {
     # create directory if it didn't already exist
-    if ( !dir.exists( dir_phen ) )
-        dir.create( dir_phen )
+    if ( !dir.exists( dir_out ) )
+        dir.create( dir_out, recursive = TRUE )
     # now move in
-    setwd( dir_phen )
+    setwd( dir_out )
 }
 
 # start PDF
@@ -129,32 +181,16 @@ layout(
 # change tick mark frequency on x axis
 par( lab = c(10, 3, 7) )
 
-# load each of our datasets
-# move back one more level in this case
-if ( fes )
-    setwd( '..' )
+# plot each of our datasets
 for ( index_dataset in 1 : nrow( datasets ) ) {
-    name <- datasets$name_dir[ index_dataset ]
-    setwd( name )
-    # move in one more level in this case
-    if ( fes )
-        setwd( dir_phen )
-
-    # read the big table!
-    tib <- read_tsv(
-        file_table,
-        col_types = 'ciiddd'
-    )
-
-    # gather data into lists, best for boxplots
-    # store in bigger structure
-    data <- tibble_to_lists_rmsd_auc( tib )
+    # get preloaded and preprocessed data
+    data_i <- data[[ datasets$name_dir[ index_dataset ] ]]
     
     # top panel: RMSD
     # set margin for titles
     par( mar = mar1 )
     # main plot
-    lineplots_rmsd_auc_one_panel( data$rmsd, lab_rmsd, r_max, main = datasets$name_paper[ index_dataset ] )
+    lineplots_rmsd_auc_one_panel( data_i$rmsd, lab_rmsd, r_max, main = datasets$name_paper[ index_dataset ] )
     # add panel letter
     panel_letter( toupper( letters[ index_dataset ] ), adj = -0.05 )
 
@@ -168,13 +204,7 @@ for ( index_dataset in 1 : nrow( datasets ) ) {
     # reduce top margin for next panel
     par( mar = mar2 )
     # main plot
-    lineplots_rmsd_auc_one_panel( data$auc, lab_auc, r_max, guide_max = TRUE )
-
-    # go back down, for next dataset
-    setwd( '..' )
-    # move back one more level in this case
-    if ( fes )
-        setwd( '..' )
+    lineplots_rmsd_auc_one_panel( data_i$auc, lab_auc, r_max, guide_max = TRUE )
 }
 
 # add outer margin label

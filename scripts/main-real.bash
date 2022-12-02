@@ -311,10 +311,6 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes
 pcs_pca=20
 pcs_lmm=0
 
-h=0.3
-mcf=27 # 10*8/3 rounded, adjusts expected coefficient size for decrease in heritability
-env1=0.3
-env2=0.2
 #sim=true # change to true/false as needed!
 sim=false # change to true/false as needed!
 

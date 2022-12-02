@@ -1,3 +1,13 @@
+# shared parameters
+
+# non-default low-heritability simulation
+h=0.3
+mcf=27 # 10*8/3 rounded, adjusts expected coefficient size for decrease in heritability
+# and env variances (only used with low herit)
+env1=0.3
+env2=0.2
+
+
 ###################
 ### SIMULATIONS ###
 ###################
@@ -95,6 +105,7 @@ time Rscript sim-10-measures-fig.R 2
 # Inflation factor: gcta: 1.00079570634139
 
 # main statistical evaluations between methods
+# TODO: include low herit and env
 time Rscript real-13-stats.R
 
 # final plot gathers all three datasets into a single multipanel figure
@@ -104,6 +115,23 @@ time Rscript real-15-plots-big.R --real
 time Rscript real-15-plots-big.R --real --fes
 time Rscript real-15-plots-big.R --real_sim
 time Rscript real-15-plots-big.R --real_sim --fes
+# low herit versions
+time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf
+time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --fes
+time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --real
+time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --real --fes
+# these two don't exist
+# time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --real_sim
+# time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --real_sim --fes
+# env versions
+time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --fes
+time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --real
+time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --real --fes
+# these two don't exist
+# time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --real_sim
+# time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --real_sim --fes
+
 
 # calculages popkin and eigensoft eigenvectors, calculates TW stats, makes plot
 time Rscript all-02-eigen.R

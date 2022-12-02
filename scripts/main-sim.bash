@@ -122,9 +122,6 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes
 ### herit 0.3 ###
 #################
 
-h=0.3
-mcf=27 # 10*8/3 rounded, adjusts expected coefficient size for decrease in heritability
-
 # do both RC and FES, instructions together here
 for rep in {1..50}; do
     # trait simulations were performed locally
@@ -166,13 +163,6 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --herit $h -
 ###########
 ### ENV ###
 ###########
-
-# start from prev low-herit sim
-h=0.3
-mcf=27 # 10*8/3 rounded, adjusts expected coefficient size for decrease in heritability
-# and add env variance
-env1=0.3
-env2=0.2
 
 # do both RC and FES, instructions together here
 for rep in {1..50}; do
