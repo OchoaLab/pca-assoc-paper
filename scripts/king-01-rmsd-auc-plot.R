@@ -58,7 +58,11 @@ option_list = list(
     make_option("--herit", type = "double", default = 0.8, 
                 help = "heritability", metavar = "double"),
     make_option("--m_causal_fac", type = "double", default = 10,
-                help = "Proportion of individuals to causal loci", metavar = "double")
+                help = "Proportion of individuals to causal loci", metavar = "double"),
+    make_option("--env1", type = "double", default = NA,
+                help = "Variance of 1st (coarsest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
+    make_option("--env2", type = "double", default = NA,
+                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -68,6 +72,8 @@ opt <- parse_args(opt_parser)
 rep_max <- opt$rep
 m_causal_fac <- opt$m_causal_fac
 herit <- opt$herit
+env1 <- opt$env1
+env2 <- opt$env2
 
 # specify location of files to process, as many levels as needed
 dir_out <- ''
@@ -77,6 +83,8 @@ if ( m_causal_fac != 10 )
     dir_out <- paste0( dir_out, 'm_causal_fac-', m_causal_fac, '/' )
 if ( herit != 0.8 )
     dir_out <- paste0( dir_out, 'h', herit, '/' )
+if ( !is.na( env1 ) )
+    dir_out <- paste0( dir_out, 'env', env1, '-', env2, '/' )
 
 
 # hack version, originally `tibble_to_lists_rmsd_auc` from plot-auc-rmsd.R but simplified to single PC per method, plus check it's the expected value

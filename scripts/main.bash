@@ -139,6 +139,7 @@ time Rscript all-02-eigen.R
 
 # a comparison of RMSD and lambda across ALL datasets (including FES and RC traits)
 # this version that fits top half only (makes most sense for our goal of talking mostly about inflation)
+# TODO: include low herit and env
 time Rscript real-11-inflation-across-datasets.R
 # model fit:
 # rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
@@ -166,7 +167,7 @@ time Rscript king-01-rmsd-auc-plot.R
 # AUC: LMM
 
 # same for low herit tests
-time Rscript king-01-rmsd-auc-plot.R --herit 0.3 --m_causal_fac 27
+time Rscript king-01-rmsd-auc-plot.R --herit $h --m_causal_fac $mcf
 # HoPacAll_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
 # RMSD: LMM
 # AUC: LMM
@@ -176,3 +177,15 @@ time Rscript king-01-rmsd-auc-plot.R --herit 0.3 --m_causal_fac 27
 # tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
 # RMSD: LMM
 # AUC: LMM
+
+# and env
+time Rscript king-01-rmsd-auc-plot.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+# HoPacAll_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
+# RMSD: LMM
+# AUC: LMM
+# hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1_king-cutoff-4
+# RMSD: tie
+# AUC: tie
+# tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
+# RMSD: tie
+# AUC: PCA
