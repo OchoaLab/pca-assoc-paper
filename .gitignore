@@ -6,6 +6,7 @@ unpub
 *.bim
 *.fam
 *.phen
+*.covar
 
 ## list trimmed from https://github.com/github/gitignore/blob/master/TeX.gitignore
 
