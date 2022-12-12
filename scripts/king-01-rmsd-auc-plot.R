@@ -27,9 +27,6 @@ method_to_label <- list(
     'pca-plink-pure' = 'PCA',
     gcta = 'LMM'
 )
-# extract methods from table itself
-methods <- names( method_to_label ) # not from table, but from hardcoded map, always lists PCA first!
-n_methods <- length( methods )
 # hardcoded same order as method_to_label
 method_cols <- c(
     'red',
@@ -62,7 +59,9 @@ option_list = list(
     make_option("--env1", type = "double", default = NA,
                 help = "Variance of 1st (coarsest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
     make_option("--env2", type = "double", default = NA,
-                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double")
+                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
+    make_option(c('-l', "--labs"), action = "store_true", default = FALSE, 
+                help = "Include LMM with labels data")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -74,6 +73,17 @@ m_causal_fac <- opt$m_causal_fac
 herit <- opt$herit
 env1 <- opt$env1
 env2 <- opt$env2
+labs <- opt$labs
+
+if ( labs ) {
+    # add a third method
+    method_to_label <- c( method_to_label, list( 'gcta-labs' = 'LMM lab.' ) )
+    method_cols <- c( method_cols, 'green' )
+}
+
+# extract methods from table itself
+methods <- names( method_to_label ) # not from table, but from hardcoded map, always lists PCA first!
+n_methods <- length( methods )
 
 # specify location of files to process, as many levels as needed
 dir_out <- ''
@@ -132,19 +142,29 @@ report_cross_method_king <- function( method_to_vals, metric ) {
         alternative <- 'g' # alternative is greater than min
     }
     # to get direction right, need to identify worst method too
-    method_worst <- setdiff( unlist( method_to_label ), method_best )
-    
-    # and decide if they're statistically significantly different or not
-    sig <- wilcox.test(
-        method_to_vals[[ method_worst ]],
-        method_to_vals[[ method_best ]],
-        paired = TRUE,
-        alternative = alternative
-    )$p.value < p_cut
+    methods_worst <- setdiff( unlist( method_to_label ), method_best )
 
-    if ( !sig )
-        method_best <- 'tie'
+    # NOTE: previously assumed two methods only, now we may have 3 groups (if `-l`)
+    # lazy sol, test all (vs best)?
+    # behavior is unchanged for case of only two groups
+    for ( method_worst in methods_worst ) {
+        # and decide if they're statistically significantly different or not
+        sig <- wilcox.test(
+            method_to_vals[[ method_worst ]],
+            method_to_vals[[ method_best ]],
+            paired = TRUE,
+            alternative = alternative
+        )$p.value < p_cut
 
+        # method_best gets overwritten if there are any ties, so stays the same if it is better than both!
+        if ( !sig ) {
+            method_best <- 'tie'
+            # stop tests if this happens
+            break
+        }
+    }
+
+    # return best or tie
     return( method_best )
 }
 

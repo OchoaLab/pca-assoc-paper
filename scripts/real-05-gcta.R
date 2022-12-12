@@ -34,7 +34,9 @@ option_list = list(
     make_option("--env1", type = "double", default = NA,
                 help = "Variance of 1st (coarsest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
     make_option("--env2", type = "double", default = NA,
-                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double")
+                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
+    make_option(c('-l', "--labs"), action = "store_true", default = FALSE, 
+                help = "Use same labels used to simulate environment effect as categorical covariates")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -50,6 +52,7 @@ m_causal_fac <- opt$m_causal_fac
 herit <- opt$herit
 env1 <- opt$env1
 env2 <- opt$env2
+labs <- opt$labs
 
 # do this consistency check early
 if ( !is.na( env1 ) && is.na( env2 ) )
@@ -83,6 +86,9 @@ setwd( dir_out )
 ############
 
 method <- 'gcta'
+# make labs part of method for output
+if ( labs )
+    method <- paste0( method, '-labs' )
 
 # message so we know where we're at
 message(
@@ -103,6 +109,13 @@ file_covar <- paste0( name_in_lower, '-n_pcs_', n_pcs, '.eigenvec' )
 if ( n_pcs == 0 )
     file_covar <- NULL
 
+# usually there's no categorical covariates
+file_covar_cat <- NULL
+# use this pre-existing file if we're testing labels
+# this is always below reps dir (where we currently are)!
+if ( labs )
+    file_covar_cat <- paste0( '../', name_in, '.covar' )
+
 # adjust paths if using fes model or non-default m_causal_fac or herit
 dir_phen <- '' # current dir
 # use subdir instead in this case
@@ -115,10 +128,13 @@ if ( herit != 0.8 )
 if ( !is.na( env1 ) )
     dir_phen <- paste0( dir_phen, 'env', env1, '-', env2, '/' )
 
+# come up with a version of labs for outputs, to avoid overlaps
+labs_name <- if ( labs ) '_labs' else ''
+
 # only these are in dir_phen
 name_phen <- paste0( dir_phen, name_in )
 # output name for GCTA runs should have number of PCs, so concurrent runs don't overwrite each other
-name_out <- paste0( dir_phen, 'gcta_', n_pcs )
+name_out <- paste0( dir_phen, method, '_', n_pcs )
 # file to create
 file_out <- paste0( dir_phen, 'pvals_', method, '_', n_pcs, '.txt.gz' )
 
@@ -132,6 +148,7 @@ data <- gcta_mlma(
     name_phen = name_phen,
     name_out = name_out, # write outputs into current level, add number of PCs
     file_covar = file_covar,
+    file_covar_cat = file_covar_cat,
     threads = threads
 )
 

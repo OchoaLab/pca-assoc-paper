@@ -33,7 +33,9 @@ option_list = list(
     make_option("--env1", type = "double", default = NA,
                 help = "Variance of 1st (coarsest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
     make_option("--env2", type = "double", default = NA,
-                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double")
+                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
+    make_option(c('-l', "--labs"), action = "store_true", default = FALSE, 
+                help = "Include LMM with labels data")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -48,6 +50,7 @@ m_causal_fac <- opt$m_causal_fac
 herit <- opt$herit
 env1 <- opt$env1
 env2 <- opt$env2
+labs <- opt$labs
 
 # do this consistency check early
 if ( !is.na( env1 ) && is.na( env2 ) )
@@ -56,6 +59,10 @@ if ( !is.na( env1 ) && is.na( env2 ) )
 # stop if name is missing
 if ( is.na(name) )
     stop('`--bfile` terminal option is required!')
+
+# add a third method in this case
+if ( labs )
+    methods <- c( methods, 'gcta-labs' )
 
 # move to where the data is
 setwd( '../data/' )
@@ -94,7 +101,9 @@ for ( rep in 1 : rep_max ) {
     
     # start a big loop
     for ( method in methods ) {
-        for ( n_pcs in 0 : n_pcs_max ) {
+        # only one method is not expected to have PCs (important for final validation)
+        n_pcs_max_method <- if ( method == 'gcta-labs' ) 0 else n_pcs_max
+        for ( n_pcs in 0 : n_pcs_max_method ) {
             # file to read
             file_pvals <- paste0( 'pvals_', method, '_', n_pcs, '.txt.gz' )
 

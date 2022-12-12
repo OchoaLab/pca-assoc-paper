@@ -5,7 +5,7 @@ library(readr)
 library(dplyr)
 
 # constants
-methods <- c('pca-plink', 'pca-plink-pure', 'gcta')
+methods <- c('pca-plink-pure', 'gcta', 'gcta-labs')
 # output file name (big table)
 file_table <- 'sum.txt'
 # dir for archived data, created manually on viiiaX6 only

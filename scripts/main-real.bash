@@ -175,6 +175,36 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes -t # t
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --fes
 
 
+
+### TODO NOTE: low-herit and env runs not documented!
+# what follows is only gcta-labs model runs
+
+# write labels into a categorical covariates file, to be used by a variant of competitors
+time Rscript real-18-make-labs.R --bfile $name
+
+# run GCTA with labels only (no PCs)
+for rep in {1..50}; do
+    time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs 0 --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l
+    time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs 0 --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l --fes
+done
+
+# RC
+time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+time Rscript real-09-figs.R --bfile $name --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l
+time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --final -l
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l -t # test first!
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l
+
+# FES
+time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --fes --env1 $env1 --env2 $env2
+time Rscript real-08-table.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --fes --env1 $env1 --env2 $env2
+time Rscript real-09-figs.R --bfile $name --herit $h --m_causal_fac $mcf --fes --env1 $env1 --env2 $env2 -l
+time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --final --fes -l
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --fes --env1 $env1 --env2 $env2 -l -t # test first!
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs 90 --herit $h --m_causal_fac $mcf --fes --env1 $env1 --env2 $env2 -l
+
+
 ###################
 ### FIT FOR SIM ###
 ###################
@@ -322,25 +352,31 @@ if [[ "$sim" == true ]]; then simflag='--sim'; fi
 name=$name_king
 # some minimal work to get AUCs and RMSDs
 # will resimulate traits, meh, though we could have subsetted the original data in theory
+time Rscript real-18-make-labs.R --bfile $name
 time Rscript real-00-preprocess-gcta.R --bfile $name
 time Rscript real-01-pcs-plink.R --bfile $name
 time Rscript real-03-popkin.R --bfile $name
 for rep in {1..50}; do
     time Rscript real-04-simtrait.R --bfile $name -r $rep --fes
     time Rscript real-04-simtrait.R --bfile $name -r $rep --fes --herit $h --m_causal_fac $mcf
+    time Rscript real-04-simtrait.R --bfile $name -r $rep --fes --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
 done
 # a bit overkill making all PCs, but faster than rewriting the code for this special case
 time Rscript real-02-subset-eigenvec.R --bfile $name --plink
 for rep in {1..50}; do
     time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs_pca --fes
     time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs_pca --fes --herit $h --m_causal_fac $mcf
+    time Rscript real-06-pca-plink.R --bfile $name -r $rep --n_pcs $pcs_pca --fes --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
 done
 time Rscript real-02-subset-eigenvec.R --bfile $name --clean --plink
 # no PCS for GCTA here only
 for rep in {1..50}; do
     time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs_lmm --fes
     time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs_lmm --fes --herit $h --m_causal_fac $mcf
+    time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs_lmm --fes --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+    time Rscript real-05-gcta.R --bfile $name -r $rep --n_pcs $pcs_lmm --fes --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l
 done
+
 
 # FES h=0.8
 # gather results into a single table (again overkill but meh)
@@ -361,6 +397,9 @@ time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_lmm --fes 
 # FES h=0.3 env
 time Rscript real-07-auc-rmsd.R --bfile $name -r 50 --n_pcs $pcs_pca --fes --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
 time Rscript real-08-table.R --bfile $name -r 50 --n_pcs $pcs_pca --fes --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
-time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes  --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 # NOTE not --final
+time Rscript real-10-validate-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes  --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l # NOTE not --final
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_pca --fes -s -m pca --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
 time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_lmm --fes -s -m lmm --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+time Rscript real-12-archive-pvals.R --bfile $name -r 50 --n_pcs $pcs_lmm --fes -s -m lmm-labs --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l
+
+# NOTE: king-cutoff reruns had RC too, but gcta-labs hasn't been run on that!  No plots for RC either! (so ok to skip for gcta-labs)

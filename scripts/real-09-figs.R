@@ -31,7 +31,9 @@ option_list = list(
     make_option("--env1", type = "double", default = NA,
                 help = "Variance of 1st (coarsest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
     make_option("--env2", type = "double", default = NA,
-                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double")
+                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
+    make_option(c('-l', "--labs"), action = "store_true", default = FALSE, 
+                help = "Include LMM with labels data")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -44,6 +46,7 @@ m_causal_fac <- opt$m_causal_fac
 herit <- opt$herit
 env1 <- opt$env1
 env2 <- opt$env2
+labs <- opt$labs
 
 # do this consistency check early
 if ( !is.na( env1 ) && is.na( env2 ) )
@@ -65,6 +68,11 @@ method_cols <- c(
     'red',
     'blue'
 )
+if ( labs ) {
+    # add a third method
+    method_to_label <- c( method_to_label, list( 'gcta-labs' = 'LMM lab.' ) )
+    method_cols <- c( method_cols, 'green' )
+}
 
 # move to where the data is
 setwd( '../data/' )
@@ -144,7 +152,8 @@ for ( i in 1 : nrow( counts ) ) {
     }
 }
 # don't plot anything if this is trivial
-if ( any( counts < rep_max ) ) {
+# also don't plot for labs (where counts are lower due to no PCs)
+if ( any( counts < rep_max ) && !labs ) {
     # simple plot of progress (shows partial run status, not all replicates complete)
     fig_start(
         paste0( name_base, 'num-reps' ),

@@ -123,14 +123,14 @@ time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --real --fes
 # these two don't exist
 # time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --real_sim
 # time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --real_sim --fes
-# env versions
-time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
-time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --fes
-time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --real
-time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --real --fes
+# env versions (all with -l to include gcta-labs version)
+time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l
+time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l --fes
+time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l --real
+time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l --real --fes
 # these two don't exist
-# time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --real_sim
-# time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 --real_sim --fes
+# time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l --real_sim
+# time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l --real_sim --fes
 
 
 # calculages popkin and eigensoft eigenvectors, calculates TW stats, makes plot
@@ -177,14 +177,14 @@ time Rscript king-01-rmsd-auc-plot.R --herit $h --m_causal_fac $mcf
 # RMSD: LMM
 # AUC: LMM
 
-# and env
-time Rscript king-01-rmsd-auc-plot.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+# and env, here add gcta-labs!
+time Rscript king-01-rmsd-auc-plot.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l
 # HoPacAll_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
 # RMSD: LMM
-# AUC: LMM
+# AUC: LMM lab.
 # hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1_king-cutoff-4
 # RMSD: tie
-# AUC: tie
+# AUC: LMM lab.
 # tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
-# RMSD: tie
-# AUC: PCA
+# RMSD: LMM lab.
+# AUC: LMM lab.

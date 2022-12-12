@@ -8,7 +8,7 @@ library(parallel)
 library(simtrait) # pval_srmsd, pval_aucpr, pval_infl
 
 # constants
-methods <- c('pca-plink-pure', 'gcta') # 'pca-plink', 
+methods <- c('pca-plink-pure', 'gcta', 'gcta-labs') # 'pca-plink', 
 # the name is for dir only, actual file is just "data"
 name_in <- 'data'
 

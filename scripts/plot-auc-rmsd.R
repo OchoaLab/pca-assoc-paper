@@ -32,6 +32,11 @@ tibble_to_lists_rmsd_auc <- function( tib ) {
             data_rmsd_i[[ pc + 1 ]] <- tib_ij$rmsd
             data_auc_i[[ pc + 1 ]] <- tib_ij$auc
         }
+        # for labs version copy data to a chosen end so it stretches, otherwise it's invisible
+        if ( method == 'gcta-labs' ) {
+            data_rmsd_i[[ 2 ]] <- data_rmsd_i[[ 1 ]]
+            data_auc_i[[ 2 ]] <- data_auc_i[[ 1 ]]
+        }
         # copy sublists to big lists
         data_rmsd[[ method ]] <- data_rmsd_i
         data_auc[[ method ]] <- data_auc_i
@@ -199,7 +204,7 @@ lineplots_rmsd_auc_one_panel <- function( data, lab, r_max, guide_max = FALSE, m
         median_max <- 0 # always larger than this in the AUC case we're interested in
         for ( method in methods ) {
             # median is third row, get its max
-            median_max <- max( stats[[ method ]][ 3, ], median_max )
+            median_max <- max( stats[[ method ]][ 3, ], median_max, na.rm = TRUE )
         }
         # now plot line
         abline(
