@@ -142,8 +142,8 @@ time Rscript all-02-eigen.R
 time Rscript real-11-inflation-across-datasets.R
 # model fit:
 # rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
-#         a         b
-# 0.5679157 0.6148027 
+#         a         b 
+# 0.5644519 0.6187852 
 # threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00852
 # Inverse threshold map (sigmoidal): RMSD = 0.01, lambda = 1.06
 
