@@ -4,6 +4,7 @@ library(readr)
 library(ochoalabtools)
 library(tibble)
 library(dplyr)
+library(optparse)
 
 # constants
 # output file name (big table)
@@ -24,6 +25,31 @@ methods <- tibble(
     name = c( 'PCA', 'LMM' )
 )
 metrics <- c('rmsd', 'auc')
+
+############
+### ARGV ###
+############
+
+# define options
+option_list = list(
+    make_option("--herit", type = "double", default = 0.8, 
+                help = "heritability", metavar = "double"),
+    make_option("--m_causal_fac", type = "double", default = 10,
+                help = "Proportion of individuals to causal loci", metavar = "double"),
+    make_option("--env1", type = "double", default = NA,
+                help = "Variance of 1st (coarsest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
+    make_option("--env2", type = "double", default = NA,
+                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double")
+)
+
+opt_parser <- OptionParser(option_list = option_list)
+opt <- parse_args(opt_parser)
+
+# get values
+m_causal_fac <- opt$m_causal_fac
+herit <- opt$herit
+env1 <- opt$env1
+env2 <- opt$env2
 
 
 ##################
@@ -232,12 +258,31 @@ setwd( '../data/' )
 # read dataset paths and names for output
 datasets <- read_tsv( 'datasets.txt', col_types = 'cccii' )
 
+# the new evaluations (low herit and env) were not performed on real-sim (tree) datasets!
+if ( m_causal_fac != 10 || herit != 0.8 || !is.na( env1 ) )
+    datasets <- datasets[ datasets$type != 'Tree', ]
+
+# to load real datasets and get back down easily
+dir_orig <- getwd()
+
+# path where data will be (for each dataset)
+dir_out <- ''
+if ( m_causal_fac != 10 )
+    dir_out <- paste0( dir_out, 'm_causal_fac-', m_causal_fac, '/' )
+if ( herit != 0.8 )
+    dir_out <- paste0( dir_out, 'h', herit, '/' )
+if ( !is.na( env1 ) )
+    dir_out <- paste0( dir_out, 'env', env1, '-', env2, '/' )
+
 # tibble for all datasets
 output <- tibble( .rows = 0 )
 
 for ( i in 1 : nrow( datasets ) ) {
     message( datasets$name_dir[ i ], ' RC' )
     setwd( datasets$name_dir[ i ] )
+    dir_dataset <- getwd()
+    if ( dir_out != '' )
+        setwd( dir_out )
     name_paper <- datasets$name_paper[ i ]
 
     # load local data, calculate row, add to final output immediately
@@ -248,7 +293,10 @@ for ( i in 1 : nrow( datasets ) ) {
     
     # now do `fes = TRUE` case
     message( datasets$name_dir[ i ], ' FES' )
+    setwd( dir_dataset )
     setwd( 'fes' )
+    if ( dir_out != '' )
+        setwd( dir_out )
     
     # load local data, calculate row, add to final output immediately
     output <- bind_rows(
@@ -257,11 +305,15 @@ for ( i in 1 : nrow( datasets ) ) {
     )
     
     # go back down
-    setwd( '../..' )
+    setwd( dir_orig )
 }
 
 # reorder so all FES traits are listed first
 output <- arrange( output, trait )
+
+# go where output will be, path of data except RC version
+if ( dir_out != '' )
+    setwd( dir_out )
 
 # write table to a file
 write_tsv( output, file = 'stats.txt' )
