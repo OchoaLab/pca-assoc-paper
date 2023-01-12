@@ -1,0 +1,13 @@
+name_paper	trait	rmsd_r_pca	rmsd_r_lmm	rmsd_method	auc_r_pca	auc_r_lmm	auc_method
+Admix. Large sim.	FES	62* (3*)	0*	LMM	3 (2)	0	tie
+Admix. Small sim.	FES	3* (2*)	0*	tie	0	0	tie
+Admix. Family sim.	FES	90 (78)	0*	LMM	7 (1)	0	LMM
+Human Origins	FES	81* (44*)	0*	LMM	16 (5)	0	LMM
+HGDP	FES	37* (17*)	0*	LMM	6 (5)	11 (0)	tie (LMM)
+1000 Genomes	FES	84* (22*)	0*	LMM	4	6 (0)	LMM
+Admix. Large sim.	RC	35* (3*)	0*	LMM	3 (2)	0	tie
+Admix. Small sim.	RC	3* (2*)	0*	tie	0	0	tie
+Admix. Family sim.	RC	90 (84)	0*	LMM	5 (1)	0	LMM
+Human Origins	RC	75* (43*)	0*	LMM	12 (7)	4 (0)	LMM
+HGDP	RC	23* (15*)	0*	LMM	5 (2)	2 (0)	tie (LMM)
+1000 Genomes	RC	41* (7*)	0*	LMM	4	0	tie
