@@ -1,13 +1,25 @@
-name_paper	trait	rmsd_r_pca	rmsd_r_lmm	rmsd_method	auc_r_pca	auc_r_lmm	auc_method
-Admix. Large sim.	FES	62* (3*)	0*	LMM	3 (2)	0	tie
-Admix. Small sim.	FES	3* (2*)	0*	tie	0	0	tie
-Admix. Family sim.	FES	90 (78)	0*	LMM	7 (1)	0	LMM
-Human Origins	FES	81* (44*)	0*	LMM	16 (5)	0	LMM
-HGDP	FES	37* (17*)	0*	LMM	6 (5)	11 (0)	tie (LMM)
-1000 Genomes	FES	84* (22*)	0*	LMM	4	6 (0)	LMM
-Admix. Large sim.	RC	35* (3*)	0*	LMM	3 (2)	0	tie
-Admix. Small sim.	RC	3* (2*)	0*	tie	0	0	tie
-Admix. Family sim.	RC	90 (84)	0*	LMM	5 (1)	0	LMM
-Human Origins	RC	75* (43*)	0*	LMM	12 (7)	4 (0)	LMM
-HGDP	RC	23* (15*)	0*	LMM	5 (2)	2 (0)	tie (LMM)
-1000 Genomes	RC	41* (7*)	0*	LMM	4	0	tie
+name_paper	trait	metric	lmm_0_calib	lmm_b_r	lmm_b_lmm_0_pval	pca_b_r	pca_b_calib	pca_b_lmm_0_best	pca_b_lmm_0_pval
+Admix. Large sim.	FES	rmsd	TRUE	0	1	62	TRUE	LMM	1.22e-4
+Admix. Small sim.	FES	rmsd	TRUE	0	1	3	TRUE	Tie	0.272
+Admix. Family sim.	FES	rmsd	TRUE	0	1	90	FALSE	LMM	3.9e-10
+Human Origins	FES	rmsd	TRUE	0	1	81	TRUE	LMM	3.9e-10
+HGDP	FES	rmsd	TRUE	0	1	37	TRUE	LMM	6.15e-9
+1000 Genomes	FES	rmsd	TRUE	0	1	84	TRUE	LMM	3.9e-10
+Admix. Large sim.	FES	auc	NA	0	1	3	NA	Tie	0.114
+Admix. Small sim.	FES	auc	NA	0	1	0	NA	Tie	0.578
+Admix. Family sim.	FES	auc	NA	0	1	7	NA	LMM	2.16e-6
+Human Origins	FES	auc	NA	0	1	16	NA	LMM	8.03e-10
+HGDP	FES	auc	NA	11	0.678	6	NA	Tie	0.00432
+1000 Genomes	FES	auc	NA	6	0.343	4	NA	LMM	2.34e-7
+Admix. Large sim.	RC	rmsd	TRUE	0	1	35	TRUE	Tie	9.41e-4
+Admix. Small sim.	RC	rmsd	TRUE	0	1	3	TRUE	Tie	0.0867
+Admix. Family sim.	RC	rmsd	TRUE	0	1	90	FALSE	LMM	4.14e-10
+Human Origins	RC	rmsd	TRUE	0	1	75	TRUE	LMM	1.65e-4
+HGDP	RC	rmsd	TRUE	0	1	23	TRUE	LMM	1.73e-5
+1000 Genomes	RC	rmsd	TRUE	0	1	41	TRUE	LMM	6.71e-10
+Admix. Large sim.	RC	auc	NA	0	1	3	NA	Tie	0.138
+Admix. Small sim.	RC	auc	NA	0	1	0	NA	Tie	0.101
+Admix. Family sim.	RC	auc	NA	0	1	5	NA	LMM	1.88e-6
+Human Origins	RC	auc	NA	4	0.162	12	NA	Tie	0.00297
+HGDP	RC	auc	NA	2	0.138	5	NA	Tie	0.14
+1000 Genomes	RC	auc	NA	0	1	4	NA	Tie	0.0779
