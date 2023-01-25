@@ -1,37 +1,37 @@
-name_paper	trait	metric	lmm_0_calib	lmm_b_r	lmm_b_lmm_0_pval	pca_b_r	pca_b_calib	pca_b_lmm_0_best	pca_b_lmm_0_pval
-Admix. Large sim.	FES	rmsd	TRUE	0	1	12	TRUE	Tie	0.0355
-Admix. Small sim.	FES	rmsd	TRUE	0	1	4	TRUE	Tie	0.0545
-Admix. Family sim.	FES	rmsd	TRUE	0	1	90	FALSE	LMM	3.9e-10
-Human Origins	FES	rmsd	TRUE	0	1	89	FALSE	LMM	3.9e-10
-HGDP	FES	rmsd	TRUE	0	1	87	TRUE	LMM	4.4e-10
-1000 Genomes	FES	rmsd	TRUE	0	1	90	FALSE	LMM	3.9e-10
-Human Origins sim.	FES	rmsd	TRUE	0	1	88	TRUE	Tie	0.0173
-HGDP sim.	FES	rmsd	TRUE	0	1	47	TRUE	Tie	0.0456
-1000 Genomes sim.	FES	rmsd	TRUE	0	1	78	TRUE	LMM	9.61e-10
-Admix. Large sim.	FES	auc	NA	0	1	3	NA	LMM	5.86e-6
-Admix. Small sim.	FES	auc	NA	0	1	2	NA	Tie	0.025
-Admix. Family sim.	FES	auc	NA	1	0.353	22	NA	LMM	3.9e-10
-Human Origins	FES	auc	NA	0	1	34	NA	LMM	3.9e-10
-HGDP	FES	auc	NA	1	0.329	16	NA	LMM	4.4e-10
-1000 Genomes	FES	auc	NA	1	0.108	8	NA	LMM	3.9e-10
-Human Origins sim.	FES	auc	NA	0	1	36	NA	LMM	3.9e-10
-HGDP sim.	FES	auc	NA	0	1	17	NA	LMM	1.73e-5
-1000 Genomes sim.	FES	auc	NA	0	1	10	NA	LMM	4.97e-10
-Admix. Large sim.	RC	rmsd	TRUE	0	1	26	TRUE	Tie	0.107
-Admix. Small sim.	RC	rmsd	TRUE	0	1	4	TRUE	Tie	9.72e-4
-Admix. Family sim.	RC	rmsd	TRUE	0	1	90	FALSE	LMM	3.9e-10
-Human Origins	RC	rmsd	TRUE	0	1	90	TRUE	Tie	6.53e-4
-HGDP	RC	rmsd	TRUE	0	1	37	TRUE	LMM	1.52e-5
-1000 Genomes	RC	rmsd	TRUE	0	1	76	TRUE	LMM	3.9e-10
-Human Origins sim.	RC	rmsd	TRUE	0	1	85	TRUE	Tie	0.144
-HGDP sim.	RC	rmsd	TRUE	0	1	44	TRUE	LMM	8.84e-7
-1000 Genomes sim.	RC	rmsd	TRUE	0	1	90	TRUE	LMM	3.9e-10
-Admix. Large sim.	RC	auc	NA	0	1	3	NA	LMM	1.4e-5
-Admix. Small sim.	RC	auc	NA	0	1	1	NA	Tie	0.0946
-Admix. Family sim.	RC	auc	NA	0	1	34	NA	LMM	3.9e-10
-Human Origins	RC	auc	NA	3	0.397	36	NA	LMM	9.61e-10
-HGDP	RC	auc	NA	4	0.206	16	NA	Tie	0.0126
-1000 Genomes	RC	auc	NA	5	0.00397	9	NA	Tie	4.34e-4
-Human Origins sim.	RC	auc	NA	0	1	37	NA	LMM	4.14e-10
-HGDP sim.	RC	auc	NA	3	0.0867	17	NA	Tie	0.00138
-1000 Genomes sim.	RC	auc	NA	3	0.368	10	NA	LMM	8.53e-10
+name_paper	trait	metric	lmm_0_calib	lmm_b_r	lmm_b_lmm_0_pval	pca_b_r	pca_b_calib	pca_b_lmm_0_pval	pca_b_lmm_0_best
+Admix. Large sim.	FES	$|\rmsd|$	True	0	1	12	True	0.0355	Tie
+Admix. Small sim.	FES	$|\rmsd|$	True	0	1	4	True	0.0545	Tie
+Admix. Family sim.	FES	$|\rmsd|$	True	0	1	90	False	3.9e-10	LMM
+Human Origins	FES	$|\rmsd|$	True	0	1	89	False	3.9e-10	LMM
+HGDP	FES	$|\rmsd|$	True	0	1	87	True	4.4e-10	LMM
+1000 Genomes	FES	$|\rmsd|$	True	0	1	90	False	3.9e-10	LMM
+Human Origins sim.	FES	$|\rmsd|$	True	0	1	88	True	0.0173	Tie
+HGDP sim.	FES	$|\rmsd|$	True	0	1	47	True	0.0456	Tie
+1000 Genomes sim.	FES	$|\rmsd|$	True	0	1	78	True	9.61e-10	LMM
+Admix. Large sim.	FES	$\auc$		0	1	3		5.86e-6	LMM
+Admix. Small sim.	FES	$\auc$		0	1	2		0.025	Tie
+Admix. Family sim.	FES	$\auc$		1	0.353	22		3.9e-10	LMM
+Human Origins	FES	$\auc$		0	1	34		3.9e-10	LMM
+HGDP	FES	$\auc$		1	0.329	16		4.4e-10	LMM
+1000 Genomes	FES	$\auc$		1	0.108	8		3.9e-10	LMM
+Human Origins sim.	FES	$\auc$		0	1	36		3.9e-10	LMM
+HGDP sim.	FES	$\auc$		0	1	17		1.73e-5	LMM
+1000 Genomes sim.	FES	$\auc$		0	1	10		4.97e-10	LMM
+Admix. Large sim.	RC	$|\rmsd|$	True	0	1	26	True	0.107	Tie
+Admix. Small sim.	RC	$|\rmsd|$	True	0	1	4	True	9.72e-4	Tie
+Admix. Family sim.	RC	$|\rmsd|$	True	0	1	90	False	3.9e-10	LMM
+Human Origins	RC	$|\rmsd|$	True	0	1	90	True	6.53e-4	Tie
+HGDP	RC	$|\rmsd|$	True	0	1	37	True	1.52e-5	LMM
+1000 Genomes	RC	$|\rmsd|$	True	0	1	76	True	3.9e-10	LMM
+Human Origins sim.	RC	$|\rmsd|$	True	0	1	85	True	0.144	Tie
+HGDP sim.	RC	$|\rmsd|$	True	0	1	44	True	8.84e-7	LMM
+1000 Genomes sim.	RC	$|\rmsd|$	True	0	1	90	True	3.9e-10	LMM
+Admix. Large sim.	RC	$\auc$		0	1	3		1.4e-5	LMM
+Admix. Small sim.	RC	$\auc$		0	1	1		0.0946	Tie
+Admix. Family sim.	RC	$\auc$		0	1	34		3.9e-10	LMM
+Human Origins	RC	$\auc$		3	0.397	36		9.61e-10	LMM
+HGDP	RC	$\auc$		4	0.206	16		0.0126	Tie
+1000 Genomes	RC	$\auc$		5	0.00397	9		4.34e-4	Tie
+Human Origins sim.	RC	$\auc$		0	1	37		4.14e-10	LMM
+HGDP sim.	RC	$\auc$		3	0.0867	17		0.00138	Tie
+1000 Genomes sim.	RC	$\auc$		3	0.368	10		8.53e-10	LMM
