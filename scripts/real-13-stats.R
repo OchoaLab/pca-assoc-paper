@@ -10,6 +10,7 @@ library(optparse)
 # output file name (big table)
 file_table <- 'sum.txt'
 # P-value threshold for Wilcoxon 2-sample paired 1-tail comparisons
+# NOTE: becomes Bonferroni-corrected below
 p_cut <- 0.01
 # threshold at which SRMSDs are essentially good enough
 srmsd_cut <- 0.01
@@ -56,7 +57,7 @@ env2 <- opt$env2
 ### STAT TESTS ###
 ##################
 
-get_best_pcs <- function(tib, metric, method) {
+get_best_pcs <- function(tib, metric) {
     # NOTE: input tibble should already be subset to be for a single method, but for several PCs and replicates per PC
     # extract this column we call very often
     tib_metric <- tib[[ metric ]]
@@ -68,108 +69,88 @@ get_best_pcs <- function(tib, metric, method) {
     # get the only data we wanted out of this aggregation
     means <- obj_agg$x
     
-    # an effect size assessment
-    eff_size <- '' # for pc_best
-    eff_size_min <- '' # for pc_best_min
-    
     # this PC was closest to perfection
     if ( metric == 'rmsd' ) {
         # best RMSDs are near zero in absolute value
-        pc_best <- pcs[ which.min( means ) ]
-        alternative <- 'g' # alternative is greater than min
-        # in this case we want to know if the mean was below a given threshold
-        if ( min( means, na.rm = TRUE ) < srmsd_cut )
-            eff_size <- '*'
+        r <- pcs[ which.min( means ) ]
     } else if ( metric == 'auc' ) {
         # best AUCs are largest
-        pc_best <- pcs[ which.max( means ) ]
-        alternative <- 'l' # alternative is lesser than max
+        r <- pcs[ which.max( means ) ]
     }
     # extract data corresponding to that PC only
-    vals_best <- tib_metric[ tib$pc == pc_best ]
-    if( length( vals_best ) != n_reps )
-        stop( 'Length of `vals_best` not ', n_reps, ' for ', method, ', ', metric, ', pc_best = ', pc_best )
+    vals <- tib_metric[ tib$pc == r ]
+    if( length( vals ) != n_reps )
+        stop( 'Length of `vals` not ', n_reps, ' for ', metric, ', r = ', r )
     
-    # now we repeat tests again, but this time two-sample tests against the "best" one
-    pvals <- vector( 'numeric', length(pcs) )
-    for ( pc in pcs ) {
-        if ( pc == pc_best ) {
-            # self comparison should always carry a p-value of 1
-            # actually best to avoid wilcox.test since it gives NaN instead because there's zeroes
-            pvals[ pcs == pc ] <- 1
-        } else {
-            # subset table more
-            # now this is just vector of values
-            vals <- tib_metric[ tib$pc == pc ]
-            if( length( vals ) != n_reps )
-                stop( 'Length of `vals` not ', n_reps, ' for ', method, ', ', metric, ', pc = ', pc )
-            # test if they are significantly different than the best or not
-            # use paired version
-            pvals[ pcs == pc ] <- wilcox.test( vals, vals_best, paired = TRUE, alternative = alternative )$p.value
-        }
-    }
-
-    # this is the smallest PC that performed as well as the best, in the sense that it is not significantly different
-    pc_best_min <- pcs[ min( which( pvals > p_cut ), na.rm = TRUE ) ]
-    # figure out effect size mark for this case
-    # do only for RMSD!
-    if ( metric == 'rmsd' ) {
-        if ( means[ pcs == pc_best_min ] < srmsd_cut )
-            eff_size_min <- '*'
-    }
-    # extract data corresponding to pc_best_min only
-    vals_best_min <- tib_metric[ tib$pc == pc_best_min ]
-
-    # before returning, collapse pc_best and pc_best_min (often the same)
-    # and add sRMSD effect size mark
-    if ( pc_best != pc_best_min ) {
-        pc_best <- paste0( pc_best, eff_size, ' (', pc_best_min, eff_size_min, ')' )
-    } else {
-        # just add effect size mark
-        pc_best <- paste0( pc_best, eff_size )
-    }
-
     # return that plus distribution of best values, for additional comparisons
     return(
         list(
-            pc_best = pc_best,
-            vals_best = vals_best, # in paper it makes more sense to talk about these
-            vals_best_min = vals_best_min # in paper it makes more sense to talk about these
+            r = r,
+            vals = vals
         )
     )
 }
 
-# final report compares best case across methods
+# applies overall statistical test between two distributions
+test_distrs <- function( vals, vals_best, metric ) {
 
-report_cross_method <- function( method_to_vals, metric ) {
-    # decide which performed best, by mean
-    method_to_mean <- sapply( method_to_vals, mean )
-    if ( metric == 'auc' ) {
-        method_best <- methods$name[ which.max( method_to_mean ) ]
-        alternative <- 'l' # alternative is lesser than max
-    } else if ( metric == 'rmsd' ) {
-        method_best <- methods$name[ which.min( method_to_mean ) ]
-        alternative <- 'g' # alternative is greater than min
+    # defaults for trivial case
+    pval <- 1
+    reverse <- FALSE
+
+    # identify a common trivial case
+    # often the two distributions to compare are actually the same (particularly LMM r=0 case)
+    # self comparison always results in p-value of 1
+    # avoid wilcox.test since it gives NaN instead because there's zeroes
+    if ( !all( vals == vals_best, na.rm = TRUE ) ) {
+
+        # we got lazy in coding, always test worst vs best regardless of order provided
+        if ( metric == 'rmsd' ) {
+            alternative <- 'g' # alternative is greater than min
+            # this says `vals` is actually better than `vals_best`
+            if ( mean( vals_best, na.rm = TRUE ) > mean( vals, na.rm = TRUE ) )
+                reverse <- TRUE
+        } else if ( metric == 'auc' ) {
+            alternative <- 'l' # alternative is lesser than max
+            # this says `vals` is actually better than `vals_best`
+            if ( mean( vals_best, na.rm = TRUE ) < mean( vals, na.rm = TRUE ) )
+                reverse <- TRUE
+        }
+
+        # apply reversal if needed
+        if ( reverse ) {
+            vals_tmp <- vals
+            vals <- vals_best
+            vals_best <- vals_tmp
+        }
+        
+        # test if they are significantly different than the best or not
+        # use paired version
+        pval <- wilcox.test( vals, vals_best, paired = TRUE, alternative = alternative )$p.value
     }
-    # to get direction right, need to identify worst method too
-    method_worst <- setdiff( methods$name, method_best )
     
-    # and decide if they're statistically significantly different or not
-    sig <- wilcox.test(
-        method_to_vals[[ method_worst ]],
-        method_to_vals[[ method_best ]],
-        paired = TRUE,
-        alternative = alternative
-    )$p.value < p_cut
+    # return p-value and whether data was reversed or not
+    return(
+        list(
+            pval = pval,
+            reverse = reverse
+        )
+    )
+}
 
-    if ( !sig )
-        method_best <- 'tie'
-
-    return( method_best )
+test_calib <- function( vals, metric ) {
+    calib <- NA # keep it this way for AUC
+    if ( metric == 'rmsd' ) 
+        calib <- mean( vals, na.rm = TRUE ) < srmsd_cut
+    return( calib )
 }
 
 # gathers more loops essentially and massages data to look as needed for output table
 process_dataset <- function( name, fes ) {
+    ######################
+    ### LOAD / PROCESS ###
+    ######################
+    
     # read the big table!
     # load from wherever current location is
     tib <- read_tsv(
@@ -186,64 +167,83 @@ process_dataset <- function( name, fes ) {
     # for simplicity, take absolute value now for all data (all PCs and all methods)!
     tib$rmsd <- abs( tib$rmsd )
 
-    # for more processing per metric
-    output_metric <- list()
+    #############
+    ### TESTS ###
+    #############
+    
+    # separate LMM and PCA data
+    # (each all pcs, reps, metrics, so still a tibble)
+    tib_lmm <- tib[ tib$method == 'LMM', ]
+    tib_pca <- tib[ tib$method == 'PCA', ]
+    
+    # get data for LMM r=0
+    # (all reps, metrics, so still a tibble)
+    tib_lmm_0 <- tib_lmm[ tib_lmm$pc == 0, ]
+
+    # output tibble to grow
+    output <- NULL
 
     # begin processing each metric separately
     for ( metric in metrics ) {
-        # other data we need to compare across methods
-        method_to_vals_best <- list()
-        method_to_vals_best_min <- list()
-        method_to_pc <- list()
+        # get data for r=0, now a vector
+        lmm_0_vals <- tib_lmm_0[[ metric ]]
         
-        # begin processing each method separately
-        for ( method in methods$name ) {
-            # subset big table
-            tib_i <- tib[ tib$method == method, ]
-            
-            # apply function to data, RMSD version
-            obj <- get_best_pcs(tib_i, metric, method)
-            method_to_vals_best[[ method ]] <- obj$vals_best # save separately
-            method_to_vals_best_min[[ method ]] <- obj$vals_best_min # save separately
-            method_to_pc[[ method ]] <- obj$pc_best # save separately
-        }
+        # identify best r for LMM, which is metric-dependent
+        obj <- get_best_pcs( tib_lmm, metric )
+        lmm_b_vals <- obj$vals
+        lmm_b_r <- obj$r
         
-        # decide on best method!
-        best_method <- report_cross_method( method_to_vals_best, metric )
-        best_method_min <- report_cross_method( method_to_vals_best_min, metric )
-        # combine into one scalar (most of the time these are identical)
-        if ( best_method_min != best_method )
-            best_method <- paste0( best_method, ' (', best_method_min, ')' )
+        # find best PCA model too (here never consider r=0)
+        obj <- get_best_pcs( tib_pca, metric )
+        pca_b_vals <- obj$vals
+        pca_b_r <- obj$r
+
+        # perform some tests
+        # LMM best vs LMM r=0
+        obj <- test_distrs( lmm_0_vals, lmm_b_vals, metric )
+        # by definition shouldn't have reversals here
+        stopifnot( ! obj$reverse )
+        lmm_b_lmm_0_pval <- obj$pval
+
+        # PCA best vs LMM r=0
+        # here we don't know which one is actually better
+        obj <- test_distrs( pca_b_vals, lmm_0_vals, metric )
+        pca_b_lmm_0_pval <- obj$pval
+        pca_b_lmm_0_best <- if ( obj$reverse ) 'PCA' else 'LMM'
+
+        # PCA best vs LMM best
+        obj <- test_distrs( pca_b_vals, lmm_b_vals, metric )
+        pca_b_lmm_b_pval <- obj$pval
+        pca_b_lmm_b_best <- if ( obj$reverse ) 'PCA' else 'LMM'
         
-        # reorganize data as we have it in the paper
-        # NOTE: PCA is 1st, LMM is 2nd (use shorthand here to access methods)
-        # put in a list per metric
-        output_metric[[ metric ]] <- tibble(
-            r_pca = method_to_pc[[ 1 ]],
-            r_lmm = method_to_pc[[ 2 ]],
-            method = best_method
+        # store all data of interest
+        output <- bind_rows(
+            output,
+            tibble(
+                name_paper = name,
+                trait = if ( fes ) 'FES' else 'RC',
+                metric = metric,
+                # is lmm r=0 calibrated?
+                lmm_0_calib = test_calib( lmm_0_vals, metric ),
+                # determine if lmm with best r is better than r=0 or not
+                lmm_b_r = lmm_b_r,
+                lmm_b_calib = test_calib( lmm_b_vals, metric ),
+                lmm_b_lmm_0_pval = lmm_b_lmm_0_pval,
+                lmm_b_lmm_0_sig = lmm_b_lmm_0_pval < p_cut,
+                # compare lmm r=0 to pca with best r too
+                pca_b_r = pca_b_r,
+                pca_b_calib = test_calib( pca_b_vals, metric ),
+                pca_b_lmm_0_best = pca_b_lmm_0_best,
+                pca_b_lmm_0_pval = pca_b_lmm_0_pval,
+                pca_b_lmm_0_sig = pca_b_lmm_0_pval < p_cut,
+                # lastly, overkill comparison of best lmm to best pca (only non-redundant under env, given previous results)
+                pca_b_lmm_b_best = pca_b_lmm_b_best,
+                pca_b_lmm_b_pval = pca_b_lmm_b_pval,
+                pca_b_lmm_b_sig = pca_b_lmm_b_pval < p_cut
+            )
         )
     }
-
-    # massage table even more
-    # right now we only have two rows, separate them
-    output_rmsd <- output_metric[[ 'rmsd' ]]
-    output_auc <- output_metric[[ 'auc' ]]
-
-    # edit column names to label each metric
-    names( output_rmsd ) <- paste0( 'rmsd_', names( output_rmsd ) )
-    names( output_auc ) <- paste0( 'auc_', names( output_auc ) )
-
-    # concatenate back!
-    output <- bind_cols(
-        tibble(
-            name_paper = name,
-            trait = if ( fes ) 'FES' else 'RC'
-        ),
-        output_rmsd,
-        output_auc
-    )
-
+    
     return( output )
 }
 
@@ -261,6 +261,11 @@ datasets <- read_tsv( 'datasets.txt', col_types = 'cccii' )
 # the new evaluations (low herit and env) were not performed on real-sim (tree) datasets!
 if ( m_causal_fac != 10 || herit != 0.8 || !is.na( env1 ) )
     datasets <- datasets[ datasets$type != 'Tree', ]
+
+# number of tests in this table, for Bonferroni
+n_tests <- nrow( datasets ) * length( methods$name ) * length( metrics )
+# adjust p_cut accordingly
+p_cut <- p_cut / n_tests
 
 # to load real datasets and get back down easily
 dir_orig <- getwd()
@@ -308,8 +313,35 @@ for ( i in 1 : nrow( datasets ) ) {
     setwd( dir_orig )
 }
 
-# reorder so all FES traits are listed first
-output <- arrange( output, trait )
+# validate our Bonferroni calculation
+# (this table isn't complete until after we've applied all thresholds, that's why we calculate it first, then validate)
+stopifnot( nrow( output ) == n_tests )
+
+# reorder so all FES traits are listed first, then rmsd before auc
+output <- arrange( output, trait, desc(metric) )
+
+# round p-values
+output$lmm_b_lmm_0_pval <- signif( output$lmm_b_lmm_0_pval, 3 )
+output$pca_b_lmm_0_pval <- signif( output$pca_b_lmm_0_pval, 3 )
+output$pca_b_lmm_b_pval <- signif( output$pca_b_lmm_b_pval, 3 )
+
+# clean up tie situations (makes words easier to scan)
+output$pca_b_lmm_0_best[ !output$pca_b_lmm_0_sig ] <- 'Tie'
+output$pca_b_lmm_b_best[ !output$pca_b_lmm_b_sig ] <- 'Tie'
+# these indicators are no longer needed
+output$pca_b_lmm_0_sig <- NULL
+output$pca_b_lmm_b_sig <- NULL
+
+# more automatic reductions when LMM r=0 is best across the board
+if ( all( !output$lmm_b_lmm_0_sig ) ) {
+    # no need for that indicator column
+    output$lmm_b_lmm_0_sig <- NULL
+    # who cares if lmm_b is calibrated
+    output$lmm_b_calib <- NULL
+    # don't show lmm_b vs pca comparisons
+    output$pca_b_lmm_b_best <- NULL
+    output$pca_b_lmm_b_pval <- NULL
+}
 
 # go where output will be, path of data except RC version
 if ( dir_out != '' )
