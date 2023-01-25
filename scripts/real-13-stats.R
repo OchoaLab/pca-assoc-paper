@@ -233,12 +233,12 @@ process_dataset <- function( name, fes ) {
                 # compare lmm r=0 to pca with best r too
                 pca_b_r = pca_b_r,
                 pca_b_calib = test_calib( pca_b_vals, metric ),
-                pca_b_lmm_0_best = pca_b_lmm_0_best,
                 pca_b_lmm_0_pval = pca_b_lmm_0_pval,
+                pca_b_lmm_0_best = pca_b_lmm_0_best,
                 pca_b_lmm_0_sig = pca_b_lmm_0_pval < p_cut,
                 # lastly, overkill comparison of best lmm to best pca (only non-redundant under env, given previous results)
-                pca_b_lmm_b_best = pca_b_lmm_b_best,
                 pca_b_lmm_b_pval = pca_b_lmm_b_pval,
+                pca_b_lmm_b_best = pca_b_lmm_b_best,
                 pca_b_lmm_b_sig = pca_b_lmm_b_pval < p_cut
             )
         )
@@ -317,14 +317,11 @@ for ( i in 1 : nrow( datasets ) ) {
 # validate our Bonferroni calculation
 # (this table isn't complete until after we've applied all thresholds, that's why we calculate it first, then validate)
 stopifnot( nrow( output ) * 2L == n_tests )
+message( 'Number of tests (for Bonferroni): ', n_tests )
 
-# reorder so all FES traits are listed first, then rmsd before auc
-output <- arrange( output, trait, desc(metric) )
-
-# round p-values
-output$lmm_b_lmm_0_pval <- signif( output$lmm_b_lmm_0_pval, 3 )
-output$pca_b_lmm_0_pval <- signif( output$pca_b_lmm_0_pval, 3 )
-output$pca_b_lmm_b_pval <- signif( output$pca_b_lmm_b_pval, 3 )
+################
+### CLEANUPS ###
+################
 
 # clean up tie situations (makes words easier to scan)
 output$pca_b_lmm_0_best[ !output$pca_b_lmm_0_sig ] <- 'Tie'
@@ -343,6 +340,46 @@ if ( all( !output$lmm_b_lmm_0_sig ) ) {
     output$pca_b_lmm_b_best <- NULL
     output$pca_b_lmm_b_pval <- NULL
 }
+
+########################
+### PAPER FORMATTING ###
+########################
+
+# only function of next edits is to make table prettier, as it gets added to paper automatically
+
+# reorder so all FES traits are listed first, then rmsd before auc
+output <- arrange( output, trait, desc(metric) )
+
+# round p-values
+output$lmm_b_lmm_0_pval <- signif( output$lmm_b_lmm_0_pval, 3 )
+output$pca_b_lmm_0_pval <- signif( output$pca_b_lmm_0_pval, 3 )
+# this one may be deleted
+if ( !is.null( output[[ 'pca_b_lmm_b_pval' ]] ) )
+    output$pca_b_lmm_b_pval <- signif( output$pca_b_lmm_b_pval, 3 )
+
+# metrics replace with LaTeX code
+output$metric[ output$metric == 'rmsd' ] <- '$|\\rmsd|$'
+output$metric[ output$metric == 'auc' ] <- '$\\auc$'
+
+# uncapitalize booleans
+# sadly very tedious
+for ( colname in c('lmm_0_calib', 'lmm_b_calib', 'lmm_b_lmm_0_sig', 'pca_b_calib') ) {
+    # extract column
+    x <- output[[ colname ]]
+    # ignore columns that aren't present
+    if ( is.null( x ) )
+        next
+    # edit
+    x[ x == TRUE ] <- 'True'
+    x[ x == 'FALSE' ] <- 'False' # cause now they're all strings, right?
+    x[ is.na( x ) ] <- '' # looks better blank! (also NA are not stringified, stays proper NA)
+    # write back
+    output[[ colname ]] <- x
+}
+
+############
+### SAVE ###
+############
 
 # go where output will be, path of data except RC version
 if ( dir_out != '' )
