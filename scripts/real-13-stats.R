@@ -326,19 +326,16 @@ message( 'Number of tests (for Bonferroni): ', n_tests )
 # clean up tie situations (makes words easier to scan)
 output$pca_b_lmm_0_best[ !output$pca_b_lmm_0_sig ] <- 'Tie'
 output$pca_b_lmm_b_best[ !output$pca_b_lmm_b_sig ] <- 'Tie'
-# these indicators are no longer needed
-output$pca_b_lmm_0_sig <- NULL
-output$pca_b_lmm_b_sig <- NULL
 
 # more automatic reductions when LMM r=0 is best across the board
+# NOTE: output$lmm_b_lmm_0_sig gets deleted later for all cases
 if ( all( !output$lmm_b_lmm_0_sig ) ) {
-    # no need for that indicator column
-    output$lmm_b_lmm_0_sig <- NULL
     # who cares if lmm_b is calibrated
     output$lmm_b_calib <- NULL
     # don't show lmm_b vs pca comparisons
     output$pca_b_lmm_b_best <- NULL
     output$pca_b_lmm_b_pval <- NULL
+    output$pca_b_lmm_b_sig <- NULL
 }
 
 ########################
@@ -350,12 +347,26 @@ if ( all( !output$lmm_b_lmm_0_sig ) ) {
 # reorder so all FES traits are listed first, then rmsd before auc
 output <- arrange( output, trait, desc(metric) )
 
-# round p-values
-output$lmm_b_lmm_0_pval <- signif( output$lmm_b_lmm_0_pval, 3 )
-output$pca_b_lmm_0_pval <- signif( output$pca_b_lmm_0_pval, 3 )
-# this one may be deleted
-if ( !is.null( output[[ 'pca_b_lmm_b_pval' ]] ) )
-    output$pca_b_lmm_b_pval <- signif( output$pca_b_lmm_b_pval, 3 )
+# round p-values and mark significant ones with asterisks
+for ( colname in c('lmm_b_lmm_0', 'pca_b_lmm_0', 'pca_b_lmm_b') ) {
+    # get two column names to process
+    colname_pval <- paste0( colname, '_pval' )
+    colname_sig <- paste0( colname, '_sig' )
+    # copy down values for ease
+    pvals <- output[[ colname_pval ]]
+    sigs <- output[[ colname_sig ]]
+    # silently skip a case that might be missing already
+    if ( is.null( pvals ) )
+        next
+    # round p-values
+    pvals <- signif( pvals, 3 )
+    # add asterisks, denoting significance, after rounding
+    pvals[ sigs ] <- paste0( pvals[ sigs ], '*' )
+    # copy pvals back
+    output[[ colname_pval ]] <- pvals
+    # delete indicator column now
+    output[[ colname_sig ]] <- NULL
+}
 
 # metrics replace with LaTeX code
 output$metric[ output$metric == 'rmsd' ] <- '$|\\rmsd|$'
@@ -363,7 +374,7 @@ output$metric[ output$metric == 'auc' ] <- '$\\auc$'
 
 # uncapitalize booleans
 # sadly very tedious
-for ( colname in c('lmm_0_calib', 'lmm_b_calib', 'lmm_b_lmm_0_sig', 'pca_b_calib') ) {
+for ( colname in c('lmm_0_calib', 'lmm_b_calib', 'pca_b_calib') ) {
     # extract column
     x <- output[[ colname ]]
     # ignore columns that aren't present
