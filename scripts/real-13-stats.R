@@ -263,7 +263,8 @@ if ( m_causal_fac != 10 || herit != 0.8 || !is.na( env1 ) )
     datasets <- datasets[ datasets$type != 'Tree', ]
 
 # number of tests in this table, for Bonferroni
-n_tests <- nrow( datasets ) * length( methods$name ) * length( metrics )
+# NOTE: last 2x is for multiple tests per row (LMM r=0 vs best r, and PCA vs LMM); although env version have one more test (distinguishes PCA vs LMM r=0 from LMM best r), in practice they were highly correlated, so makes sense to treat as the same for Bonferroni purposes
+n_tests <- nrow( datasets ) * length( methods$name ) * length( metrics ) * 2L
 # adjust p_cut accordingly
 p_cut <- p_cut / n_tests
 
@@ -315,7 +316,7 @@ for ( i in 1 : nrow( datasets ) ) {
 
 # validate our Bonferroni calculation
 # (this table isn't complete until after we've applied all thresholds, that's why we calculate it first, then validate)
-stopifnot( nrow( output ) == n_tests )
+stopifnot( nrow( output ) * 2L == n_tests )
 
 # reorder so all FES traits are listed first, then rmsd before auc
 output <- arrange( output, trait, desc(metric) )
