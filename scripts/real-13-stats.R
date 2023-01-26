@@ -234,8 +234,8 @@ process_dataset <- function( name, fes ) {
         # store all data of interest
         output_row <- tibble(
             name_paper = name,
-            trait = if ( fes ) 'FES' else 'RC',
             metric = metric,
+            trait = if ( fes ) 'FES' else 'RC',
             # is lmm r=0 calibrated?
             lmm_0_calib = test_calib( lmm_0_vals, metric ),
             # determine if lmm with best r is better than r=0 or not
@@ -402,7 +402,7 @@ output$pca_b_lmm_b_best[ !output$pca_b_lmm_b_sig ] <- 'Tie'
 # only function of next edits is to make table prettier, as it gets added to paper automatically
 
 # reorder so all FES traits are listed first, then rmsd before auc
-output <- arrange( output, trait, desc(metric) )
+output <- arrange( output, desc(metric), trait )
 
 # round p-values and mark significant ones with asterisks
 for ( colname in c('lmm_b_lmm_0', 'pca_b_lmm_0', 'pca_b_lmm_b', 'best_lmm_labs_0') ) {
@@ -416,7 +416,7 @@ for ( colname in c('lmm_b_lmm_0', 'pca_b_lmm_0', 'pca_b_lmm_b', 'best_lmm_labs_0
     if ( is.null( pvals ) )
         next
     # round p-values
-    pvals <- signif( pvals, 3 )
+    pvals <- signif( pvals, 2 )
     # add asterisks, denoting significance, after rounding
     pvals[ sigs ] <- paste0( pvals[ sigs ], '*' )
     # copy pvals back
