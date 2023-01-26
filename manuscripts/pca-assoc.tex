@@ -211,17 +211,19 @@ The additive linear model for a quantitative (continuous) trait is:
   \label{eq:trait}
   \mathbf{y}
   =
-  \mathbf{1} \alpha + \mathbf{X}^\intercal \boldsymbol{\beta} + \boldsymbol{\epsilon}
+  \mathbf{1} \alpha + \mathbf{X}^\intercal \boldsymbol{\beta} + \mathbf{Z}^\intercal \boldsymbol{\eta} + \boldsymbol{\epsilon}
   ,
 \end{equation}
 where
 $\mathbf{1}$ is a length-$n$ vector of ones,
 $\alpha$ is the scalar intercept coefficient,
 $\boldsymbol{\beta}$ is the length-$m$ vector of locus coefficients,
+$\mathbf{Z}$ is a design matrix of environment effects and other covariates,
+$\boldsymbol{\eta}$ is the vector of environment coefficients,
 $\boldsymbol{\epsilon}$ is a length-$n$ vector of residuals,
 and $\intercal$ denotes matrix transposition.
-The residuals follow $\epsilon_j \sim \text{Normal}(0, \sigma^2)$ independently per individual $j$, for some $\sigma^2$.
-For simplicity, non-genetic covariates are omitted from this model (and the PCA and LMM counterparts) but are trivial to include without changing any of our theoretical results.
+The residuals follow $\epsilon_j \sim \text{Normal}(0, \sigma^2_\epsilon)$ independently per individual $j$, for some $\sigma^2_\epsilon$.
+%For simplicity, non-genetic covariates will be omitted from the PCA and LMM models below, but are trivial to include without changing any of our theoretical results.
 
 The full model of \cref{eq:trait}, which has a coefficient for each of the $m$ loci, is underdetermined in current datasets where $m \gg n$.
 The PCA and LMM models, respectively, approximate the full model fit at a single locus $i$:
@@ -231,13 +233,13 @@ The PCA and LMM models, respectively, approximate the full model fit at a single
   \text{PCA:}\quad
   \mathbf{y}
   &=
-    \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{U}_r \boldsymbol{\gamma}_r + \boldsymbol{\epsilon}
+    \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{U}_r \boldsymbol{\gamma}_r + \mathbf{Z}^\intercal \boldsymbol{\eta} + \boldsymbol{\epsilon}
     , \\
   \label{eq:lmm_gwas}
   \text{LMM:}\quad
   \mathbf{y}
   &=
-    \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{s} + \boldsymbol{\epsilon}
+    \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{s} + \mathbf{Z}^\intercal \boldsymbol{\eta} + \boldsymbol{\epsilon}
     ,
     \quad\quad
     \mathbf{s} \sim \text{Normal} \left( \mathbf{0}, 2 \sigma^2_s \mathbf{\Phi}^T \right),
@@ -316,8 +318,7 @@ $
 $
 \citep{price_principal_2006, kang_efficient_2008, kang_variance_2010, yang_gcta:_2011, zhou_genome-wide_2012, yang_advantages_2014, loh_efficient_2015, sul_population_2018, zhou_efficiently_2018}.
 However, this kinship estimator has a complex bias that differs for every individual pair, which arises due to the use of this estimated \pith \citep{ochoa_estimating_2021, ochoa_new_2019}.
-Nevertheless, in PCA and LMM these biased estimates perform as well as unbiased ones, an observation that will be explored in future work (data not shown).
-% [TODO: cite BIAS GWAS]
+Nevertheless, in PCA and LMM these biased estimates perform as well as unbiased ones \citep{hou_genetic_2022}.
 
 We selected fast and robust software implementing the basic PCA and LMM models.
 PCA association was performed with \texttt{plink2} \citep{chang_second-generation_2015}.
@@ -485,8 +486,8 @@ To account for small biases in coancestry estimation, an intercept term $\delta_
 
 Traits are simulated from the quantitative trait model of \cref{eq:trait}, with novel bias corrections for simulating the desired heritability from real data relying on the unbiased kinship estimator \texttt{popkin} \citep{ochoa_estimating_2021}.
 This simulation is implemented in the R package \texttt{simtrait}.
-All simulations have a narrow-sense heritability of $h^2 = 0.8$ and $\epsilon_j \sim \text{Normal}(0, 1 - h^2 )$.
-To balance power while varying $n$, the number of causal loci is $m_1 = n / 10$.
+All simulations have a fixed narrow-sense heritability of $h^2$, a variance proportion due to environment effects $\sigma^2_\eta$, and residuals are drawn from $\epsilon_j \sim \text{Normal}(0, \sigma^2_\epsilon )$ with $\sigma^2_\epsilon = 1 - h^2 - \sigma^2_\eta$.
+The number of causal loci $m_1$, which determines the average coefficient size, is chosen with the formula $m_1 = \round( n h^2 / 8 )$, which empirically balances power well with varying $n$ and $h^2$.
 The set of causal loci $C$ is drawn anew for each replicate, from loci with $\text{MAF} \ge 0.01$ to avoid rare causal variants (inappropriate for PCA and LMM).
 Letting $v_i^T = \pit \left( 1 - \pit \right)$, the effect size of locus $i$ equals $2 v_i^T \beta_i^2$, its contribution of the trait variance \citep{park_estimation_2010}.
 Under the \textit{fixed effect sizes} (FES) model, initial causal coefficients are
@@ -523,6 +524,35 @@ $$
 $$
 \end{linenomath*}
 
+Simulations optionally included multiple environment group effects, as follows.
+Each independent environment $i$ has predefined groups, and each group $g$ has random coefficients drawn independent from $\eta_{gi} \sim \text{Normal}( 0, \sigma^2_{\eta i} )$ where $\sigma^2_{\eta i}$ is a specified variance proportion for environment $i$.
+$\mathbf{Z}$ has individuals along columns and environment-groups along rows, and it contains indicator variables: 1 if the individual belongs to the environment-group, 0 otherwise.
+
+We performed trait simulations with the following variance parameters (\cref{tab:trait-var-sim}):
+\textit{high heritability} used $h^2 = 0.8$ and no environment effects;
+\textit{low heritability} used $h^2 = 0.3$ and no environment effects;
+lastly,
+\textit{environment} used $h^2 = 0.3, \sigma^2_{\eta 1} = 0.3, \sigma^2_{\eta 2} = 0.2$ (total $\sigma^2_\eta = \sigma^2_{\eta 1} + \sigma^2_{\eta 2} = 0.5$).
+For real genotype datasets, the groups are the subpopulation (environment 1) and sub-subpopulation (environment 2) labels given (see next subsection).
+For simulated genotypes, we created these labels by grouping by the index $j$ (geographical coordinate) of each simulated individual, assigning group $g = \text{ceiling}( j k_i / n )$ where $k_i$ is the number of groups in environment $i$, and we selected $k_1 = 5$ and $k_2 = 25$ to mimic the number of groups in each level of 1000 Genomes (\cref{tab:human_sum}).
+
+\begin{table}[b!]
+  \centering
+  \caption{
+    \textbf{Variance parameters of trait simulations.}
+  }
+  \label{tab:trait-var-sim}
+  \begin{tabular}{lrrr}
+    \toprule
+    Trait variance type & $h^2$ & $\sigma^2_\eta$ & $\sigma^2_\epsilon$ \\
+    \midrule
+    High heritability & 0.8 & 0.0 & 0.2 \\
+    Low heritability  & 0.3 & 0.0 & 0.7 \\
+    Environment       & 0.3 & 0.5 & 0.2 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
 \subsection{Real human genotype datasets}
 
 \begin{table}[b!]
@@ -543,7 +573,7 @@ $$
   \begin{flushleft} 
     \textsuperscript{a}For admixed family, ignores dimensionality of 20 generation pedigree structure.
     For real datasets, lower range is continental subpopulations, upper range is number of fine-grained subpopulations.\\
-    \textsuperscript{b}$m_1 = n / 10$ to balance power across datasets.\\
+    \textsuperscript{b}$m_1 = \round( n h^2 / 8 )$ to balance power across datasets, shown for $h^2=0.8$ only.\\
     \textsuperscript{c}Model parameter for simulations, estimated value on real datasets.
   \end{flushleft}
 \end{table}
@@ -708,43 +738,42 @@ $\auc$ has been used to evaluate association models \citep{rakitsch_lasso_2013},
 
 \begin{table}[b!]
   \centering
-  %\scriptsize
+  \scriptsize
   \caption{
-    \textbf{Overview of PCA and LMM evaluation results}
+    \textbf{Overview of PCA and LMM evaluations for high heritability simulations}
   }
   \label{tab:human_sum_pcs}
   \csvreader[
-  tabular = lc|ccc|ccc,
+  tabular = lcc|crl|rclc,
   separator = tab,
-  table head = 
+  table head =
   % header row 1
-  \toprule & & \multicolumn{3}{c|}{$|\rmsd|$\textsuperscript{a}} & \multicolumn{3}{c}{$\auc$} \\
+  \toprule & & & \multicolumn{3}{c|}{LMM $r=0$ vs best $r$} & \multicolumn{4}{c}{PCA vs LMM $r=0$} \\
   % header row 2
-  \midrule & & \multicolumn{2}{c}{Best (min\textsuperscript{c}) PCs} & & \multicolumn{2}{c}{Best (min\textsuperscript{c}) PCs} & \\
-  % header row 3
-  Dataset & {Trait model\textsuperscript{b}} & PCA & LMM & {Best\textsuperscript{d}} & PCA & LMM & {Best\textsuperscript{d}} \\\midrule,
+  Dataset & Metric & {Trait\textsuperscript{a}} & {Cal.\textsuperscript{b}} & {Best $r$\textsuperscript{c}} & {P-value\textsuperscript{d}} & {Best $r$\textsuperscript{c}} & {Cal.\textsuperscript{b}} & {P-value\textsuperscript{d}} & {Best model\textsuperscript{e}} \\\midrule,
   late after last line = \\\bottomrule
   ]{../data/stats.txt}{}{\csvlinetotablerow}
   \begin{flushleft}
-    \textsuperscript{a}$r$ for which mean $|\rmsd| < 0.01$ marked with asterisk.\\
-    \textsuperscript{b}FES: Fixed Effect Sizes, RC: Random Coefficients.\\
-    \textsuperscript{c}Smallest $r$ (number of PCs) whose distribution ($|\rmsd|$ or $\auc$) was not significantly different (Wilcoxon paired 1-tailed $p > 0.01$) from best $r$ (if any).\\
-    \textsuperscript{d}Tie if distributions of best PCA and LMM version did not differ significantly (Wilcoxon paired 1-tailed $p > 0.01$).
-    Same result for ``min'' except cases in parentheses.
+    \textsuperscript{a}FES: Fixed Effect Sizes, RC: Random Coefficients.\\
+    \textsuperscript{b}Calibrated: whether mean $|\rmsd| < 0.01$.\\
+    \textsuperscript{c}Value of $r$ (number of PCs) with minimum mean $|\rmsd|$ or maximum mean $\auc$.\\
+    \textsuperscript{d}Wilcoxon paired 1-tailed test of distributions ($|\rmsd|$ or $\auc$) between models in header.
+    Asterisk marks significant value using Bonferroni threshold ($p < \alpha/n_\text{tests}$ with $\alpha = 0.01$ and $n_\text{tests} = 72$ is the number of tests in this table).\\
+    \textsuperscript{e}Tie if no significant difference using Bonferroni threshold.
   \end{flushleft}
 \end{table}
 
 % results overview
-Both PCA and LMM were evaluated in each replicate dataset including a number of PCs $r$ between 0 and 90 as fixed covariates.
-In terms of p-value calibration, for PCA the best number of PCs $r$ (minimizing mean $|\rmsd|$ over replicates) is typically large across all datasets, but much smaller ``min'' $r$ values often performed as well (numbers in parentheses in \cref{tab:human_sum_pcs}).
-Most cases had a mean $|\rmsd| < 0.01$ (marked with asterisks in \cref{tab:human_sum_pcs}), whose p-values are effectively calibrated.
-However, PCA best and min $r$ values tended to be large on the family simulation and real datasets, and those cases were often miscalibrated.
-In contrast, for LMM, $r=0$ (no PCs) was always best, and was always calibrated.
-Comparing LMM with $r=0$ to PCA with its best $r$, LMM always had significantly smaller $|\rmsd|$ than PCA or was statistically tied.
+Both PCA and LMM are evaluated in each replicate dataset including a number of PCs $r$ between 0 and 90 as fixed covariates.
+In terms of p-value calibration, for PCA the best number of PCs $r$ (minimizing mean $|\rmsd|$ over replicates) is typically large across all datasets (\cref{tab:human_sum_pcs}), although much smaller $r$ values often performed as well (shown in following sections).
+Most cases have a mean $|\rmsd| < 0.01$, whose p-values are effectively calibrated.
+However, PCA is often miscalibrated on the family simulation and real datasets (\cref{tab:human_sum_pcs}).
+In contrast, for LMM, $r=0$ (no PCs) is always best, and is always calibrated.
+Comparing LMM with $r=0$ to PCA with its best $r$, LMM always has significantly smaller $|\rmsd|$ than PCA or is statistically tied.
 % 
-For $\auc$ and PCA, the best $r$ was always smaller than the best $r$ for $|\rmsd|$, so there is often a tradeoff between calibrated p-values versus classification performance.
-For LMM there is no tradeoff, as $r=0$ had $\auc$ not significantly different from the best $r$ in all cases except two (the min $r$ was 2 for both 1000 Genomes simulation with FES trait and 1000 Genomes real dataset with RC trait).
-Lastly, LMM with its best $r$ always had significantly greater $\auc$ than PCA with its best $r$.
+For $\auc$ and PCA, the best $r$ is always smaller than the best $r$ for $|\rmsd|$, so there is often a tradeoff between calibrated p-values versus classification performance.
+For LMM there is no tradeoff, as $r=0$ often has the best mean $\auc$, and otherwise is not significantly different from the best $r$.
+Lastly, LMM with $r=0$ always has significantly greater or statistically tied $\auc$ than PCA with its best $r$.
 
 \subsection{Evaluations in admixture simulations}
 
@@ -915,6 +944,22 @@ Otherwise, $\auc$ and $\rmsd$ ranges were similar here as in our earlier evaluat
 Therefore, the removal of the small number of highly related individual pairs had a negligible effect in PCA performance, so the larger number of more distantly related pairs explain the poor PCA performance in the real datasets.
 
 
+\subsection{Low heritability and environment simulations}
+
+Our main evaluations were repeated with traits simulated under a lower heritability value of $h^2 = 0.3$.
+We reduced the number of causal loci in response to this change in heritability, to result in equal average effect size per locus compared to the previous high heritability evaluations (see Methods).
+Despite that, these low heritability evaluations measured lower $\auc$ values than their high heritability counterparts (\cref{fig:rmsd-auc-sim-fes-h3,fig:rmsd-auc-real-fes-h3,fig:king_cutoff-h3,fig:rmsd-auc-sim-rc-h3,fig:rmsd-auc-real-rc-h3}).
+The gap between LMM and PCA was reduced in these evaluations, but LMM with $r=0$ again significantly outperforms or ties PCA in all cases (\cref{tab:human_sum_pcs_h3}).
+
+Lastly, we simulated traits with both a low heritability ($h^2 = 0.3$ again) and large environment effects (total $\sigma_\eta^2 = 0.5$) strongly correlated to the low-dimensional population structure (see Methods).
+For that reason, PCs may be expected to perform better in this setting (in either PCA or LMM).
+However, we find that both PCA and LMM (even without PCs) increase their $\auc$ values compared to the low-heritability evaluations, and there is only a marginal advantage of LMM with a few PCs versus LMM without PCs (\cref{fig:rmsd-auc-sim-fes-env,fig:rmsd-auc-real-fes-env,fig:king_cutoff-env,fig:rmsd-auc-sim-rc-env,fig:rmsd-auc-real-rc-env,tab:human_sum_pcs_env}).
+Oh the other hand, p-value calibration is poorer for all models under environment effects.
+Interestingly, on RC traits only, here PCA significantly outperforms LMM in the three real human datasets (\cref{tab:human_sum_pcs_env}), the only cases in all of our evaluations where this is observed.
+For comparison, we also evaluate an oracle LMM without PCs but with the finest group labels, the same used to simulate environment, as fixed categorical covariates (``LMM lab.''), and see a much larger gain of performance compared to LMM with PCs.
+In particular, LMM with labels always has significantly better or tied $\auc$ than either LMM or PCA without such labels (\cref{fig:rmsd-auc-sim-fes-env,fig:rmsd-auc-real-fes-env,fig:king_cutoff-env,fig:rmsd-auc-sim-rc-env,fig:rmsd-auc-real-rc-env,tab:human_sum_pcs_env}).
+However, LMM with labels is typically more poorly calibrated than LMM or PCA without labels, which may be since these numerous labels are inappropriately modeled as fixed rather than random effects.
+Overall, we find that association studies with correlated environment and genetic effects remain a challenge for PCA and LMM, and that in this case addition of PCs to an LMM improves performance only marginally.
 
 \section{Discussion}
 
@@ -962,6 +1007,11 @@ In contrast, LMM is simpler since there is no need to choose the number of PCs.
 However, an LMM with a large number of covariates may have conservative p-values (as observed for LMM with large numbers of PCs), a weakness of the score test used by the LMM we evaluated that may be overcome with other statistical tests.
 Simulations or post hoc evaluations remain crucial for ensuring that statistics are calibrated.
 
+% limitations overview
+One of the limitations of this work include relatively small sample sizes compared to modern association studies.
+However, our conclusions are not expected to change with larger sample sizes, as cryptic relatedness will continue to be abundant in such data and thus give LMMs an advantage over PCA.
+Newer approaches not tested in this work have made LMMs more scalable and applicable to biobank-scale data \citep{loh_efficient_2015, zhou_efficiently_2018}, so one clear next step is carefully evaluating these approaches in simulations with larger sample sizes.
+
 % Q vs CC traits
 The largest limitation of our work is that we only considered quantitative traits.
 We noted that previous evaluations involving case-control traits tended to report PCA-LMM ties or mixed results, an observation potentially confounded by the use of low-dimensional simulations without family relatedness (\cref{tab:lit}).
@@ -975,7 +1025,6 @@ The large numbers of distant relatives expected of any real dataset all but ensu
 Our findings also suggest that related applications such as polygenic models may enjoy gains in power and accuracy by employing an LMM instead of PCA to model relatedness \citep{rakitsch_lasso_2013,qian_fast_2020}.
 PCA remains indispensable across population genetics, from visualizing population structure and performing quality control to its deep connection to admixture models, but the time has come to limit its use in association testing in favor of LMM or other, richer models capable of modeling all forms of relatedness.
 
-%%% TODOTODOTODO
 
 \section{Appendices}
 
@@ -1325,6 +1374,107 @@ The high-coverage version of the 1000 Genomes Project was downloaded from \url{f
   \label{fig:eigen}
 \end{figure}
 
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fes/m_causal_fac-27/h0.3/rmsd-auc-sim.pdf}
+  \caption{
+    {\bf Evaluations in admixture simulations with FES traits, low heritability.}
+    Traits simulated using $h^2=0.3$, otherwise the same as \cref{fig:rmsd-auc-sim}.
+  }
+  \label{fig:rmsd-auc-sim-fes-h3}
+\end{figure}
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fes/m_causal_fac-27/h0.3/rmsd-auc-real.pdf}
+  \caption{
+    {\bf Evaluations in real human genotype datasets with FES traits, low heritability.}
+    Traits simulated using $h^2=0.3$, otherwise the same as \cref{fig:rmsd-auc-real}.
+  }
+  \label{fig:rmsd-auc-real-fes-h3}
+\end{figure}
+
+\begin{figure}[hp]
+  \centering
+  \includegraphics[width=\textwidth]{fes/m_causal_fac-27/h0.3/rmsd-auc_king-cutoff-4.pdf}
+  \caption{
+    {\bf Evaluation in real datasets excluding 4th degree relatives, low heritability.}
+    Traits simulated using $h^2=0.3$, otherwise the same as \cref{fig:king_cutoff}.
+  }
+  \label{fig:king_cutoff-h3}
+\end{figure}
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{m_causal_fac-27/h0.3/rmsd-auc-sim.pdf}
+  \caption{
+    {\bf Evaluations in admixture simulations with RC traits, low heritability.}
+    Traits simulated using $h^2=0.3$, otherwise the same as \cref{fig:rmsd-auc-sim-rc}.
+  }
+  \label{fig:rmsd-auc-sim-rc-h3}
+\end{figure}
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{m_causal_fac-27/h0.3/rmsd-auc-real.pdf}
+  \caption{
+    {\bf Evaluations in real human genotype datasets with RC traits, low heritability.}
+    Traits simulated using $h^2=0.3$, otherwise the same as \cref{fig:rmsd-auc-real-rc}.
+  }
+  \label{fig:rmsd-auc-real-rc-h3}
+\end{figure}
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fes/m_causal_fac-27/h0.3/env0.3-0.2/rmsd-auc-sim.pdf}
+  \caption{
+    {\bf Evaluations in admixture simulations with FES traits, environment.}
+    Traits simulated with environment effects, otherwise the same as \cref{fig:rmsd-auc-sim-fes-h3}.
+  }
+  \label{fig:rmsd-auc-sim-fes-env}
+\end{figure}
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fes/m_causal_fac-27/h0.3/env0.3-0.2/rmsd-auc-real.pdf}
+  \caption{
+    {\bf Evaluations in real human genotype datasets with FES traits, environment.}
+    Traits simulated with environment effects, otherwise the same as \cref{fig:rmsd-auc-real-fes-h3}.
+  }
+  \label{fig:rmsd-auc-real-fes-env}
+\end{figure}
+
+\begin{figure}[hp]
+  \centering
+  \includegraphics[width=\textwidth]{fes/m_causal_fac-27/h0.3/env0.3-0.2/rmsd-auc_king-cutoff-4.pdf}
+  \caption{
+    {\bf Evaluation in real datasets excluding 4th degree relatives, environment.}
+    Traits simulated with environment effects, otherwise the same as \cref{fig:king_cutoff-h3}.
+  }
+  \label{fig:king_cutoff-env}
+\end{figure}
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{m_causal_fac-27/h0.3/env0.3-0.2/rmsd-auc-sim.pdf}
+  \caption{
+    {\bf Evaluations in admixture simulations with RC traits, environment.}
+    Traits simulated with environment effects, otherwise the same as \cref{fig:rmsd-auc-sim-rc-h3}.
+  }
+  \label{fig:rmsd-auc-sim-rc-env}
+\end{figure}
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{m_causal_fac-27/h0.3/env0.3-0.2/rmsd-auc-real.pdf}
+  \caption{
+    {\bf Evaluations in real human genotype datasets with RC traits, environment.}
+    Traits simulated with environment effects, otherwise the same as \cref{fig:rmsd-auc-real-rc-h3}.
+  }
+  \label{fig:rmsd-auc-real-rc-env}
+\end{figure}
+
+
 \clearpage
 
 \section*{Supplemental tables}
@@ -1344,6 +1494,61 @@ The high-coverage version of the 1000 Genomes Project was downloaded from \url{f
   late after last line = \\\bottomrule
   ]{../data/dimensions_king-cutoff-4.txt}{}{\csvlinetotablerow}
 \end{table}
+
+\begin{table}[b!]
+  \centering
+  \scriptsize
+  \caption{
+    \textbf{Overview of PCA and LMM evaluations for low heritability simulations}
+  }
+  \label{tab:human_sum_pcs_h3}
+  \csvreader[
+  tabular = lcc|crl|rclc,
+  separator = tab,
+  table head =
+  % header row 1
+  \toprule & & & \multicolumn{3}{c|}{LMM $r=0$ vs best $r$} & \multicolumn{4}{c}{PCA vs LMM $r=0$} \\
+  % header row 2
+  Dataset & Metric & {Trait\textsuperscript{a}} & {Cal.\textsuperscript{b}} & {Best $r$\textsuperscript{c}} & {P-value\textsuperscript{d}} & {Best $r$\textsuperscript{c}} & {Cal.\textsuperscript{b}} & {P-value\textsuperscript{d}} & {Best model\textsuperscript{e}} \\\midrule,
+  late after last line = \\\bottomrule
+  ]{../data/m_causal_fac-27/h0.3/stats.txt}{}{\csvlinetotablerow}
+  \begin{flushleft}
+    \textsuperscript{a}FES: Fixed Effect Sizes, RC: Random Coefficients.\\
+    \textsuperscript{b}Calibrated: whether mean $|\rmsd| < 0.01$.\\
+    \textsuperscript{c}Value of $r$ (number of PCs) with minimum mean $|\rmsd|$ or maximum mean $\auc$.\\
+    \textsuperscript{d}Wilcoxon paired 1-tailed test of distributions ($|\rmsd|$ or $\auc$) between models in header.
+    Asterisk marks significant value using Bonferroni threshold ($p < \alpha/n_\text{tests}$ with $\alpha = 0.01$ and $n_\text{tests} = 48$ is the number of tests in this table).\\
+    \textsuperscript{e}Tie if no significant difference using Bonferroni threshold.
+  \end{flushleft}
+\end{table}
+
+\begin{table}[b!]
+  \centering
+  \tiny
+  \caption{
+    \textbf{Overview of PCA and LMM evaluations for environment simulations}
+  }
+  \label{tab:human_sum_pcs_env}
+  \csvreader[
+  tabular = lcc|crl|rclc|clc,
+  separator = tab,
+  table head =
+  % header row 1
+  \toprule & & & \multicolumn{3}{c|}{LMM $r=0$ vs best $r$} & \multicolumn{4}{c|}{PCA vs LMM $r=0$} & \multicolumn{3}{c}{LMM lab. vs PCA/LMM} \\
+  % header row 2
+  Dataset & Metric & {Trait\textsuperscript{a}} & {Cal.\textsuperscript{b}} & {$r$\textsuperscript{c}} & {P-value\textsuperscript{d}} & {$r$\textsuperscript{c}} & {Cal.\textsuperscript{b}} & {P-value\textsuperscript{d}} & {Best\textsuperscript{e}} & {Cal.\textsuperscript{b}} & {P-value\textsuperscript{d}} & {Best\textsuperscript{e}} \\\midrule,
+  late after last line = \\\bottomrule
+  ]{../data/m_causal_fac-27/h0.3/env0.3-0.2/stats.txt}{}{\csvlinetotablerow}
+  \begin{flushleft}
+    \textsuperscript{a}FES: Fixed Effect Sizes, RC: Random Coefficients.\\
+    \textsuperscript{b}Calibrated: whether mean $|\rmsd| < 0.01$.\\
+    \textsuperscript{c}Value of $r$ (number of PCs) with minimum mean $|\rmsd|$ or maximum mean $\auc$.\\
+    \textsuperscript{d}Wilcoxon paired 1-tailed test of distributions ($|\rmsd|$ or $\auc$) between models in header.
+    Asterisk marks significant value using Bonferroni threshold ($p < \alpha/n_\text{tests}$ with $\alpha = 0.01$ and $n_\text{tests} = 72$ is the number of tests in this table).\\
+    \textsuperscript{e}Tie if no significant difference using Bonferroni threshold; in last column, pairwise ties are specified and ``Tie'' is three-way tie.
+  \end{flushleft}
+\end{table}
+
 
 
 \end{document}
