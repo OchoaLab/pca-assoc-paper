@@ -106,8 +106,11 @@ time Rscript sim-10-measures-fig.R 2
 
 # main statistical evaluations between methods
 time Rscript real-13-stats.R
+# Number of tests (for Bonferroni): 72
 time Rscript real-13-stats.R --herit $h --m_causal_fac $mcf
-time Rscript real-13-stats.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2
+# Number of tests (for Bonferroni): 48
+time Rscript real-13-stats.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l
+# Number of tests (for Bonferroni): 72
 
 # final plot gathers all three datasets into a single multipanel figure
 time Rscript real-15-plots-big.R

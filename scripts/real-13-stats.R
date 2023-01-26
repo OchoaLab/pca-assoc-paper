@@ -18,6 +18,8 @@ srmsd_cut <- 0.01
 pcs <- 0L : 90L
 # for a length validation
 n_reps <- 50L
+# number of trait models (FES, RC), hardcoded, for Bonferroni correction
+n_traits <- 2L
 
 # final versions for papers
 # pure plink version is only PCA version, add LMM too
@@ -40,7 +42,9 @@ option_list = list(
     make_option("--env1", type = "double", default = NA,
                 help = "Variance of 1st (coarsest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
     make_option("--env2", type = "double", default = NA,
-                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double")
+                help = "Variance of 2nd (finest) level of environment (non-genetic) effects (default NA is no env)", metavar = "double"),
+    make_option(c('-l', "--labs"), action = "store_true", default = FALSE, 
+                help = "Include LMM with labels data")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -51,7 +55,12 @@ m_causal_fac <- opt$m_causal_fac
 herit <- opt$herit
 env1 <- opt$env1
 env2 <- opt$env2
+labs <- opt$labs
 
+if ( labs ) {
+    # add a third method
+    methods <- bind_rows( methods, tibble( code = 'gcta-labs', name = 'LMM lab.' ) )
+}
 
 ##################
 ### STAT TESTS ###
@@ -180,6 +189,12 @@ process_dataset <- function( name, fes ) {
     # (all reps, metrics, so still a tibble)
     tib_lmm_0 <- tib_lmm[ tib_lmm$pc == 0, ]
 
+    if ( labs ) {
+        # one more set of tests to add!
+        # (all reps, metrics, so still a tibble)
+        tib_lmm_labs_0 <- tib[ tib$method == 'LMM lab.' & tib$pc == 0, ]
+    }
+
     # output tibble to grow
     output <- NULL
 
@@ -217,31 +232,68 @@ process_dataset <- function( name, fes ) {
         pca_b_lmm_b_best <- if ( obj$reverse ) 'PCA' else 'LMM'
         
         # store all data of interest
-        output <- bind_rows(
-            output,
-            tibble(
-                name_paper = name,
-                trait = if ( fes ) 'FES' else 'RC',
-                metric = metric,
-                # is lmm r=0 calibrated?
-                lmm_0_calib = test_calib( lmm_0_vals, metric ),
-                # determine if lmm with best r is better than r=0 or not
-                lmm_b_r = lmm_b_r,
-                lmm_b_calib = test_calib( lmm_b_vals, metric ),
-                lmm_b_lmm_0_pval = lmm_b_lmm_0_pval,
-                lmm_b_lmm_0_sig = lmm_b_lmm_0_pval < p_cut,
-                # compare lmm r=0 to pca with best r too
-                pca_b_r = pca_b_r,
-                pca_b_calib = test_calib( pca_b_vals, metric ),
-                pca_b_lmm_0_pval = pca_b_lmm_0_pval,
-                pca_b_lmm_0_best = pca_b_lmm_0_best,
-                pca_b_lmm_0_sig = pca_b_lmm_0_pval < p_cut,
-                # lastly, overkill comparison of best lmm to best pca (only non-redundant under env, given previous results)
-                pca_b_lmm_b_pval = pca_b_lmm_b_pval,
-                pca_b_lmm_b_best = pca_b_lmm_b_best,
-                pca_b_lmm_b_sig = pca_b_lmm_b_pval < p_cut
-            )
+        output_row <- tibble(
+            name_paper = name,
+            trait = if ( fes ) 'FES' else 'RC',
+            metric = metric,
+            # is lmm r=0 calibrated?
+            lmm_0_calib = test_calib( lmm_0_vals, metric ),
+            # determine if lmm with best r is better than r=0 or not
+            lmm_b_r = lmm_b_r,
+            lmm_b_calib = test_calib( lmm_b_vals, metric ),
+            lmm_b_lmm_0_pval = lmm_b_lmm_0_pval,
+            lmm_b_lmm_0_sig = lmm_b_lmm_0_pval < p_cut,
+            # compare lmm r=0 to pca with best r too
+            pca_b_r = pca_b_r,
+            pca_b_calib = test_calib( pca_b_vals, metric ),
+            pca_b_lmm_0_pval = pca_b_lmm_0_pval,
+            pca_b_lmm_0_best = pca_b_lmm_0_best,
+            pca_b_lmm_0_sig = pca_b_lmm_0_pval < p_cut,
+            # lastly, overkill comparison of best lmm to best pca (only non-redundant under env, given previous results)
+            pca_b_lmm_b_pval = pca_b_lmm_b_pval,
+            pca_b_lmm_b_best = pca_b_lmm_b_best,
+            pca_b_lmm_b_sig = pca_b_lmm_b_pval < p_cut
         )
+
+        if ( labs ) {
+            # one more set of tests to add!
+            # get values for this one distribution (r=0 is only choice)
+            lmm_labs_0_vals <- tib_lmm_labs_0[[ metric ]]
+
+            # because there are now multiple comparators, lets compare against best of rest only
+            # let's narrow the choices to lmm r=0 vs pca best r
+            # actually the best choice is already known, let's use that previous calculation
+            best_vals <- if ( pca_b_lmm_0_best == 'PCA' ) pca_b_vals else lmm_0_vals
+            # now perform test!
+            obj <- test_distrs( best_vals, lmm_labs_0_vals, metric )
+            best_lmm_labs_0_pval <- obj$pval
+            best_lmm_labs_0_best <- if ( obj$reverse ) pca_b_lmm_0_best else 'LMM lab.'
+
+            # add to report
+            output_row$lmm_labs_0_calib <- test_calib( lmm_labs_0_vals, metric )
+            output_row$best_lmm_labs_0_pval <- best_lmm_labs_0_pval
+            output_row$best_lmm_labs_0_best <- best_lmm_labs_0_best
+            output_row$best_lmm_labs_0_sig <- best_lmm_labs_0_pval < p_cut
+            # ties are very messy here, let's do the extra work now because its easier at this point
+            if ( output_row$best_lmm_labs_0_sig ) {
+                # if difference is significant and "LMM lab." was the winner, stays as-is
+                # else it could be a tie...
+                # if not tie in first round, then report is correct already
+                if ( best_lmm_labs_0_best != 'LMM lab.' && ! output_row$pca_b_lmm_0_sig )
+                    output_row$best_lmm_labs_0_best <- 'PCA/LMM' # this is correct tie status
+            } else {
+                # here new test was not significant, but was previous eval a tie?
+                if ( output_row$pca_b_lmm_0_sig ) {
+                    # this is correct pairwise tie
+                    output_row$best_lmm_labs_0_best <- paste0( pca_b_lmm_0_best, '/LMM lab.' )
+                } else
+                    # mark 3-way tie this way:
+                    output_row$best_lmm_labs_0_best <- 'Tie'
+            }
+        }
+
+        # append to output table
+        output <- bind_rows( output, output_row )
     }
     
     return( output )
@@ -263,8 +315,7 @@ if ( m_causal_fac != 10 || herit != 0.8 || !is.na( env1 ) )
     datasets <- datasets[ datasets$type != 'Tree', ]
 
 # number of tests in this table, for Bonferroni
-# NOTE: last 2x is for multiple tests per row (LMM r=0 vs best r, and PCA vs LMM); although env version have one more test (distinguishes PCA vs LMM r=0 from LMM best r), in practice they were highly correlated, so makes sense to treat as the same for Bonferroni purposes
-n_tests <- nrow( datasets ) * length( methods$name ) * length( metrics ) * 2L
+n_tests <- nrow( datasets ) * length( methods$name ) * length( metrics ) * n_traits
 # adjust p_cut accordingly
 p_cut <- p_cut / n_tests
 
@@ -316,7 +367,8 @@ for ( i in 1 : nrow( datasets ) ) {
 
 # validate our Bonferroni calculation
 # (this table isn't complete until after we've applied all thresholds, that's why we calculate it first, then validate)
-stopifnot( nrow( output ) * 2L == n_tests )
+# only variable in columns rather than rows are the methods
+stopifnot( nrow( output ) * length( methods$name ) == n_tests )
 message( 'Number of tests (for Bonferroni): ', n_tests )
 
 ################
@@ -326,17 +378,22 @@ message( 'Number of tests (for Bonferroni): ', n_tests )
 # clean up tie situations (makes words easier to scan)
 output$pca_b_lmm_0_best[ !output$pca_b_lmm_0_sig ] <- 'Tie'
 output$pca_b_lmm_b_best[ !output$pca_b_lmm_b_sig ] <- 'Tie'
+## # for labs case, tie is ambiguous because it's now 3 methods, so let's be more explicit
+## if ( labs ) {
+##     output$best_lmm_labs_0_best[ !output$best_lmm_labs_0_sig ] <- 'Tie'
+## }
 
 # more automatic reductions when LMM r=0 is best across the board
 # NOTE: output$lmm_b_lmm_0_sig gets deleted later for all cases
-if ( all( !output$lmm_b_lmm_0_sig ) ) {
+# Update: let's always omit these cases, even in env they were largely the same as for LMM with r=0
+#if ( all( !output$lmm_b_lmm_0_sig ) ) {
     # who cares if lmm_b is calibrated
     output$lmm_b_calib <- NULL
     # don't show lmm_b vs pca comparisons
     output$pca_b_lmm_b_best <- NULL
     output$pca_b_lmm_b_pval <- NULL
     output$pca_b_lmm_b_sig <- NULL
-}
+#}
 
 ########################
 ### PAPER FORMATTING ###
@@ -348,7 +405,7 @@ if ( all( !output$lmm_b_lmm_0_sig ) ) {
 output <- arrange( output, trait, desc(metric) )
 
 # round p-values and mark significant ones with asterisks
-for ( colname in c('lmm_b_lmm_0', 'pca_b_lmm_0', 'pca_b_lmm_b') ) {
+for ( colname in c('lmm_b_lmm_0', 'pca_b_lmm_0', 'pca_b_lmm_b', 'best_lmm_labs_0') ) {
     # get two column names to process
     colname_pval <- paste0( colname, '_pval' )
     colname_sig <- paste0( colname, '_sig' )
@@ -374,7 +431,7 @@ output$metric[ output$metric == 'auc' ] <- '$\\auc$'
 
 # uncapitalize booleans
 # sadly very tedious
-for ( colname in c('lmm_0_calib', 'lmm_b_calib', 'pca_b_calib') ) {
+for ( colname in c('lmm_0_calib', 'lmm_b_calib', 'pca_b_calib', 'lmm_labs_0_calib') ) {
     # extract column
     x <- output[[ colname ]]
     # ignore columns that aren't present
