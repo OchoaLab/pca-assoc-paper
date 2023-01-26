@@ -1,37 +1,37 @@
-name_paper	trait	metric	lmm_0_calib	lmm_b_r	lmm_b_lmm_0_pval	pca_b_r	pca_b_calib	pca_b_lmm_0_pval	pca_b_lmm_0_best
-Admix. Large sim.	FES	$|\rmsd|$	True	0	1	12	True	0.0355	Tie
-Admix. Small sim.	FES	$|\rmsd|$	True	0	1	4	True	0.0545	Tie
-Admix. Family sim.	FES	$|\rmsd|$	True	0	1	90	False	3.9e-10*	LMM
-Human Origins	FES	$|\rmsd|$	True	0	1	89	False	3.9e-10*	LMM
-HGDP	FES	$|\rmsd|$	True	0	1	87	True	4.4e-10*	LMM
-1000 Genomes	FES	$|\rmsd|$	True	0	1	90	False	3.9e-10*	LMM
-Human Origins sim.	FES	$|\rmsd|$	True	0	1	88	True	0.0173	Tie
-HGDP sim.	FES	$|\rmsd|$	True	0	1	47	True	0.0456	Tie
-1000 Genomes sim.	FES	$|\rmsd|$	True	0	1	78	True	9.61e-10*	LMM
-Admix. Large sim.	FES	$\auc$		0	1	3		5.86e-06*	LMM
-Admix. Small sim.	FES	$\auc$		0	1	2		0.025	Tie
-Admix. Family sim.	FES	$\auc$		1	0.353	22		3.9e-10*	LMM
-Human Origins	FES	$\auc$		0	1	34		3.9e-10*	LMM
-HGDP	FES	$\auc$		1	0.329	16		4.4e-10*	LMM
-1000 Genomes	FES	$\auc$		1	0.108	8		3.9e-10*	LMM
-Human Origins sim.	FES	$\auc$		0	1	36		3.9e-10*	LMM
-HGDP sim.	FES	$\auc$		0	1	17		1.73e-05*	LMM
-1000 Genomes sim.	FES	$\auc$		0	1	10		4.97e-10*	LMM
-Admix. Large sim.	RC	$|\rmsd|$	True	0	1	26	True	0.107	Tie
-Admix. Small sim.	RC	$|\rmsd|$	True	0	1	4	True	0.000972	Tie
-Admix. Family sim.	RC	$|\rmsd|$	True	0	1	90	False	3.9e-10*	LMM
-Human Origins	RC	$|\rmsd|$	True	0	1	90	True	0.000653	Tie
-HGDP	RC	$|\rmsd|$	True	0	1	37	True	1.52e-05*	LMM
-1000 Genomes	RC	$|\rmsd|$	True	0	1	76	True	3.9e-10*	LMM
-Human Origins sim.	RC	$|\rmsd|$	True	0	1	85	True	0.144	Tie
-HGDP sim.	RC	$|\rmsd|$	True	0	1	44	True	8.84e-07*	LMM
-1000 Genomes sim.	RC	$|\rmsd|$	True	0	1	90	True	3.9e-10*	LMM
-Admix. Large sim.	RC	$\auc$		0	1	3		1.4e-05*	LMM
-Admix. Small sim.	RC	$\auc$		0	1	1		0.0946	Tie
-Admix. Family sim.	RC	$\auc$		0	1	34		3.9e-10*	LMM
-Human Origins	RC	$\auc$		3	0.397	36		9.61e-10*	LMM
-HGDP	RC	$\auc$		4	0.206	16		0.0126	Tie
-1000 Genomes	RC	$\auc$		5	0.00397	9		0.000434	Tie
-Human Origins sim.	RC	$\auc$		0	1	37		4.14e-10*	LMM
-HGDP sim.	RC	$\auc$		3	0.0867	17		0.00138	Tie
-1000 Genomes sim.	RC	$\auc$		3	0.368	10		8.53e-10*	LMM
+name_paper	metric	trait	lmm_0_calib	lmm_b_r	lmm_b_lmm_0_pval	pca_b_r	pca_b_calib	pca_b_lmm_0_pval	pca_b_lmm_0_best
+Admix. Large sim.	$|\rmsd|$	FES	True	0	1	12	True	0.036	Tie
+Admix. Small sim.	$|\rmsd|$	FES	True	0	1	4	True	0.055	Tie
+Admix. Family sim.	$|\rmsd|$	FES	True	0	1	90	False	3.9e-10*	LMM
+Human Origins	$|\rmsd|$	FES	True	0	1	89	False	3.9e-10*	LMM
+HGDP	$|\rmsd|$	FES	True	0	1	87	True	4.4e-10*	LMM
+1000 Genomes	$|\rmsd|$	FES	True	0	1	90	False	3.9e-10*	LMM
+Human Origins sim.	$|\rmsd|$	FES	True	0	1	88	True	0.017	Tie
+HGDP sim.	$|\rmsd|$	FES	True	0	1	47	True	0.046	Tie
+1000 Genomes sim.	$|\rmsd|$	FES	True	0	1	78	True	9.6e-10*	LMM
+Admix. Large sim.	$|\rmsd|$	RC	True	0	1	26	True	0.11	Tie
+Admix. Small sim.	$|\rmsd|$	RC	True	0	1	4	True	0.00097	Tie
+Admix. Family sim.	$|\rmsd|$	RC	True	0	1	90	False	3.9e-10*	LMM
+Human Origins	$|\rmsd|$	RC	True	0	1	90	True	0.00065	Tie
+HGDP	$|\rmsd|$	RC	True	0	1	37	True	1.5e-05*	LMM
+1000 Genomes	$|\rmsd|$	RC	True	0	1	76	True	3.9e-10*	LMM
+Human Origins sim.	$|\rmsd|$	RC	True	0	1	85	True	0.14	Tie
+HGDP sim.	$|\rmsd|$	RC	True	0	1	44	True	8.8e-07*	LMM
+1000 Genomes sim.	$|\rmsd|$	RC	True	0	1	90	True	3.9e-10*	LMM
+Admix. Large sim.	$\auc$	FES		0	1	3		5.9e-06*	LMM
+Admix. Small sim.	$\auc$	FES		0	1	2		0.025	Tie
+Admix. Family sim.	$\auc$	FES		1	0.35	22		3.9e-10*	LMM
+Human Origins	$\auc$	FES		0	1	34		3.9e-10*	LMM
+HGDP	$\auc$	FES		1	0.33	16		4.4e-10*	LMM
+1000 Genomes	$\auc$	FES		1	0.11	8		3.9e-10*	LMM
+Human Origins sim.	$\auc$	FES		0	1	36		3.9e-10*	LMM
+HGDP sim.	$\auc$	FES		0	1	17		1.7e-05*	LMM
+1000 Genomes sim.	$\auc$	FES		0	1	10		5e-10*	LMM
+Admix. Large sim.	$\auc$	RC		0	1	3		1.4e-05*	LMM
+Admix. Small sim.	$\auc$	RC		0	1	1		0.095	Tie
+Admix. Family sim.	$\auc$	RC		0	1	34		3.9e-10*	LMM
+Human Origins	$\auc$	RC		3	0.4	36		9.6e-10*	LMM
+HGDP	$\auc$	RC		4	0.21	16		0.013	Tie
+1000 Genomes	$\auc$	RC		5	0.004	9		0.00043	Tie
+Human Origins sim.	$\auc$	RC		0	1	37		4.1e-10*	LMM
+HGDP sim.	$\auc$	RC		3	0.087	17		0.0014	Tie
+1000 Genomes sim.	$\auc$	RC		3	0.37	10		8.5e-10*	LMM

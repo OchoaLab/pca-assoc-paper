@@ -1,25 +1,25 @@
-name_paper	trait	metric	lmm_0_calib	lmm_b_r	lmm_b_lmm_0_pval	pca_b_r	pca_b_calib	pca_b_lmm_0_pval	pca_b_lmm_0_best	lmm_labs_0_calib	best_lmm_labs_0_pval	best_lmm_labs_0_best
-Admix. Large sim.	FES	$|\rmsd|$	True	0	1	83	True	0.379	Tie	True	1.78e-14*	PCA/LMM
-Admix. Small sim.	FES	$|\rmsd|$	True	0	1	90	True	0.00104	Tie	False	1.42e-14*	PCA/LMM
-Admix. Family sim.	FES	$|\rmsd|$	True	4	0.185	90	False	3.9e-10*	LMM	True	0.066	LMM/LMM lab.
-Human Origins	FES	$|\rmsd|$	True	9	3.94e-05*	90	False	1.42e-08*	LMM	False	3.9e-10*	LMM
-HGDP	FES	$|\rmsd|$	True	0	1	90	True	0.00375	Tie	False	2.07e-09*	PCA/LMM
-1000 Genomes	FES	$|\rmsd|$	False	8	8.83e-08*	85	True	0.0535	Tie	True	3.9e-10*	LMM lab.
-Admix. Large sim.	FES	$\auc$		4	2.37e-06*	6		0.00214	Tie		1.78e-15*	LMM lab.
-Admix. Small sim.	FES	$\auc$		3	0.0545	4		0.0333	Tie		0.283	Tie
-Admix. Family sim.	FES	$\auc$		12	0.000699	63		3.9e-10*	LMM		3.9e-10*	LMM lab.
-Human Origins	FES	$\auc$		20	3.75e-06*	90		1.4e-05*	LMM		3.9e-10*	LMM lab.
-HGDP	FES	$\auc$		12	4.29e-06*	45		0.00445	Tie		3.9e-10*	LMM lab.
-1000 Genomes	FES	$\auc$		9	1.87e-08*	55		0.028	Tie		3.9e-10*	LMM lab.
-Admix. Large sim.	RC	$|\rmsd|$	True	0	1	60	True	0.0333	Tie	True	6.32e-10*	PCA/LMM
-Admix. Small sim.	RC	$|\rmsd|$	True	0	1	9	True	0.851	Tie	False	1.42e-14*	PCA/LMM
-Admix. Family sim.	RC	$|\rmsd|$	True	5	0.138	90	False	3.9e-10*	LMM	True	0.0111	LMM/LMM lab.
-Human Origins	RC	$|\rmsd|$	False	9	1.08e-08*	90	True	2.34e-07*	PCA	False	3.9e-10*	PCA
-HGDP	RC	$|\rmsd|$	True	0	1	89	True	6.51e-09*	PCA	False	3.9e-10*	PCA
-1000 Genomes	RC	$|\rmsd|$	False	8	1.59e-08*	88	True	4.9e-09*	PCA	True	0.0898	PCA/LMM lab.
-Admix. Large sim.	RC	$\auc$		4	0.000853	5		0.00183	Tie		4.97e-10*	LMM lab.
-Admix. Small sim.	RC	$\auc$		2	0.129	5		0.093	Tie		0.00276	Tie
-Admix. Family sim.	RC	$\auc$		9	0.01	86		1.73e-09*	LMM		3.9e-10*	LMM lab.
-Human Origins	RC	$\auc$		22	0.00386	90		1.02e-06*	PCA		3.9e-10*	LMM lab.
-HGDP	RC	$\auc$		19	0.00572	64		2.84e-05*	PCA		3.01e-07*	LMM lab.
-1000 Genomes	RC	$\auc$		9	8.66e-05*	87		1.22e-09*	PCA		4.4e-10*	LMM lab.
+name_paper	metric	trait	lmm_0_calib	lmm_b_r	lmm_b_lmm_0_pval	pca_b_r	pca_b_calib	pca_b_lmm_0_pval	pca_b_lmm_0_best	lmm_labs_0_calib	best_lmm_labs_0_pval	best_lmm_labs_0_best
+Admix. Large sim.	$|\rmsd|$	FES	True	0	1	83	True	0.38	Tie	True	1.8e-14*	PCA/LMM
+Admix. Small sim.	$|\rmsd|$	FES	True	0	1	90	True	0.001	Tie	False	1.4e-14*	PCA/LMM
+Admix. Family sim.	$|\rmsd|$	FES	True	4	0.18	90	False	3.9e-10*	LMM	True	0.066	LMM/LMM lab.
+Human Origins	$|\rmsd|$	FES	True	9	3.9e-05*	90	False	1.4e-08*	LMM	False	3.9e-10*	LMM
+HGDP	$|\rmsd|$	FES	True	0	1	90	True	0.0037	Tie	False	2.1e-09*	PCA/LMM
+1000 Genomes	$|\rmsd|$	FES	False	8	8.8e-08*	85	True	0.053	Tie	True	3.9e-10*	LMM lab.
+Admix. Large sim.	$|\rmsd|$	RC	True	0	1	60	True	0.033	Tie	True	6.3e-10*	PCA/LMM
+Admix. Small sim.	$|\rmsd|$	RC	True	0	1	9	True	0.85	Tie	False	1.4e-14*	PCA/LMM
+Admix. Family sim.	$|\rmsd|$	RC	True	5	0.14	90	False	3.9e-10*	LMM	True	0.011	LMM/LMM lab.
+Human Origins	$|\rmsd|$	RC	False	9	1.1e-08*	90	True	2.3e-07*	PCA	False	3.9e-10*	PCA
+HGDP	$|\rmsd|$	RC	True	0	1	89	True	6.5e-09*	PCA	False	3.9e-10*	PCA
+1000 Genomes	$|\rmsd|$	RC	False	8	1.6e-08*	88	True	4.9e-09*	PCA	True	0.09	PCA/LMM lab.
+Admix. Large sim.	$\auc$	FES		4	2.4e-06*	6		0.0021	Tie		1.8e-15*	LMM lab.
+Admix. Small sim.	$\auc$	FES		3	0.055	4		0.033	Tie		0.28	Tie
+Admix. Family sim.	$\auc$	FES		12	7e-04	63		3.9e-10*	LMM		3.9e-10*	LMM lab.
+Human Origins	$\auc$	FES		20	3.7e-06*	90		1.4e-05*	LMM		3.9e-10*	LMM lab.
+HGDP	$\auc$	FES		12	4.3e-06*	45		0.0044	Tie		3.9e-10*	LMM lab.
+1000 Genomes	$\auc$	FES		9	1.9e-08*	55		0.028	Tie		3.9e-10*	LMM lab.
+Admix. Large sim.	$\auc$	RC		4	0.00085	5		0.0018	Tie		5e-10*	LMM lab.
+Admix. Small sim.	$\auc$	RC		2	0.13	5		0.093	Tie		0.0028	Tie
+Admix. Family sim.	$\auc$	RC		9	0.01	86		1.7e-09*	LMM		3.9e-10*	LMM lab.
+Human Origins	$\auc$	RC		22	0.0039	90		1e-06*	PCA		3.9e-10*	LMM lab.
+HGDP	$\auc$	RC		19	0.0057	64		2.8e-05*	PCA		3e-07*	LMM lab.
+1000 Genomes	$\auc$	RC		9	8.7e-05*	87		1.2e-09*	PCA		4.4e-10*	LMM lab.
