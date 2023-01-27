@@ -160,35 +160,35 @@ time Rscript king-00-dimensions.R
 # make AUC/RMSD plot and stats tests for the limited king-cutoff test
 time Rscript king-01-rmsd-auc-plot.R
 # HoPacAll_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
-# RMSD: LMM
-# AUC: LMM
+# RMSD: LMM r = 0
+# AUC: LMM r = 0
 # hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1_king-cutoff-4
-# RMSD: LMM
-# AUC: LMM
+# RMSD: LMM r = 0
+# AUC: LMM r = 0
 # tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
-# RMSD: LMM
-# AUC: LMM
+# RMSD: LMM r = 0
+# AUC: LMM r = 0
 
 # same for low herit tests
 time Rscript king-01-rmsd-auc-plot.R --herit $h --m_causal_fac $mcf
 # HoPacAll_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
-# RMSD: LMM
-# AUC: LMM
+# RMSD: LMM r = 0
+# AUC: LMM r = 0
 # hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1_king-cutoff-4
-# RMSD: LMM
-# AUC: LMM
+# RMSD: LMM r = 0
+# AUC: LMM r = 0
 # tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
-# RMSD: LMM
-# AUC: LMM
+# RMSD: LMM r = 0
+# AUC: LMM r = 0
 
 # and env, here add gcta-labs!
 time Rscript king-01-rmsd-auc-plot.R --herit $h --m_causal_fac $mcf --env1 $env1 --env2 $env2 -l
 # HoPacAll_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
-# RMSD: LMM
-# AUC: LMM lab.
+# RMSD: LMM r = 10
+# AUC: LMM lab. r = 0
 # hgdp_wgs_autosomes_ld_prune_1000kb_0.3_maf-0.01_geno-0.1_king-cutoff-4
-# RMSD: tie
-# AUC: LMM lab.
+# RMSD: LMM r = 0/PCA r = 20
+# AUC: LMM lab. r = 0
 # tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
-# RMSD: LMM lab.
-# AUC: LMM lab.
+# RMSD: LMM lab. r = 0
+# AUC: LMM lab. r = 0

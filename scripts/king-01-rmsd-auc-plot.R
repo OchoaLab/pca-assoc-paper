@@ -17,21 +17,22 @@ source('plot-auc-rmsd.R')
 # input file name (big table), per dataset
 file_table <- 'sum.txt'
 # hardcoded params
-r_pca <- 20
-r_lmm <- 0
 fes <- TRUE
 # P-value threshold for Wilcoxon 2-sample paired 1-tail comparisons
 p_cut <- 0.01
-# pure plink version is only PCA version, add LMM too
-method_to_label <- list(
-    'pca-plink-pure' = 'PCA',
-    gcta = 'LMM'
+# full specification of methods (code and r) and their aesthetics (nice name and color)
+# this is comprehensive list, though it's shorter for non-labs cases
+methods <- tibble(
+#    name = c('PCA', 'LMM', 'LMM+PCs', 'LMM lab.'),
+    name = c('PCA', 'LMM', 'LMM', 'LMM lab.'),
+    code = c('pca-plink-pure', 'gcta', 'gcta', 'gcta-labs'),
+    pc = c(20, 0, 10, 0),
+    col = c('red', 'blue', 'blue', 'green')
 )
-# hardcoded same order as method_to_label
-method_cols <- c(
-    'red',
-    'blue'
-)
+# add r to figure names
+# newline for visual version, uses space more efficiently
+methods$name <- paste0( methods$name, "\nr = ", methods$pc)
+
 # names of datasets
 # base is real datasets (for getting "paper" names), but we're really looking at king-cutoff versions
 names_dir <- c(
@@ -75,15 +76,12 @@ env1 <- opt$env1
 env2 <- opt$env2
 labs <- opt$labs
 
-if ( labs ) {
-    # add a third method
-    method_to_label <- c( method_to_label, list( 'gcta-labs' = 'LMM lab.' ) )
-    method_cols <- c( method_cols, 'green' )
-}
+# keep first two methods only except for labs case
+if ( !labs )
+    methods <- methods[ 1L:2L, ]
 
 # extract methods from table itself
-methods <- names( method_to_label ) # not from table, but from hardcoded map, always lists PCA first!
-n_methods <- length( methods )
+n_methods <- nrow( methods )
 
 # specify location of files to process, as many levels as needed
 dir_out <- ''
@@ -102,17 +100,11 @@ tibble_to_lists_rmsd_auc_king <- function( tib ) {
     # initialize lists
     data_rmsd <- list()
     data_auc <- list()
-    for ( method in methods ) {
+    for ( i in 1L : n_methods ) {
         # get label for figure
-        method_label <- method_to_label[[ method ]]
-        # subset big table
-        tib_i <- tib[ tib$method == method, ]
-        # check that all data is as desired
-        # assumes first method is PCA, second is LMM (assumption made elsewhere too)
-        if ( method == methods[1] )
-            stopifnot( all( tib_i$pc == r_pca ) )
-        if ( method == methods[2] )
-            stopifnot( all( tib_i$pc == r_lmm ) )
+        method_label <- methods$name[i]
+        # subset big table, simultaneously by method and number of PCs
+        tib_i <- tib[ tib$method == methods$code[i] & tib$pc == methods$pc[i], ]
         # copy sublists to big lists
         data_rmsd[[ method_label ]] <- tib_i$rmsd
         data_auc[[ method_label ]] <- tib_i$auc
@@ -135,14 +127,14 @@ report_cross_method_king <- function( method_to_vals, metric ) {
     # decide which performed best, by mean
     method_to_mean <- sapply( method_to_vals, mean )
     if ( metric == 'auc' ) {
-        method_best <- method_to_label[[ which.max( method_to_mean ) ]]
+        method_best <- methods$name[[ which.max( method_to_mean ) ]]
         alternative <- 'l' # alternative is lesser than max
     } else if ( metric == 'rmsd' ) {
-        method_best <- method_to_label[[ which.min( method_to_mean ) ]]
+        method_best <- methods$name[[ which.min( method_to_mean ) ]]
         alternative <- 'g' # alternative is greater than min
     }
     # to get direction right, need to identify worst method too
-    methods_worst <- setdiff( unlist( method_to_label ), method_best )
+    methods_worst <- setdiff( methods$name, method_best )
 
     # NOTE: previously assumed two methods only, now we may have 3 groups (if `-l`)
     # lazy sol, test all (vs best)?
@@ -158,11 +150,14 @@ report_cross_method_king <- function( method_to_vals, metric ) {
 
         # method_best gets overwritten if there are any ties, so stays the same if it is better than both!
         if ( !sig ) {
-            method_best <- 'tie'
+            method_best <- paste0( method_best, '/', method_worst )
             # stop tests if this happens
             break
         }
     }
+
+    # remove newlines from name for report
+    method_best <- gsub( "\n", ' ', method_best )
 
     # return best or tie
     return( method_best )
@@ -244,9 +239,9 @@ fig_start(
     height = width * 2 / 3
 )
 # margin for panels with titles
-mar1 <- c(1.5, 1.5, 2.5, 0) + 0.2
+mar1 <- c(1, 1.5, 2.5, 0) + 0.2
 # margin for panels without titles
-mar2 <- c(1.5, 1.5, 0, 0) + 0.2
+mar2 <- c(2.5, 1.5, 0, 0) + 0.2
 # add lower margin, so inner margins can be even smaller
 # same with left (only outer needs a big margin)
 par( oma = c(1.5, 1.5, 0, 0) )
@@ -254,7 +249,7 @@ par( oma = c(1.5, 1.5, 0, 0) )
 # since some have titles and others don't, looks better to have this uneven sizing
 layout(
     matrix( 1:6, nrow = 2, ncol = 3 ),
-    heights = c(1.15, 1)
+    heights = c(1.05, 1)
 )
 
 # process each of our datasets
@@ -290,9 +285,10 @@ for ( index_dataset in 1 : nrow( datasets ) ) {
     boxplot(
         data_i$rmsd,
         range = 0, # wiskers extend to outliers
-        border = method_cols,
-        col = alpha( method_cols, alpha_q ), # inside box, to match big plots in transparency
-        add = TRUE
+        border = methods$col,
+        col = alpha( methods$col, alpha_q ), # inside box, to match big plots in transparency
+        add = TRUE,
+        names = NA # no names for RMSD (top row), will use AUC (bottom row) names only
     )
     # add panel letter
     panel_letter( toupper( letters[ index_dataset ] ) )
@@ -307,9 +303,12 @@ for ( index_dataset in 1 : nrow( datasets ) ) {
         ylab = '',
         ylim = ylim_auc, # c(0, max( unlist( data_i$auc ) ) ), # include zero
         range = 0, # wiskers extend to outliers
-        border = method_cols,
-        col = alpha( method_cols, alpha_q ) # inside box, to match big plots in transparency
+        border = methods$col,
+        col = alpha( methods$col, alpha_q ), # inside box, to match big plots in transparency
+        names = NA # automatic names aren't in right line, so will plot separately
     )
+    # add names now, at a lower-than-default line!
+    axis( 1L, at = 1L : n_methods, labels = methods$name, line = 1, tick = FALSE )
     # mark zero line
     abline( h = 0, lty = 2, col = 'gray' )
     # add y-label on leftmost panels only, make sure it can go on outer margin space

@@ -54,9 +54,9 @@ submit_rep_pcs <- function( rep, bfile, threads, fes, herit_low, env, plink, par
 
     # default number of PCs hardcoded here
     pcs <- '0-90'
-    # only king_cutoff has obvious special cases (hack of "array" notation for a single value)
+    # only king_cutoff has obvious special cases (hack of "array" notation for a single or two values)
     if ( king_cutoff )
-        pcs <- if ( plink ) 20 else 0
+        pcs <- if ( plink ) 20 else '0,10'
     
     # pass params to command
     # first do core set of parameters, more to be added below as needed
