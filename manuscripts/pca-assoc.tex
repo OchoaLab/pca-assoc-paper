@@ -63,7 +63,6 @@
 
 \usepackage[displaymath,mathlines]{lineno}
 
-% OLD: Testing the effectiveness of principal components in adjusting for relatedness in genetic association studies
 \title{\Large \textbf{
     Limitations of principal components in quantitative genetic association models for human studies
   }}
@@ -83,17 +82,18 @@ $^3$ Present address: BenHealth Consulting, Shanghai, Shanghai, 200023, China \\
 % department(s) or subunit(s), institution, city, state or region, zip code or postal code, country.
 $^*$ Correspondence: \texttt{alejandro.ochoa@duke.edu}
 
+% elife: normally 150-200 words; actual 200!
 \begin{abstract}
   Principal Component Analysis (PCA) and the Linear Mixed-effects Model (LMM), sometimes in combination, are the most common genetic association models.
   Previous PCA-LMM comparisons give mixed results, unclear guidance, and have several limitations, including not varying the number of principal components (PCs), simulating simple population structures, and inconsistent use of real data and power evaluations.
-  We evaluate PCA and LMM both varying number of PCs in new realistic genotype and complex trait simulations including admixed families, trees, and real multiethnic human genotype datasets (1000 Genomes, Human Genome Diversity Panel, Human Origins) with simulated traits.
-  We find that LMM without PCs always performs best, with the largest effects in the family simulation and real human datasets.
-  The large gaps in PCA-LMM performance on human datasets is driven by the high-dimensional effect of large numbers of distant relatives more than the smaller number of highly related pairs.
-  While PCA was known to fail on family data, we report strong effects of family relatedness in several genetically diverse human datasets, not avoided by pruning highly related individual pairs.
+  We evaluate PCA and LMM both varying number of PCs in realistic genotype and complex trait simulations including admixed families, trees, and real multiethnic human datasets with simulated traits.
+  We find that LMM without PCs usually performs best, with the largest effects in family simulations and real human datasets and traits without environment effects.
+  Poor PCA performance on human datasets is driven by large numbers of distant relatives more than the smaller number of closer relatives.
+  While PCA was known to fail on family data, we report strong effects of family relatedness in genetically diverse human datasets, not avoided by pruning close relatives.
+  Environment effects driven by geography and ethicity are better modeled with LMM including those labels instead of PCs.
   This work better characterizes the severe limitations of PCA compared to LMM in modeling the complex relatedness structures of multiethnic human data for association studies.
 \end{abstract}
 
-% used for AJHG submission
 % \textbf{Keywords:} genetic association; statistical genetics; population structure; cryptic relatedness; complex quantitative traits; simulations; multiethnic human data.
 
 \textbf{Abbreviations:}
@@ -119,6 +119,7 @@ Genetic association with PCA consists of including the top eigenvectors of the p
 These top eigenvectors are commonly referred to as PCs in genetics \citep{patterson_population_2006}, the convention adopted here, but in other fields PCs denote the projections of loci onto eigenvectors \citep{jolliffe_principal_2002}.
 The direct ancestor of PCA association is structured association, in which inferred ancestry or admixture proportions are used as regression covariates \citep{pritchard_association_2000}.
 These models are deeply connected because PCs map to ancestry empirically \citep{alexander_fast_2009, zhou_strong_2016} and theoretically \citep{mcvean_genealogical_2009,zheng_eigenanalysis_2016,cabreros_likelihood-free_2019,chiu_inferring_2022}, and they work as well as global ancestry in association studies but are estimated more easily \citep{patterson_population_2006, zhao_arabidopsis_2007, alexander_fast_2009, bouaziz_accounting_2011}.
+PCs are also proposed for modeling environment effects that are correlated to ancestry, for example, through geography \citep{novembre_genes_2008, zhang_principal_2015, lin_admixed_2021}.
 The strength of PCA is its simplicity, which as covariates can be readily included in more complex models, such as haplotype association \citep{xu_detecting_2014} and polygenic models \citep{qian_fast_2020}.
 However, PCA assumes that relatedness is low-dimensional, which may limit its applicability.
 PCA is known to be inadequate for family data \citep{patterson_population_2006, thornton_roadtrips:_2010, price_new_2010}, which is called ``cryptic relatedness'' when it is unknown to the researchers, but no other troublesome cases have been confidently identified.
@@ -130,15 +131,17 @@ The other dominant association model under relatedness is the LMM, which include
 Unlike PCA, LMM does not assume that relatedness is low-dimensional, and explicitly models families via the kinship matrix.
 Early LMMs required kinship matrices estimated from known pedigrees or which otherwise captured recent relatedness only \citep{yu_unified_2006, zhao_arabidopsis_2007}.
 Modern LMMs estimate kinship from genotypes using a non-parametric estimator, often referred to as a genetic relationship matrix, that captures the combined covariance due to recent family relatedness and ancestral population structure \citep{kang_efficient_2008, astle_population_2009, ochoa_estimating_2021}.
+Like PCA, LMM has also been proposed for modeling environment correlated to genetics \citep{vilhjalmsson_nature_2013, wang_trade-offs_2022}.
 The classic LMM assumes a quantitative (continuous) complex trait, the focus of our work.
 Although case-control (binary) traits and their underlying ascertainment are theoretically a challenge \citep{yang_advantages_2014}, LMMs have been applied successfully to balanced case-control studies \citep{astle_population_2009, kang_variance_2010} and simulations \citep{price_new_2010, wu_comparison_2011, sul_mixed_2013}, and have been adapted for unbalanced case-control studies \citep{zhou_efficiently_2018}.
 However, LMMs tend to be considerably slower than PCA and other models, so much effort has focused on improving their runtime and scalability \citep{aulchenko_genomewide_2007, kang_efficient_2008, kang_variance_2010, zhang_mixed_2010, lippert_fast_2011, yang_gcta:_2011, listgarten_improved_2012, zhou_genome-wide_2012, svishcheva_rapid_2012, loh_efficient_2015, zhou_efficiently_2018}.
 
 % LMM+PCA
 An LMM variant that incorporates PCs as fixed covariates is tested thoroughly in our work.
-Since PCs are the top eigenvectors of the same kinship matrix estimate used in modern LMMs \citep{astle_population_2009, hoffman_correcting_2013}, then population structure is modeled twice in an LMM with PCs.
-However, some previous work has found the apparent redundancy of an LMM with PCs beneficial \citep{price_new_2010, tucker_improving_2014}, while others did not \citep{liu_controlling_2011}, and the approach continues to be used \citep{zeng_signatures_2018}.
-Recall that early LMMs used kinship to model family relatedness only, so population structure had to be modeled separately, in practice as admixture fractions instead of PCs \citep{yu_unified_2006, zhao_arabidopsis_2007}.
+Since PCs are the top eigenvectors of the same kinship matrix estimate used in modern LMMs \citep{astle_population_2009, hoffman_correcting_2013, zhang_principal_2015}, then population structure is modeled twice in an LMM with PCs.
+However, some previous work has found the apparent redundancy of an LMM with PCs beneficial \citep{price_new_2010, tucker_improving_2014, zhang_principal_2015}, while others did not \citep{liu_controlling_2011}, and the approach continues to be used \citep{zeng_signatures_2018, mbatchou_computationally_2021}.
+(Recall that early LMMs used kinship to model family relatedness only, so population structure had to be modeled separately, in practice as admixture fractions instead of PCs \citep{yu_unified_2006, zhao_arabidopsis_2007}.)
+The LMM with PCs (vs no PCs) is believed to help better model loci that have experienced selection \citep{price_new_2010, vilhjalmsson_nature_2013} and environment effects correlated with genetics \citep{zhang_principal_2015}.
 
 \begin{table}[b!]
   \centering
@@ -164,8 +167,10 @@ Recall that early LMMs used kinship to model family relatedness only, so populat
     \textcite{yang_advantages_2014}  &     &      &         &\checkmark& CC &\checkmark&    5 & Tie \\
     \textcite{song_testing_2015}     &S, A &  2-3 &       R &          &  Q &          &    3 & LMM \\
     \textcite{loh_efficient_2015}    &     &      &         &\checkmark&  Q &\checkmark&   10 & LMM \\
+    \textcite{zhang_principal_2015}  &     &      &         &\checkmark&  Q &\checkmark&20-100& LMM \\
     \textcite{liu_iterative_2016}    &     &      &         &\checkmark&  Q &\checkmark&  3-6 & LMM \\ 
     \textcite{sul_population_2018}   &     &      &         &\checkmark&  Q &          &  100 & LMM \\
+\textcite{mbatchou_computationally_2021}&  &      &         &\checkmark&Both&          &    1 & LMM \\
     This work                        &A, T, F&10-243&$\le$0.25&\checkmark&  Q &\checkmark& 0-90 & LMM \\
     \bottomrule
   \end{tabular}
@@ -179,23 +184,24 @@ Recall that early LMMs used kinship to model family relatedness only, so populat
 \end{table}
 
 % LMM and PCA are similar
-LMM and PCA are closely related models \citep{astle_population_2009, hoffman_correcting_2013}, so similar performance is expected particularly under low-dimensional relatedness.
+LMM and PCA are closely related models \citep{astle_population_2009, hoffman_correcting_2013, zhang_principal_2015}, so similar performance is expected particularly under low-dimensional relatedness.
 Direct comparisons have yielded mixed results, with several studies finding superior performance for LMM (notably from papers promoting advances in LMMs) while many others report comparable performance (\cref{tab:lit}).
 No papers find that PCA outperforms LMM decisively, although PCA occasionally performs better in isolated and artificial cases or individual measures (often with unknown significance).
 Previous studies were generally divided those that employed simulated versus real genotypes (only one study used both).
-The simulated genotype studies, which tended to have low dimensionalities and differentiation (\Fst), were more likely to report ties or mixed results (6/7), whereas real genotypes tended to clearly favor LMMs (5/7).
-Similarly, 6/8 papers with quantitative traits favor LMMs, whereas 5/7 papers with case-control traits gave ties or mixed results (the only factor we do not explore).
-Additionally, although all previous evaluations measured type I error (or proxies such as inflation factors or QQ plots), a large fraction (5/13) did not measure power (including proxies such as ROC curves), and only two used more than one number of PCs for PCA.
+The simulated genotype studies, which tended to have low dimensionalities and differentiation (\Fst), were more likely to report ties or mixed results (6/7), whereas real genotypes tended to clearly favor LMMs (7/9).
+Similarly, 8/10 papers with quantitative traits favor LMMs, whereas 6/8 papers with case-control traits gave ties or mixed results (the only factor we do not explore).
+Additionally, although all previous evaluations measured type I error (or proxies such as inflation factors or QQ plots), a large fraction (6/15) did not measure power (including proxies such as ROC curves), and only three used more than one number of PCs for PCA.
 Lastly, no consensus has emerged as to why LMM might outperform PCA or vice versa \citep{price_new_2010, sul_mixed_2013, price_response_2013, hoffman_correcting_2013}, or which features of the real datasets are critical for the LMM advantage other than cryptic relatedness, resulting in unclear guidance for using PCA.
-Hence, our work includes real and simulated genotypes with higher dimensionalities and differentiation matching that of multiethnic human cohorts, we vary the number of PCs, and measure robust proxies for type I error control and power.
+Hence, our work includes real and simulated genotypes with higher dimensionalities and differentiation matching that of multiethnic human cohorts, we vary the number of PCs, and measure robust proxies for type I error control and calibrated power.
 
 % this work
 In this work, we evaluate the PCA and LMM association models under various numbers of PCs (included in LMM too).
 We use genotype simulations (admixture, family, and tree models) and three real datasets: the 1000 Genomes Project \citep{the_1000_genomes_project_consortium_map_2010, 1000_genomes_project_consortium_integrated_2012}, the Human Genome Diversity Panel (HGDP) \citep{cann_human_2002, rosenberg_genetic_2002, bergstrom_insights_2020}, and Human Origins \citep{patterson_ancient_2012, lazaridis_ancient_2014, lazaridis_genomic_2016, skoglund_genomic_2016}.
 We simulate quantitative traits from two models: fixed effect sizes (FES; coefficients inverse to allele frequency) that matches real data \citep{park_distribution_2011, zeng_signatures_2018, oconnor_extreme_2019} and corresponds to high pleiotropy and strong balancing selection \citep{simons_population_2018} and strong negative selection \citep{zeng_signatures_2018, oconnor_extreme_2019}, which are appropriate assumptions for diseases; and random coefficients (RC; independent of allele frequency) that corresponds to neutral traits \citep{zeng_signatures_2018, simons_population_2018}.
-LMM without PCs consistently performs best, and greatly outperforms PCA in the family simulation and in all real datasets.
+LMM without PCs consistently performs best in simulations without environment, and greatly outperforms PCA in the family simulation and in all real datasets.
 The tree simulations do not recapitulate the real data results, suggesting that family relatedness in real data is the reason for poor PCA performance.
 Lastly, removing up to 4th degree relatives in the real datasets recapitulates poor PCA performance, showing that the more numerous distant relatives explain the result, and suggesting that PCA is generally not an appropriate model for real data.
+We find that both LMM and PCA are able to model environment effects correlated with genetics, and LMM with PCs gains a small advantage in this setting only, but direct modeling of environment performs much better.
 All together, we find that LMMs without PCs are generally a preferable association model, and present novel simulation and evaluation approaches to measure the performance of these and other genetic association approaches.
 
 \section{Materials and Methods}
@@ -288,7 +294,7 @@ $$
 \end{linenomath*}
 which follows from the affine transformation property of multivariate normal distributions.
 Therefore, the PCA term $\mathbf{U}_r \boldsymbol{\gamma}_r$ can be derived from the above equation under the additional assumption that the kinship matrix has dimensionality $r$ and the coefficients $\boldsymbol{\gamma}_r$ are fit without constraints.
-In contrast, the LMM uses all eigenvectors, while effectively shrinking their coefficients $\boldsymbol{\gamma}_\text{LMM}$ as all random effects models do, although these parameters are marginalized \citep{astle_population_2009, hoffman_correcting_2013}.
+In contrast, the LMM uses all eigenvectors, while effectively shrinking their coefficients $\boldsymbol{\gamma}_\text{LMM}$ as all random effects models do, although these parameters are marginalized \citep{astle_population_2009, hoffman_correcting_2013, zhang_principal_2015}.
 PCA has more parameters than LMM, so it may overfit more: ignoring the shared terms in \cref{eq:pca_gwas,eq:lmm_gwas}, PCA fits $r$ parameters (length of $\boldsymbol{\gamma}$), whereas LMMs fit only one ($\sigma^2_s$).
 
 In practice, the kinship matrix used for PCA and LMM is estimated with variations of a method-of-moments formula applied to standardized genotypes $\mathbf{X}_S$, which is derived from \cref{eq:kinship_model}:
@@ -524,7 +530,7 @@ $$
 $$
 \end{linenomath*}
 
-Simulations optionally included multiple environment group effects, as follows.
+Simulations optionally included multiple environment group effects, similarly to previous models \citep{zhang_principal_2015, wang_trade-offs_2022}, as follows.
 Each independent environment $i$ has predefined groups, and each group $g$ has random coefficients drawn independent from $\eta_{gi} \sim \text{Normal}( 0, \sigma^2_{\eta i} )$ where $\sigma^2_{\eta i}$ is a specified variance proportion for environment $i$.
 $\mathbf{Z}$ has individuals along columns and environment-groups along rows, and it contains indicator variables: 1 if the individual belongs to the environment-group, 0 otherwise.
 
@@ -782,7 +788,7 @@ Lastly, LMM with $r=0$ always has significantly greater or statistically tied $\
   \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fes/rmsd-auc-sim.pdf}
   \caption{
     {\bf Evaluations in admixture simulations.}
-    Traits simulated from FES model.
+    Traits simulated from FES model with high heritability.
     PCA and LMM models have varying number of PCs ($r \in \{0, ..., 90\}$ on x-axis), with the distributions (y-axis) of $\rmsd$ (top subpanel) and $\auc$ (bottom subpanel) for 50 replicates.
     Best performance is zero $\rmsd$ and large $\auc$.
     Zero and maximum median $\auc$ values are marked with horizontal gray dashed lines, and $|\rmsd| < 0.01$ is marked with a light gray area.
@@ -833,7 +839,7 @@ Next we repeat our evaluations with real human genotype data, which differs from
   \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fes/rmsd-auc-real.pdf}
   \caption{
     {\bf Evaluations in real human genotype datasets.}
-    Traits simulated from FES model.
+    Traits simulated from FES model with high heritability.
     Same setup as \cref{fig:rmsd-auc-sim}, see that for details.
     These datasets strongly favor LMM with no PCs over PCA, with distributions that most resemble the family simulation.
     \textbf{A.}
@@ -869,7 +875,7 @@ Nevertheless, LMM with $r=0$ was significantly better than PCA for all measures 
   \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fes/rmsd-auc-real-sim.pdf}
   \caption{
     {\bf Evaluations in tree simulations fit to human data.}
-    Traits simulated from FES model.
+    Traits simulated from FES model with high heritability.
     Same setup as \cref{fig:rmsd-auc-sim}, see that for details.
     These tree simulations, which exclude family structure by design, do not explain the large gaps in LMM-PCA performance observed in the real data.
     \textbf{A.}
@@ -928,8 +934,7 @@ However, these highly related pairs are vastly outnumbered by more distant pairs
   \includegraphics[width=\textwidth]{fes/rmsd-auc_king-cutoff-4.pdf}
   \caption{
     {\bf Evaluation in real datasets excluding 4th degree relatives.}
-    LMM had $r=0$ PCs and PCA had $r=20$.
-    FES traits only.
+    Traits simulated from FES model with high heritability.
     Each dataset is a column, rows are measures.
     First row has $|\rmsd| < 0.01$ band marked as gray area.
   }
@@ -949,24 +954,42 @@ Therefore, the removal of the small number of highly related individual pairs ha
 Our main evaluations were repeated with traits simulated under a lower heritability value of $h^2 = 0.3$.
 We reduced the number of causal loci in response to this change in heritability, to result in equal average effect size per locus compared to the previous high heritability evaluations (see Methods).
 Despite that, these low heritability evaluations measured lower $\auc$ values than their high heritability counterparts (\cref{fig:rmsd-auc-sim-fes-h3,fig:rmsd-auc-real-fes-h3,fig:king_cutoff-h3,fig:rmsd-auc-sim-rc-h3,fig:rmsd-auc-real-rc-h3}).
-The gap between LMM and PCA was reduced in these evaluations, but LMM with $r=0$ again significantly outperforms or ties PCA in all cases (\cref{tab:human_sum_pcs_h3}).
+The gap between LMM and PCA was reduced in these evaluations, but the main conclusion of the high heritability evaluation holds for low heritability as well, namely that LMM with $r=0$ significantly outperforms or ties LMM with $r > 0$ and PCA in all cases (\cref{tab:human_sum_pcs_h3}).
 
-Lastly, we simulated traits with both a low heritability ($h^2 = 0.3$ again) and large environment effects (total $\sigma_\eta^2 = 0.5$) strongly correlated to the low-dimensional population structure (see Methods).
+\begin{figure}[hp]
+  \centering
+  \includegraphics[width=\textwidth]{fes/m_causal_fac-27/h0.3/env0.3-0.2/rmsd-auc_king-cutoff-4.pdf}
+  \caption{
+    {\bf Evaluation in real datasets excluding 4th degree relatives, FES traits, environment.}
+    Traits simulated with environment effects, otherwise the same as \cref{fig:king_cutoff}.
+  }
+  \label{fig:king_cutoff-env}
+\end{figure}
+
+Lastly, we simulated traits with both low heritability and large environment effects determined by geography and race/ethnicity labels, so they are strongly correlated to the low-dimensional population structure (\cref{tab:trait-var-sim}).
 For that reason, PCs may be expected to perform better in this setting (in either PCA or LMM).
-However, we find that both PCA and LMM (even without PCs) increase their $\auc$ values compared to the low-heritability evaluations, and there is only a marginal advantage of LMM with a few PCs versus LMM without PCs (\cref{fig:rmsd-auc-sim-fes-env,fig:rmsd-auc-real-fes-env,fig:king_cutoff-env,fig:rmsd-auc-sim-rc-env,fig:rmsd-auc-real-rc-env,tab:human_sum_pcs_env}).
-Oh the other hand, p-value calibration is poorer for all models under environment effects.
-Interestingly, on RC traits only, here PCA significantly outperforms LMM in the three real human datasets (\cref{tab:human_sum_pcs_env}), the only cases in all of our evaluations where this is observed.
-For comparison, we also evaluate an oracle LMM without PCs but with the finest group labels, the same used to simulate environment, as fixed categorical covariates (``LMM lab.''), and see a much larger gain of performance compared to LMM with PCs.
-In particular, LMM with labels always has significantly better or tied $\auc$ than either LMM or PCA without such labels (\cref{fig:rmsd-auc-sim-fes-env,fig:rmsd-auc-real-fes-env,fig:king_cutoff-env,fig:rmsd-auc-sim-rc-env,fig:rmsd-auc-real-rc-env,tab:human_sum_pcs_env}).
-However, LMM with labels is typically more poorly calibrated than LMM or PCA without labels, which may be since these numerous labels are inappropriately modeled as fixed rather than random effects.
-Overall, we find that association studies with correlated environment and genetic effects remain a challenge for PCA and LMM, and that in this case addition of PCs to an LMM improves performance only marginally.
+However, we find that both PCA and LMM (even without PCs) increase their $\auc$ values compared to the low-heritability evaluations (\cref{fig:king_cutoff-env} shows representative numbers of PCs that performed optimally or nearly so in individual simulations shown in \cref{fig:rmsd-auc-sim-fes-env,fig:rmsd-auc-real-fes-env,fig:rmsd-auc-sim-rc-env,fig:rmsd-auc-real-rc-env}).
+On the other hand, p-value calibration ($\rmsd$) is poorer for all models under environment effects.
+These simulations are the only where we occasionally observed for both metrics a significant, though small, advantage of LMM with PCs versus LMM without PCs (\cref{tab:human_sum_pcs_env}).
+Additionally, on RC traits only, PCA significantly outperforms LMM in the three real human datasets (\cref{tab:human_sum_pcs_env}), the only cases in all of our evaluations where this is observed.
+For comparison, we also evaluate an ``oracle'' LMM without PCs but with the finest group labels, the same used to simulate environment, as fixed categorical covariates (``LMM lab.''), and see much larger $\auc$ values than either LMM with PCs or PCA (\cref{fig:king_cutoff-env,fig:rmsd-auc-sim-fes-env,fig:rmsd-auc-real-fes-env,fig:rmsd-auc-sim-rc-env,fig:rmsd-auc-real-rc-env,tab:human_sum_pcs_env}).
+However, LMM with labels is often more poorly calibrated than LMM or PCA without labels, which may be since these numerous labels are inappropriately modeled as fixed rather than random effects.
+Overall, we find that association studies with correlated environment and genetic effects remain a challenge for PCA and LMM, that addition of PCs to an LMM improves performance only marginally, and that if the environment effect is driven by geography or ethnicity then use of those labels greatly improves performance compared to using PCs.
 
 \section{Discussion}
 
 % LMM r=0 best, r>0 not good
-Our evaluations conclusively determined that LMM without PCs performs better than PCA (for any number of PCs) across all scenarios, including all real and simulated genotypes and two trait simulation models.
-Although the addition of a few PCs to LMM does not greatly hurt its performance (except for small sample sizes), they generally did not improve it either (\cref{tab:human_sum_pcs}), which agrees with previous observations \citep{liu_controlling_2011} but contradicts others \citep{zhao_arabidopsis_2007, price_new_2010}.
+Our evaluations conclusively determined that LMM without PCs performs better than PCA (for any number of PCs) across all scenarios without environment effects, including all real and simulated genotypes and two trait simulation models.
+Although the addition of a few PCs to LMM does not greatly hurt its performance (except for small sample sizes), they generally did not improve it either (\cref{tab:human_sum_pcs,tab:human_sum_pcs_h3}), which agrees with previous observations \citep{liu_controlling_2011} but contradicts others \citep{zhao_arabidopsis_2007, price_new_2010}.
 Our findings make sense since PCs are the eigenvectors of the same kinship matrix that parametrizes random effects, so including both is redundant.
+
+% env results
+The presence of environment effects that are correlated to relatedness presents the only scenario where occasionally PCA and LMM with PCs outperform LMM without PCs (\cref{tab:human_sum_pcs_env}).
+It is commonly believed that PCs model such environment effects well \citep{novembre_genes_2008, zhang_principal_2015, lin_admixed_2021}.
+However, we observe that LMM without PCs models environment effects nearly as well as PCs (\cref{fig:king_cutoff-env}), consistent with previous findings \citep{vilhjalmsson_nature_2013, wang_trade-offs_2022} and with environment inflating heritability estimates using LMM \citep{heckerman_linear_2016}.
+Moreover, modeling the true environment groups as fixed effects always substantially improved $\auc$ compared to modeling them with PCs (\cref{fig:king_cutoff-env,tab:human_sum_pcs_env}).
+Modeling numerous environment groups as fixed effects does result in deflated p-values (\cref{fig:king_cutoff-env,tab:human_sum_pcs_env}), which we expect would be avoided by modeling them as random effects, a strategy we chose not to pursue here as it is both a circular evaluation (the true effects were drawn from that model) and out of scope.
+Overall, including PCs to model environment effects yields limited power gains if at all, even in an LMM, and is no replacement for more adequate modeling of environment whenever possible.
 
 % unusually differentiated markers
 Previous studies found that PCA was better calibrated than LMM for unusually differentiated markers \citep{price_new_2010, wu_comparison_2011, yang_advantages_2014}, which as simulated were an artificial scenario not based on a population genetics model, and are otherwise believed to be unusual \citep{sul_mixed_2013, price_response_2013}.
@@ -1322,7 +1345,7 @@ The high-coverage version of the 1000 Genomes Project was downloaded from \url{f
   \includegraphics{sum-rmsd-vs-lambda.pdf}
   \caption{
     {\bf Comparison between $\rmsd$ and inflation factor.}
-    Each point is a pair of statistics for one replicate, one association model (PCA or LMM with some number of PCs $r$), one trait model (FES vs RC), and one dataset (color coded by dataset).
+    Each point is a pair of statistics for one replicate, one association model (PCA or LMM with some number of PCs $r$), one trait model (FES vs RC, all heritability/environments tested), and one dataset (color coded by dataset).
     Note log y-axis ($\lambda$).
     The sigmoidal curve in \cref{eq:rmsd_lambda_sigmoidal} is fit to the data.
   }
@@ -1398,7 +1421,7 @@ The high-coverage version of the 1000 Genomes Project was downloaded from \url{f
   \centering
   \includegraphics[width=\textwidth]{fes/m_causal_fac-27/h0.3/rmsd-auc_king-cutoff-4.pdf}
   \caption{
-    {\bf Evaluation in real datasets excluding 4th degree relatives, low heritability.}
+    {\bf Evaluation in real datasets excluding 4th degree relatives, FES traits, low heritability.}
     Traits simulated using $h^2=0.3$, otherwise the same as \cref{fig:king_cutoff}.
   }
   \label{fig:king_cutoff-h3}
@@ -1442,16 +1465,6 @@ The high-coverage version of the 1000 Genomes Project was downloaded from \url{f
     Traits simulated with environment effects, otherwise the same as \cref{fig:rmsd-auc-real-fes-h3}.
   }
   \label{fig:rmsd-auc-real-fes-env}
-\end{figure}
-
-\begin{figure}[hp]
-  \centering
-  \includegraphics[width=\textwidth]{fes/m_causal_fac-27/h0.3/env0.3-0.2/rmsd-auc_king-cutoff-4.pdf}
-  \caption{
-    {\bf Evaluation in real datasets excluding 4th degree relatives, environment.}
-    Traits simulated with environment effects, otherwise the same as \cref{fig:king_cutoff-h3}.
-  }
-  \label{fig:king_cutoff-env}
 \end{figure}
 
 \begin{figure}[hp!]
