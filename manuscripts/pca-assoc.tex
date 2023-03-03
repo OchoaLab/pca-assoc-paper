@@ -968,8 +968,8 @@ The gap between LMM and PCA was reduced in these evaluations, but the main concl
 
 Lastly, we simulated traits with both low heritability and large environment effects determined by geography and race/ethnicity labels, so they are strongly correlated to the low-dimensional population structure (\cref{tab:trait-var-sim}).
 For that reason, PCs may be expected to perform better in this setting (in either PCA or LMM).
-However, we find that both PCA and LMM (even without PCs) increase their $\auc$ values compared to the low-heritability evaluations (\cref{fig:king_cutoff-env} shows representative numbers of PCs that performed optimally or nearly so in individual simulations shown in \cref{fig:rmsd-auc-sim-fes-env,fig:rmsd-auc-real-fes-env,fig:rmsd-auc-sim-rc-env,fig:rmsd-auc-real-rc-env}).
-On the other hand, p-value calibration ($\rmsd$) is poorer for all models under environment effects.
+However, we find that both PCA and LMM (even without PCs) increase their $\auc$ values compared to the low-heritability evaluations (\cref{fig:low-herit-vs-env}; \cref{fig:king_cutoff-env} also shows representative numbers of PCs, which performed optimally or nearly so in individual simulations shown in \cref{fig:rmsd-auc-sim-fes-env,fig:rmsd-auc-real-fes-env,fig:rmsd-auc-sim-rc-env,fig:rmsd-auc-real-rc-env}).
+P-value calibration ($\rmsd$) is comparable with or without environment effects, for LMM for all $r$ and for PCA once $r$ is large enough (\cref{fig:low-herit-vs-env}).
 These simulations are the only where we occasionally observed for both metrics a significant, though small, advantage of LMM with PCs versus LMM without PCs (\cref{tab:human_sum_pcs_env}).
 Additionally, on RC traits only, PCA significantly outperforms LMM in the three real human datasets (\cref{tab:human_sum_pcs_env}), the only cases in all of our evaluations where this is observed.
 For comparison, we also evaluate an ``oracle'' LMM without PCs but with the finest group labels, the same used to simulate environment, as fixed categorical covariates (``LMM lab.''), and see much larger $\auc$ values than either LMM with PCs or PCA (\cref{fig:king_cutoff-env,fig:rmsd-auc-sim-fes-env,fig:rmsd-auc-real-fes-env,fig:rmsd-auc-sim-rc-env,fig:rmsd-auc-real-rc-env,tab:human_sum_pcs_env}).
@@ -1210,7 +1210,7 @@ $$
 % \rmsd
 % = a \frac{ e^{-bx} - 1 }{ e^{-bx} + 1 }
 % = a \frac{ 1 - e^{bx} }{ 1 + e^{bx} }
-We fit this model to $\lambda > 1$ only since it was less noisy and of greater interest, and obtained the curve shown in \cref{fig:rmsd_lambda} with $a = 0.563$ and $b = 0.622$.
+We fit this model to $\lambda > 1$ only since it was less noisy and of greater interest, and obtained the curve shown in \cref{fig:rmsd_lambda} with $a = 0.564$ and $b = 0.619$.
 % Using this model, we also produced a log-linear approximation based on its Taylor series with respect to $x = \log( \lambda )$ about $x=0$, resulting in
 % \begin{equation}
 %   \label{eq:rmsd_lambda_log_linear}
@@ -1445,6 +1445,20 @@ The high-coverage version of the 1000 Genomes Project was downloaded from \url{f
     Traits simulated using $h^2=0.3$, otherwise the same as \cref{fig:rmsd-auc-real-rc}.
   }
   \label{fig:rmsd-auc-real-rc-h3}
+\end{figure}
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{low-herit-vs-env.pdf}
+  \caption{
+    {\bf Comparison of performance in low heritability vs environment simulations.}
+    Each curve traces as the number of PCs $r$ is increased from $r=0$ (marked with an ``x'') until $r=90$ (unmarked end), on one axis is the mean value over replicates of either $\rmsd$ or $\auc$, for low heritability simulations on the x-axis and environment simulations on the y-axis.
+    Each curve corresponds to one dataset (color) and association model (solid or dashed line type).
+    Columns: \textbf{A.} FES and \textbf{B.} RC traits show similar results.
+    First row shows that for PCA curves $\rmsd$ is higher (worse) in environment simulations for low $r$, but becomes equal in both simulations once $r$ is sufficiently large; for LMM curves performance is equal in both simulations for all $r$, all datasets.
+    Second row shows that for PCA curves $\auc$ is higher (better) in low heritability simulations for low $r$, but becomes higher in environment simulations once $r$ is sufficiently large; for LMM curves performance is better in environment simulations for all $r$, all datasets.
+  }
+  \label{fig:low-herit-vs-env}
 \end{figure}
 
 \begin{figure}[hp!]
