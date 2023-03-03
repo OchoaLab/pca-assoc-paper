@@ -151,6 +151,9 @@ time Rscript real-11-inflation-across-datasets.R
 # threshold map (sigmoidal): lambda = 1.05, RMSD = 0.00852
 # Inverse threshold map (sigmoidal): RMSD = 0.01, lambda = 1.06
 
+# create figure that compares h3 and env simulations directly
+time Rscript all-04-plot-low-herit-vs-env.R
+
 # look at kinship distributions in real and simulated datasets
 time Rscript all-03-king.R
 
