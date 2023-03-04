@@ -324,7 +324,7 @@ $
 $
 \citep{price_principal_2006, kang_efficient_2008, kang_variance_2010, yang_gcta:_2011, zhou_genome-wide_2012, yang_advantages_2014, loh_efficient_2015, sul_population_2018, zhou_efficiently_2018}.
 However, this kinship estimator has a complex bias that differs for every individual pair, which arises due to the use of this estimated \pith \citep{ochoa_estimating_2021, ochoa_new_2019}.
-Nevertheless, in PCA and LMM these biased estimates perform as well as unbiased ones \citep{hou_genetic_2022}.
+Nevertheless, in PCA and LMM these biased estimates perform as well as unbiased ones \citep{hou_genetic_2023}.
 
 We selected fast and robust software implementing the basic PCA and LMM models.
 PCA association was performed with \texttt{plink2} \citep{chang_second-generation_2015}.
@@ -1030,10 +1030,19 @@ In contrast, LMM is simpler since there is no need to choose the number of PCs.
 However, an LMM with a large number of covariates may have conservative p-values (as observed for LMM with large numbers of PCs), a weakness of the score test used by the LMM we evaluated that may be overcome with other statistical tests.
 Simulations or post hoc evaluations remain crucial for ensuring that statistics are calibrated.
 
+% PCA and LMM variants
+There are several variants of the PCA and LMM analyses that we did not evaluate directly, in which PCs are no longer exactly the top eigenvectors of the kinship matrix, although this is not a crucial aspect of our arguments.
+One approach tests PCs for association against every locus in the genome in order to identify and exclude PCs that capture linkage disequilibrium (LD) structure (which is localized) instead of ancestry (which should be present across the genome) \citep{prive_efficient_2020}; a previous proposal removes LD using an autocorrelation model prior to estimating PCs \citep{patterson_population_2006}.
+These improvements do not change the fact that the resulting PCs are nevertheless inadequate models of family or cryptic relatedness, so an LMM will continue to outperform these approaches in that setting.
+Similarly, the leave-one-chromosome-out (LOCO) approach for estimating kinship matrices for LMMs prevents the test locus and loci in LD with it from being modeled by the random effect \citep{lippert_fast_2011, yang_advantages_2014}.
+While LOCO kinship estimates vary for each chromosome, they continue to model family or cryptic relatedness, thus their key advantage over PCA remains.
+Overall, these alternative PCs or kinship matrices differ from their basic counterparts by either the extent to which they inappropriately model LD structure (which may be a confounder in a small portion of the genome) or by sampling noise, neither of which are expected to change our key conclusion.
+
 % limitations overview
 One of the limitations of this work include relatively small sample sizes compared to modern association studies.
 However, our conclusions are not expected to change with larger sample sizes, as cryptic relatedness will continue to be abundant in such data and thus give LMMs an advantage over PCA.
-Newer approaches not tested in this work have made LMMs more scalable and applicable to biobank-scale data \citep{loh_efficient_2015, zhou_efficiently_2018}, so one clear next step is carefully evaluating these approaches in simulations with larger sample sizes.
+Recent approaches not tested in this work have made LMMs more scalable and applicable to biobank-scale data \citep{loh_efficient_2015, zhou_efficiently_2018, mbatchou_computationally_2021}, so one clear next step is carefully evaluating these approaches in simulations with larger sample sizes.
+Many of these newer LMMs also no longer follow the infinitesimal model of the basic LMM \citep{loh_efficient_2015, mbatchou_computationally_2021}, and employ additional approximations, which are features not evaluated in this work and worthy of future study.
 
 % Q vs CC traits
 The largest limitation of our work is that we only considered quantitative traits.
