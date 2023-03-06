@@ -138,8 +138,8 @@ However, LMMs tend to be considerably slower than PCA and other models, so much 
 
 % LMM+PCA
 An LMM variant that incorporates PCs as fixed covariates is tested thoroughly in our work.
-Since PCs are the top eigenvectors of the same kinship matrix estimate used in modern LMMs \citep{astle_population_2009, hoffman_correcting_2013, zhang_principal_2015}, then population structure is modeled twice in an LMM with PCs.
-However, some previous work has found the apparent redundancy of an LMM with PCs beneficial \citep{price_new_2010, tucker_improving_2014, zhang_principal_2015}, while others did not \citep{liu_controlling_2011}, and the approach continues to be used \citep{zeng_signatures_2018, mbatchou_computationally_2021}.
+Since PCs are the top eigenvectors of the same kinship matrix estimate used in modern LMMs \citep{astle_population_2009, janss_inferences_2012, hoffman_correcting_2013, zhang_principal_2015}, then population structure is modeled twice in an LMM with PCs.
+However, some previous work has found the apparent redundancy of an LMM with PCs beneficial \citep{price_new_2010, tucker_improving_2014, zhang_principal_2015}, while others did not \citep{liu_controlling_2011, janss_inferences_2012}, and the approach continues to be used \citep{zeng_signatures_2018, mbatchou_computationally_2021} though not always \citep{matoba_gwas_2020}.
 (Recall that early LMMs used kinship to model family relatedness only, so population structure had to be modeled separately, in practice as admixture fractions instead of PCs \citep{yu_unified_2006, zhao_arabidopsis_2007}.)
 The LMM with PCs (vs no PCs) is believed to help better model loci that have experienced selection \citep{price_new_2010, vilhjalmsson_nature_2013} and environment effects correlated with genetics \citep{zhang_principal_2015}.
 
@@ -170,6 +170,7 @@ The LMM with PCs (vs no PCs) is believed to help better model loci that have exp
     \textcite{zhang_principal_2015}  &     &      &         &\checkmark&  Q &\checkmark&20-100& LMM \\
     \textcite{liu_iterative_2016}    &     &      &         &\checkmark&  Q &\checkmark&  3-6 & LMM \\ 
     \textcite{sul_population_2018}   &     &      &         &\checkmark&  Q &          &  100 & LMM \\
+    \textcite{loh_mixed-model_2018}  &     &      &         &\checkmark&Both&\checkmark&   20 & LMM \\
 \textcite{mbatchou_computationally_2021}&  &      &         &\checkmark&Both&          &    1 & LMM \\
     This work                        &A, T, F&10-243&$\le$0.25&\checkmark&  Q &\checkmark& 0-90 & LMM \\
     \bottomrule
@@ -184,13 +185,13 @@ The LMM with PCs (vs no PCs) is believed to help better model loci that have exp
 \end{table}
 
 % LMM and PCA are similar
-LMM and PCA are closely related models \citep{astle_population_2009, hoffman_correcting_2013, zhang_principal_2015}, so similar performance is expected particularly under low-dimensional relatedness.
+LMM and PCA are closely related models \citep{astle_population_2009, janss_inferences_2012, hoffman_correcting_2013, zhang_principal_2015}, so similar performance is expected particularly under low-dimensional relatedness.
 Direct comparisons have yielded mixed results, with several studies finding superior performance for LMM (notably from papers promoting advances in LMMs) while many others report comparable performance (\cref{tab:lit}).
 No papers find that PCA outperforms LMM decisively, although PCA occasionally performs better in isolated and artificial cases or individual measures (often with unknown significance).
 Previous studies were generally divided those that employed simulated versus real genotypes (only one study used both).
-The simulated genotype studies, which tended to have low dimensionalities and differentiation (\Fst), were more likely to report ties or mixed results (6/7), whereas real genotypes tended to clearly favor LMMs (7/9).
-Similarly, 8/10 papers with quantitative traits favor LMMs, whereas 6/8 papers with case-control traits gave ties or mixed results (the only factor we do not explore).
-Additionally, although all previous evaluations measured type I error (or proxies such as inflation factors or QQ plots), a large fraction (6/15) did not measure power (including proxies such as ROC curves), and only three used more than one number of PCs for PCA.
+The simulated genotype studies, which tended to have low dimensionalities and differentiation (\Fst), were more likely to report ties or mixed results (6/7), whereas real genotypes tended to clearly favor LMMs (8/10).
+Similarly, 9/11 papers with quantitative traits favor LMMs, whereas 6/9 papers with case-control traits gave ties or mixed results (the only factor we do not explore).
+Additionally, although all previous evaluations measured type I error (or proxies such as inflation factors or QQ plots), a large fraction (6/16) did not measure power (including proxies such as ROC curves), and only three used more than one number of PCs for PCA.
 Lastly, no consensus has emerged as to why LMM might outperform PCA or vice versa \citep{price_new_2010, sul_mixed_2013, price_response_2013, hoffman_correcting_2013}, or which features of the real datasets are critical for the LMM advantage other than cryptic relatedness, resulting in unclear guidance for using PCA.
 Hence, our work includes real and simulated genotypes with higher dimensionalities and differentiation matching that of multiethnic human cohorts, we vary the number of PCs, and measure robust proxies for type I error control and calibrated power.
 
@@ -294,7 +295,7 @@ $$
 \end{linenomath*}
 which follows from the affine transformation property of multivariate normal distributions.
 Therefore, the PCA term $\mathbf{U}_r \boldsymbol{\gamma}_r$ can be derived from the above equation under the additional assumption that the kinship matrix has dimensionality $r$ and the coefficients $\boldsymbol{\gamma}_r$ are fit without constraints.
-In contrast, the LMM uses all eigenvectors, while effectively shrinking their coefficients $\boldsymbol{\gamma}_\text{LMM}$ as all random effects models do, although these parameters are marginalized \citep{astle_population_2009, hoffman_correcting_2013, zhang_principal_2015}.
+In contrast, the LMM uses all eigenvectors, while effectively shrinking their coefficients $\boldsymbol{\gamma}_\text{LMM}$ as all random effects models do, although these parameters are marginalized \citep{astle_population_2009, janss_inferences_2012, hoffman_correcting_2013, zhang_principal_2015}.
 PCA has more parameters than LMM, so it may overfit more: ignoring the shared terms in \cref{eq:pca_gwas,eq:lmm_gwas}, PCA fits $r$ parameters (length of $\boldsymbol{\gamma}$), whereas LMMs fit only one ($\sigma^2_s$).
 
 In practice, the kinship matrix used for PCA and LMM is estimated with variations of a method-of-moments formula applied to standardized genotypes $\mathbf{X}_S$, which is derived from \cref{eq:kinship_model}:
@@ -596,7 +597,7 @@ Non-autosomal loci were removed.
 Our analysis of the whole-genome sequencing (WGS) version of HGDP \citep{bergstrom_insights_2020} was restricted to autosomal biallelic SNP loci with filter ``PASS''.
 Our analysis of the high-coverage NYGC version of 1000 Genomes \citep{fairley_international_2020} was restricted to autosomal biallelic SNP loci with filter ``PASS''.
 
-Since our evaluations assume uncorrelated loci, we filtered each dataset with \texttt{plink2} using parameters ``\texttt{-{}-indep-pairwise 1000kb 0.3}'', which iteratively removes loci that have a greater than 0.3 squared correlation coefficient with another locus that is within 1000kb, stopping until no such loci remain.
+Since our evaluations assume uncorrelated loci, we filtered each real dataset with \texttt{plink2} using parameters ``\texttt{-{}-indep-pairwise 1000kb 0.3}'', which iteratively removes loci that have a greater than 0.3 squared correlation coefficient with another locus that is within 1000kb, stopping until no such loci remain.
 Since all real datasets have numerous rare variants, while PCA and LMM are not able to detect associations involving rare variants, we removed all loci with $\text{MAF} < 0.01$.
 Lastly, only HGDP had loci with over 10\% missingness removed, as they were otherwise 17\% of remaining loci (for Human Origins and 1000 Genomes they were under 1\% of loci so they were not removed).
 Kinship dimensionality and eigenvalues were calculated from \texttt{popkin} kinship estimates.
@@ -980,7 +981,7 @@ Overall, we find that association studies with correlated environment and geneti
 
 % LMM r=0 best, r>0 not good
 Our evaluations conclusively determined that LMM without PCs performs better than PCA (for any number of PCs) across all scenarios without environment effects, including all real and simulated genotypes and two trait simulation models.
-Although the addition of a few PCs to LMM does not greatly hurt its performance (except for small sample sizes), they generally did not improve it either (\cref{tab:human_sum_pcs,tab:human_sum_pcs_h3}), which agrees with previous observations \citep{liu_controlling_2011} but contradicts others \citep{zhao_arabidopsis_2007, price_new_2010}.
+Although the addition of a few PCs to LMM does not greatly hurt its performance (except for small sample sizes), they generally did not improve it either (\cref{tab:human_sum_pcs,tab:human_sum_pcs_h3}), which agrees with previous observations \citep{liu_controlling_2011, janss_inferences_2012} but contradicts others \citep{zhao_arabidopsis_2007, price_new_2010}.
 Our findings make sense since PCs are the eigenvectors of the same kinship matrix that parametrizes random effects, so including both is redundant.
 
 % env results
@@ -1019,7 +1020,7 @@ Among our simulations, such poor performance occurred only in the admixed family
 Local kinship estimates reveal considerable family relatedness in the real datasets absent in the corresponding tree simulations.
 Admixture is also absent in our tree simulations, but our simulations and theory show that admixture is handled well by PCA.
 Hundreds of close relative pairs have been identified in 1000 Genomes \citep{gazal_high_2015, al-khudhair_inference_2015, fedorova_atlas_2016, schlauch_identification_2017}, but their removal does not improve PCA performance sufficiently in our tests, so the larger number of more distantly related pairs are PCA's most serious obstacle in practice.
-Distant relatives are expected to be numerous in any large human dataset \citep{henn_cryptic_2012, shchur_number_2018}.
+Distant relatives are expected to be numerous in any large human dataset \citep{henn_cryptic_2012, shchur_number_2018, loh_mixed-model_2018}.
 Our FES trait tests show that cryptic relatedness is more challenging when rarer variants have larger coefficients.
 Overall, the high dimensionality induced by cryptic relatedness is the key challenge for PCA association in modern datasets that is readily overcome by LMM.
 
@@ -1031,17 +1032,22 @@ However, an LMM with a large number of covariates may have conservative p-values
 Simulations or post hoc evaluations remain crucial for ensuring that statistics are calibrated.
 
 % PCA and LMM variants
-There are several variants of the PCA and LMM analyses that we did not evaluate directly, in which PCs are no longer exactly the top eigenvectors of the kinship matrix, although this is not a crucial aspect of our arguments.
-One approach tests PCs for association against every locus in the genome in order to identify and exclude PCs that capture linkage disequilibrium (LD) structure (which is localized) instead of ancestry (which should be present across the genome) \citep{prive_efficient_2020}; a previous proposal removes LD using an autocorrelation model prior to estimating PCs \citep{patterson_population_2006}.
-These improvements do not change the fact that the resulting PCs are nevertheless inadequate models of family or cryptic relatedness, so an LMM will continue to outperform these approaches in that setting.
-Similarly, the leave-one-chromosome-out (LOCO) approach for estimating kinship matrices for LMMs prevents the test locus and loci in LD with it from being modeled by the random effect \citep{lippert_fast_2011, yang_advantages_2014}.
-While LOCO kinship estimates vary for each chromosome, they continue to model family or cryptic relatedness, thus their key advantage over PCA remains.
-Overall, these alternative PCs or kinship matrices differ from their basic counterparts by either the extent to which they inappropriately model LD structure (which may be a confounder in a small portion of the genome) or by sampling noise, neither of which are expected to change our key conclusion.
+There are several variants of the PCA and LMM analyses, most designed for better modeling linkage disequilibrium (LD), that we did not evaluate directly, in which PCs are no longer exactly the top eigenvectors of the kinship matrix (if estimated with different approaches), although this is not a crucial aspect of our arguments.
+We do not consider the case where samples are projected onto PCs estimated from an external sample \citep{prive_efficient_2020}, which is uncommon in association studies, and whose primary effect is shrinkage, so if all samples are project they are all equally affected and larger regression coefficients compensate for the shrinkage, although this will no longer be the case if only a portion of the sample is projected onto the PCs of the rest of the sample.
+Another approach tests PCs for association against every locus in the genome in order to identify and exclude PCs that capture LD structure (which is localized) instead of ancestry (which should be present across the genome) \citep{prive_efficient_2020}; a previous proposal removes LD using an autocorrelation model prior to estimating PCs \citep{patterson_population_2006}.
+These improvements do not change the fact that the resulting PCs are nevertheless inadequate models of family or cryptic relatedness, so an LMM will continue to outperform them in that setting.
+Similarly, the leave-one-chromosome-out (LOCO) approach for estimating kinship matrices for LMMs prevents the test locus and loci in LD with it from being modeled by the random effect as well, which is called ``proximal contamination'' \citep{lippert_fast_2011, yang_advantages_2014}.
+While LOCO kinship estimates vary for each chromosome, they continue to model family or cryptic relatedness, thus maintaining their key advantage over PCA.
+The LDAK model estimates kinship instead by weighing loci taking LD into account \citep{speed_improved_2012}.
+LD effects must be adjusted for, if present, so in unfiltered data we advise the previous methods be applied.
+However, our simulated genotypes do not have LD, and the real datasets were filtered to remove LD, so here there is no proximal contamination and LD confounding is minimized if present at all, so these evaluations may be considered the ideal situation where LD effects have been adjusted successfully, and in this setting LMM outperforms PCA.
+Overall, these alternative PCs or kinship matrices differ from their basic counterparts by either the extent to which LD influences the estimates (which may be a confounder in a small portion of the genome, by definition) or by sampling noise, neither of which are expected to change our key conclusion.
 
 % limitations overview
 One of the limitations of this work include relatively small sample sizes compared to modern association studies.
-However, our conclusions are not expected to change with larger sample sizes, as cryptic relatedness will continue to be abundant in such data and thus give LMMs an advantage over PCA.
+However, our conclusions are not expected to change with larger sample sizes, as cryptic relatedness will continue to be abundant in such data, if not increase in abundance, and thus give LMMs an advantage over PCA \citep{henn_cryptic_2012, shchur_number_2018, loh_mixed-model_2018}.
 Recent approaches not tested in this work have made LMMs more scalable and applicable to biobank-scale data \citep{loh_efficient_2015, zhou_efficiently_2018, mbatchou_computationally_2021}, so one clear next step is carefully evaluating these approaches in simulations with larger sample sizes.
+A different benefit for including PCs were recently reported for BOLT-LMM, which does not result in greater power but rather in reduced runtime, a property that may be specific to its use of scalable algorithms such as conjugate gradient and variational Bayes \citep{loh_mixed-model_2018}.
 Many of these newer LMMs also no longer follow the infinitesimal model of the basic LMM \citep{loh_efficient_2015, mbatchou_computationally_2021}, and employ additional approximations, which are features not evaluated in this work and worthy of future study.
 
 % Q vs CC traits
@@ -1053,7 +1059,7 @@ Future evaluations should aim to include our simulations and real datasets, to e
 % closing
 Overall, our results lead us to recommend LMM over PCA for association studies in general.
 Although PCA offer flexibility and speed compared to LMM, additional work is required to ensure that PCA is adequate, including removal of close relatives (lowering sample size and wasting resources) followed by simulations or other evaluations of statistics, and even then PCA may perform poorly in terms of both type I error control and power.
-The large numbers of distant relatives expected of any real dataset all but ensures that PCA will perform poorly compared to LMM.
+The large numbers of distant relatives expected of any real dataset all but ensures that PCA will perform poorly compared to LMM \citep{henn_cryptic_2012, shchur_number_2018, loh_mixed-model_2018}.
 Our findings also suggest that related applications such as polygenic models may enjoy gains in power and accuracy by employing an LMM instead of PCA to model relatedness \citep{rakitsch_lasso_2013,qian_fast_2020}.
 PCA remains indispensable across population genetics, from visualizing population structure and performing quality control to its deep connection to admixture models, but the time has come to limit its use in association testing in favor of LMM or other, richer models capable of modeling all forms of relatedness.
 
