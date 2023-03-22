@@ -141,6 +141,13 @@ time Rscript real-15-plots-big.R --herit $h --m_causal_fac $mcf --env1 $env1 --e
 time Rscript all-02-eigen.R
 # 30m14.103s viiiaR5 first time
 
+# calculate numbers of significant PCs against trait (null model without SNPs)
+# only ran these two versions, to match the data that was there when "eigen" is presented (i.e. low herit and env come later, but eigen stuff doesn't come back at that point; don't expect major differences)
+# (also, will have to exclude real-sims for those cases, current code doesn't and will just die)
+time Rscript all-05-pcs-num-sig.R
+# 5m4.593s
+time Rscript all-05-pcs-num-sig.R --fes
+
 # a comparison of RMSD and lambda across ALL datasets (including FES and RC traits)
 # this version that fits top half only (makes most sense for our goal of talking mostly about inflation)
 time Rscript real-11-inflation-across-datasets.R
@@ -195,3 +202,4 @@ time Rscript king-01-rmsd-auc-plot.R --herit $h --m_causal_fac $mcf --env1 $env1
 # tgp-nygc-autosomes_ld_prune_1000kb_0.3_maf-0.01_king-cutoff-4
 # RMSD: LMM lab. r = 0
 # AUC: LMM lab. r = 0
+
