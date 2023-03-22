@@ -130,7 +130,7 @@ PCA remains a popular and powerful approach for association studies.
 % LMM
 The other dominant association model under relatedness is the LMM, which includes a random effect parametrized by the kinship matrix.
 Unlike PCA, LMM does not assume that relatedness is low-dimensional, and explicitly models families via the kinship matrix.
-Early LMMs required kinship matrices estimated from known pedigrees or which otherwise captured recent relatedness only \citep{yu_unified_2006, zhao_arabidopsis_2007, zhu_nonmetric_2009}.
+Early LMMs used kinship matrices estimated from known pedigrees or using methods that captured recent relatedness only, and modeled population structure as fixed effects \citep{yu_unified_2006, zhao_arabidopsis_2007, zhu_nonmetric_2009}.
 Modern LMMs estimate kinship from genotypes using a non-parametric estimator, often referred to as a genetic relationship matrix, that captures the combined covariance due to recent family relatedness and ancestral population structure \citep{kang_efficient_2008, astle_population_2009, ochoa_estimating_2021}.
 Like PCA, LMM has also been proposed for modeling environment correlated to genetics \citep{vilhjalmsson_nature_2013, wang_trade-offs_2022}.
 The classic LMM assumes a quantitative (continuous) complex trait, the focus of our work.
@@ -350,7 +350,7 @@ In the special case of the \textit{total} inbreeding of $A$, $\ft[A]$, $T$ is an
 \subsubsection{Genotype simulation from the admixture model}
 
 The basic admixture model is as described previously \citep{ochoa_estimating_2021} and is implemented in the R package \texttt{bnpsd}.
-Large and Family have $n = 1,000$ individuals, while Small has $n = 100$.
+Both Large and Family simulations have $n = 1,000$ individuals, while Small has $n = 100$.
 The number of loci is $m = 100,000$.
 Individuals are admixed from $K = 10$ intermediate subpopulations, or ancestries.
 Each subpopulation $S_u$ ($u \in \{ 1, ..., K \}$) is at coordinate $u$ and has an inbreeding coefficient $\ft[S_u] = u \tau$ for some $\tau$.
@@ -909,6 +909,7 @@ However, estimated dimensionalities do not separate real datasets from tree simu
 Moreover, the HGDP and 1000 Genomes dimensionality estimates are 45 and 61, respectively, yet PCA performed poorly for all $r \le 90$ numbers of PCs (\cref{fig:rmsd-auc-real}).
 The top eigenvalue explained a proportion of variance proportional to \Fst (\cref{tab:human_sum}), but the rest of the top 10 eigenvalues show no clear differences between datasets, except the small simulation had larger variances explained per eigenvalue (expected since it has fewer eigenvalues; \cref{fig:eigen}C).
 Comparing cumulative variance explained versus rank fraction across all eigenvalues, all datasets increase from their starting point almost linearly until they reach 1, except the family simulation has much greater variance explained by mid-rank eigenvalues (\cref{fig:eigen}B).
+We also calculated the number of PCs that are significantly associated with the trait, and observed similar results, namely that while the family simulation has more significant PCs than the non-family admixture simulations, the real datasets and their tree simulated counterparts have similar numbers of significant PCs (\cref{fig:pcs-num-sig}).
 Overall, there is no separation between real datasets (where PCA performed poorly) and tree simulations (where PCA performed relatively well) in terms of their eigenvalues or dimensionality estimates.
 
 \begin{figure}[b!]
@@ -1420,6 +1421,21 @@ The high-coverage version of the 1000 Genomes Project was downloaded from \url{f
   }
   \label{fig:eigen}
 \end{figure}
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics[width=0.5\textwidth]{fes/pcs-num-sig.pdf}
+  \caption{
+    {\bf Number of PCs significantly associated with traits.}
+    PCs are tested using an ordinary linear regression sequentially, with the $k$th PC tested conditionally on the previous $k-1$ PCs and the intercept.
+    Q-values are estimated from the 90 p-values (one for each PC in a given dataset and replicate) using the qvalue R package assuming $\pi_0 = 1$ (necessary since the default $\pi_0$ estimates were unreliable for such small numbers of p-values and ocasionally produced errors), and an FDR threshold of 0.05 is used to determine the number of significant PCs.
+    Distribution per dataset is over its 50 replicates.
+    Shown are results for FES traits with $h^2=0.8$ (the results for RC were very similar, not shown).
+  }
+  \label{fig:pcs-num-sig}
+\end{figure}
+
+
 
 \begin{figure}[hp!]
   \centering
