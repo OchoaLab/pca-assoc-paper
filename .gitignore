@@ -1,6 +1,9 @@
 *~
 unpub
 
+# ignore binary data
+*.RData
+
 # we should never commit data here, so let's forbid the bed/bim/fam/phen extensions
 *.bed
 *.bim

@@ -141,7 +141,7 @@ if ( dir_phen != '' )
     setwd( dir_phen )
 
 # being lazy here, instead of transforming into a nice table, just save list as Rdata
-save( qvals_num_sig, file = 'pcs-num-sig.Rdata' )
+save( qvals_num_sig, file = 'pcs-num-sig.RData' )
 
 # make figure!
 
