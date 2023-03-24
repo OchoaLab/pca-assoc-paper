@@ -61,7 +61,7 @@
   %\pagenumbering{gobble}
 }
 
-\usepackage[displaymath,mathlines]{lineno}
+\usepackage[mathlines]{lineno}
 
 \title{\Large \textbf{
     Limitations of principal components in quantitative genetic association models for human studies
@@ -742,8 +742,9 @@ The RC model draws coefficients independent of allele frequency, corresponding t
 We evaluate using two complementary measures:
 (1) $\rmsd$ (p-value signed root mean square deviation) measures p-value calibration (closer to zero is better), and
 (2) $\auc$ (precision-recall area under the curve) measures causal locus classification performance (higher is better; \cref{fig:measures_illustration}).
-$\rmsd$ is a more robust alternative to the common inflation factor $\lambda$ and type I error control measures; there is a correspondence between $\lambda$ and $\rmsd$, with $\rmsd > 0.01$ giving $\lambda > 1.06$ (\cref{fig:rmsd_lambda}) and thus evidence of miscalibration close to the rule of thumb of $\lambda > 1.05$ \citep{price_new_2010}.
-$\auc$ has been used to evaluate association models \citep{rakitsch_lasso_2013}, and reflects statistical power while being robust to miscalibrated models (Appendix B).
+$\rmsd$ is a more robust alternative to the common inflation factor $\lambda$ and type I error control measures; there is a correspondence between $\lambda$ and $\rmsd$, with $\rmsd > 0.01$ giving $\lambda > 1.06$ (\cref{fig:rmsd-vs-lambda}) and thus evidence of miscalibration close to the rule of thumb of $\lambda > 1.05$ \citep{price_new_2010}.
+There is also a monotonic correspondence between $\rmsd$ and type I error rate (\cref{fig:rmsd-vs-tie}).
+$\auc$ has been used to evaluate association models \citep{rakitsch_lasso_2013}, and reflects calibrated statistical power (\cref{fig:auc-vs-power}) while being robust to miscalibrated models (Appendix B).
 
 \begin{table}[b!]
   \centering
@@ -1217,11 +1218,11 @@ However, $\rmsd$ requires knowing which loci are null, so unlike $\lambda$ it is
 
 \subsubsection{Empirical comparison of $\rmsd$ and $\lambda$}
 
-There is a near one-to-one correspondence between $\lambda$ and $\rmsd$ in our data (\cref{fig:rmsd_lambda}).
+There is a near one-to-one correspondence between $\lambda$ and $\rmsd$ in our data (\cref{fig:rmsd-vs-lambda}).
 PCA tended to be inflated ($\lambda > 1$ and $\rmsd > 0$) whereas LMM tended to be deflated ($\lambda < 1$ and $\rmsd < 0$), otherwise the data for both models fall on the same contiguous curve.
 We fit a sigmoidal function to this data,
 \begin{equation}
-  \label{eq:rmsd_lambda_sigmoidal}
+  \label{eq:rmsd-vs-lambda-sigmoidal}
   \rmsd( \lambda ) = a \frac{ \lambda^b - 1 }{ \lambda^b + 1 },
 \end{equation}
 % inverse:
@@ -1235,15 +1236,15 @@ $$
 % \rmsd
 % = a \frac{ e^{-bx} - 1 }{ e^{-bx} + 1 }
 % = a \frac{ 1 - e^{bx} }{ 1 + e^{bx} }
-We fit this model to $\lambda > 1$ only since it was less noisy and of greater interest, and obtained the curve shown in \cref{fig:rmsd_lambda} with $a = 0.564$ and $b = 0.619$.
+We fit this model to $\lambda > 1$ only since it was less noisy and of greater interest, and obtained the curve shown in \cref{fig:rmsd-vs-lambda} with $a = 0.564$ and $b = 0.619$.
 % Using this model, we also produced a log-linear approximation based on its Taylor series with respect to $x = \log( \lambda )$ about $x=0$, resulting in
 % \begin{equation}
-%   \label{eq:rmsd_lambda_log_linear}
+%   \label{eq:rmsd-vs-lambda-log-linear}
 %   \rmsd( \lambda ) \approx \frac{a b}{2} \log( \lambda ).
 % \end{equation}
 % % inverse:
 % % lambda <- exp( 2 * rmsd / ( a * b ) )
-The value $\lambda = 1.05$, a common threshold for benign inflation \citep{price_new_2010}, corresponds to $\rmsd = 0.0085$ according to \cref{eq:rmsd_lambda_sigmoidal}.
+The value $\lambda = 1.05$, a common threshold for benign inflation \citep{price_new_2010}, corresponds to $\rmsd = 0.0085$ according to \cref{eq:rmsd-vs-lambda-sigmoidal}.
 Conversely, $\rmsd = 0.01$, serving as a simpler rule of thumb, corresponds to $\lambda = 1.06$.
 
 \subsubsection{Type I error rate}
@@ -1252,6 +1253,7 @@ The type I error rate is the proportion of null p-values with $p \le t$.
 Calibrated p-values have type I error rate near $t$, which may be evaluated with a binomial test.
 This measure may give different results for different $t$, for example be significantly miscalibrated only for large $t$ (due to lack of power for smaller $t$).
 In contrast, $\rmsd = 0$ guarantees calibrated type I error rates at all $t$, while large $|\rmsd|$ indicates incorrect type I errors for a range of $t$.
+Empirically, we find the expected agreement and monotonic relationship between $\rmsd$ and type I error rate (\cref{fig:rmsd-vs-tie}).
 
 \subsubsection{Statistical power and comparison to $\auc$}
 
@@ -1320,6 +1322,9 @@ Therefore $F_A^{-1}( \text{Recall} ) < F_B^{-1}( \text{Recall} )$ for every reca
 This ensures that the precision of $A$ is greater than that of $B$ at every recall value, so $\auc$ is greater for $A$ than $B$.
 Thus, $\auc$ ranks calibrated models according to power.
 
+Empirically, we find the predicted positive correlation between $\auc$ and calibrated power (\cref{fig:auc-vs-power}).
+The correlation is clear when considered separately per dataset, but the slope varies per dataset, which is expected because the proportion of alternative cases $\pi_1$ varies per dataset.
+
 % \section*{Supplemental data}
 % Supplemental data include five figures and one table.
 
@@ -1367,14 +1372,39 @@ The high-coverage version of the 1000 Genomes Project was downloaded from \url{f
 
 \begin{figure}[hp!]
   \centering
-  \includegraphics{sum-rmsd-vs-lambda.pdf}
+  \includegraphics{rmsd-vs-lambda.pdf}
   \caption{
     {\bf Comparison between $\rmsd$ and inflation factor.}
     Each point is a pair of statistics for one replicate, one association model (PCA or LMM with some number of PCs $r$), one trait model (FES vs RC, all heritability/environments tested), and one dataset (color coded by dataset).
-    Note log y-axis ($\lambda$).
-    The sigmoidal curve in \cref{eq:rmsd_lambda_sigmoidal} is fit to the data.
+    Note log y-axis.
+    The sigmoidal curve in \cref{eq:rmsd-vs-lambda-sigmoidal} is fit to the data.
   }
-  \label{fig:rmsd_lambda}
+  \label{fig:rmsd-vs-lambda}
+\end{figure}
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics{rmsd-vs-tie.pdf}
+  \caption{
+    {\bf Comparison between $\rmsd$ and type I error rate.}
+    Type I error rate calculated at a p-value threshold of 1e-2 (horizontal dashed gray line).
+    Thus, a calibrated model has a type I error rate of 1e-2 and $\rmsd = 0$ (where the dashed lines meet).
+    As expected, increased type I error rates correspond to $\rmsd > 0$, while reduced type I error rates correspond to $\rmsd < 0$.
+    Each point is a pair of statistics for one replicate, one association model (PCA or LMM with some number of PCs $r$), one trait model (FES vs RC, all heritability/environments tested), and one dataset (color coded by dataset).
+    Note log y-axis.
+  }
+  \label{fig:rmsd-vs-tie}
+\end{figure}
+
+\begin{figure}[hp!]
+  \centering
+  \includegraphics{auc-vs-power.pdf}
+  \caption{
+    {\bf Comparison between $\auc$ and calibrated power.}
+    Calibrated power is power calculated at an empirical type I error threshold of 1e-4.
+    Each point is a pair of statistics for one replicate, one association model (PCA or LMM with some number of PCs $r$), one trait model (FES vs RC, all heritability/environments tested), and one dataset (color coded by dataset).
+  }
+  \label{fig:auc-vs-power}
 \end{figure}
 
 \begin{figure}[hp!]
