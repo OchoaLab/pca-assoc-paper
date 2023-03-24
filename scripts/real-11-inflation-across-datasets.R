@@ -22,7 +22,9 @@ dir_phen <- 'fes'
 dir_low <- 'm_causal_fac-27/h0.3'
 dir_env <- paste0( dir_low, '/env0.3-0.2' )
 # output name
-name_out <- 'sum-rmsd-vs-lambda'
+name_out_lambda <- 'rmsd-vs-lambda'
+name_out_tie <- 'rmsd-vs-tie'
+name_out_power <- 'auc-vs-power'
 # methods to keep in analysis
 methods <- c('pca-plink-pure', 'gcta')
 # report on the RMSD predicted for lambda = 1.05
@@ -49,9 +51,9 @@ lty_fit_sigmoid <- 2
 col_guides <- 'gray95'
 lty_guides <- 1
 
-################
-### DATA/FIG ###
-################
+############
+### DATA ###
+############
 
 # move to where the data is
 setwd( '../data/' )
@@ -132,27 +134,31 @@ for ( i in 1 : nrow( datasets ) ) {
     setwd( '..' )
 }
 
-######################
-### LAMBDA vs RMSD ###
-######################
+# randomize rows so last dataset doesn't just overlap previous datasets
+data <- data[ sample( nrow(data) ), ]
 
-# plotting labels
-lab_rmsd <- expression( bold( SRMSD[p] ) )
-lab_lambda <- expression( bold( paste("Inflation Factor (", lambda, ")") ) )
+###########################
+### MISSINGNESS FILTERS ###
+###########################
 
-# sigmoid fit
-# remove NAs for simplicity
-# test on one of these, it should be the same for all other metrics
-indexes_missing <- is.na( data$rmsd )
-stopifnot( all( is.na( data$lambda[ indexes_missing ] ) ) )
-stopifnot( all( is.na( data$auc[ indexes_missing ] ) ) )
+# remove all NAs, can't plot or fit
+
+# power has slightly higher missingness than the rest of the stats
+indexes_missing <- is.na( data$power_calib2 )
 # subset now
 data <- data[ !indexes_missing, ]
+# there should be no more missingness after this
+stopifnot( !anyNA( data ) )
 
 # also remove infinities (observed once for lambda only)
 indexes_finite <- is.finite( data$lambda )
 data <- data[ indexes_finite, ]
 
+######################
+### LAMBDA vs RMSD ###
+######################
+
+# sigmoid fit
 # NOTE: x and y are reversed from actual plot
 y <- data$rmsd
 #x <- log(data$lambda)
@@ -216,6 +222,10 @@ message(
 ## #lines( x2, fl(x2, 1, 1), col = 2 )
 ## lines( x2, predict(objp, list(xp = x2) ), col = 3 ) # best fit!
 
+###################
+### PLOT LAMBDA ###
+###################
+
 # find common data range
 range_rmsd <- range( data$rmsd, na.rm = TRUE )
 range_lambda <- range( data$lambda, na.rm = TRUE )
@@ -230,10 +240,13 @@ range_rmsd <- c( -max_srmsd, max_srmsd )
 # uniformly spaced points for curve
 xp <- exp( log_max_lambda * (-100 : 100) / 100 )
 
+# plotting labels, shared across plots
+lab_rmsd <- expression( bold( SRMSD[p] ) )
+
 # plot in base data dir
 width <- fig_width() / 2
 fig_start(
-    name_out,
+    name_out_lambda,
     mar_t = 1,
     mar_r = 0.3,
     width = width,
@@ -247,7 +260,7 @@ plot(
     xlim = range_rmsd,
     ylim = range_lambda,
     xlab = lab_rmsd,
-    ylab = lab_lambda,
+    ylab = 'Inflation Factor',
     log = 'y'
 )
 # guide lines
@@ -258,8 +271,6 @@ lines( predict(objp, list(xp = xp) ), xp, lty = lty_fit_sigmoid, col = col_fit_s
 #lines( predict(objp, list(xp = x2) ), x2, lty = lty_fit_sigmoid, col = col_fit_sigmoid ) # using actual data
 
 
-# randomize rows so last dataset doesn't just overlap previous datasets
-data <- data[ sample( nrow(data) ), ]
 # add data on top
 points(
     data$rmsd,
@@ -293,6 +304,8 @@ legend(
 fig_end()
 
 ## #############
+
+## # NOTE: should have used non-centrality parameters!  (instead of different degree of freedom!)
 
 ## # test a hypothesis about generating this curve
 ## # failed experiment, curves don't track well for high RMSD, lambda, so meh
@@ -334,3 +347,82 @@ fig_end()
 ## )
 
 ## fig_end()
+
+####################
+### TYPE I ERROR ###
+####################
+
+# log: 2 (1e-2) looks perfect, the rest start to look crummy because of all the zeroes
+# linear: all look hard to interpret, meh
+# so stick with log version of 1e-2
+log10_alpha <- 2
+
+# same dimensions as lambda fig
+fig_start(
+    name_out_tie,
+    mar_t = 1,
+    mar_r = 0.3,
+    width = width,
+    height = width
+)
+plot(
+    data$rmsd,
+    data[[ paste0( 'type_1_err', log10_alpha ) ]],
+    col = data$col,
+    pch = '.',
+    xlab = lab_rmsd,
+    ylab = 'Type I error rate',
+    log = 'y'
+)
+abline( h = 10^(-log10_alpha), lty = 2, col = 'gray' )
+abline( v = 0, lty = 2, col = 'gray' )
+# legend
+legend(
+    'bottomright',
+    datasets$name_paper,
+    title = 'Dataset',
+    text.col = datasets$col,
+    pch = NA,
+    bty = 'n',
+    cex = 0.7
+)
+fig_end()
+
+
+#############
+### POWER ###
+#############
+
+# force symmetric and leave space for legend
+ylim <- range( data$power_calib4 )
+
+# same dimensions as lambda fig
+fig_start(
+    name_out_power,
+    mar_t = 1,
+    mar_r = 0.3,
+    width = width,
+    height = width
+)
+plot(
+    data$auc,
+    data$power_calib4,
+    col = data$col,
+    pch = '.',
+    xlab = expression( bold( AUC[PR] ) ),
+    ylab = 'Calibrated power',
+    xlim = ylim,
+    ylim = ylim
+)
+abline( 0, 1, lty = 2, col = 'gray' )
+# legend
+legend(
+    'bottomright',
+    datasets$name_paper,
+    title = 'Dataset',
+    text.col = datasets$col,
+    pch = NA,
+    bty = 'n',
+    cex = 0.7
+)
+fig_end()

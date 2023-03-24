@@ -150,6 +150,7 @@ time Rscript all-05-pcs-num-sig.R --fes
 
 # a comparison of RMSD and lambda across ALL datasets (including FES and RC traits)
 # this version that fits top half only (makes most sense for our goal of talking mostly about inflation)
+# same script now also compares RMSD and type I error, and also AUC vs power
 time Rscript real-11-inflation-across-datasets.R
 # model fit:
 # rmsd ~ a * (lambda^b - 1) / (lambda^b + 1)
