@@ -220,7 +220,7 @@ The additive linear model for a quantitative (continuous) trait is:
   \label{eq:trait}
   \mathbf{y}
   =
-  \mathbf{1} \alpha + \mathbf{X}^\intercal \boldsymbol{\beta} + \mathbf{Z}^\intercal \boldsymbol{\eta} + \boldsymbol{\epsilon}
+  \mathbf{1} \alpha + \mathbf{X}' \boldsymbol{\beta} + \mathbf{Z}' \boldsymbol{\eta} + \boldsymbol{\epsilon}
   ,
 \end{equation}
 where
@@ -230,7 +230,7 @@ $\boldsymbol{\beta}$ is the length-$m$ vector of locus coefficients,
 $\mathbf{Z}$ is a design matrix of environment effects and other covariates,
 $\boldsymbol{\eta}$ is the vector of environment coefficients,
 $\boldsymbol{\epsilon}$ is a length-$n$ vector of residuals,
-and $\intercal$ denotes matrix transposition.
+and the prime symbol ($'$) denotes matrix transposition.
 The residuals follow $\epsilon_j \sim \text{Normal}(0, \sigma^2_\epsilon)$ independently per individual $j$, for some $\sigma^2_\epsilon$.
 %For simplicity, non-genetic covariates will be omitted from the PCA and LMM models below, but are trivial to include without changing any of our theoretical results.
 
@@ -242,13 +242,13 @@ The PCA and LMM models, respectively, approximate the full model fit at a single
   \text{PCA:}\quad
   \mathbf{y}
   &=
-    \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{U}_r \boldsymbol{\gamma}_r + \mathbf{Z}^\intercal \boldsymbol{\eta} + \boldsymbol{\epsilon}
+    \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{U}_r \boldsymbol{\gamma}_r + \mathbf{Z}' \boldsymbol{\eta} + \boldsymbol{\epsilon}
     , \\
   \label{eq:lmm_gwas}
   \text{LMM:}\quad
   \mathbf{y}
   &=
-    \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{s} + \mathbf{Z}^\intercal \boldsymbol{\eta} + \boldsymbol{\epsilon}
+    \mathbf{1} \alpha + \mathbf{x}_i \beta_i + \mathbf{s} + \mathbf{Z}' \boldsymbol{\eta} + \boldsymbol{\epsilon}
     ,
     \quad\quad
     \mathbf{s} \sim \text{Normal} \left( \mathbf{0}, 2 \sigma^2_s \mathbf{\Phi}^T \right),
@@ -260,8 +260,8 @@ $\mathbf{U}_r$ is an $n \times r$ matrix of PCs,
 $\boldsymbol{\gamma}_r$ is the length-$r$ vector of PC coefficients,
 $\mathbf{s}$ is a length-$n$ vector of random effects,
 $\mathbf{\Phi}^T = (\kt)$ is the $n \times n$ kinship matrix conditioned on the ancestral population $T$,
-and $\sigma^2_s$ is a variance factor (do not confuse the ancestral population superscript $T$ with the matrix transposition symbol $\intercal$).
-Both models condition the regression of the focal locus $i$ on an approximation of the total polygenic effect $\mathbf{X}^\intercal \boldsymbol{\beta}$ with the same covariance structure, which is parametrized by the kinship matrix.
+and $\sigma^2_s$ is a variance factor.
+Both models condition the regression of the focal locus $i$ on an approximation of the total polygenic effect $\mathbf{X}' \boldsymbol{\beta}$ with the same covariance structure, which is parametrized by the kinship matrix.
 Under the kinship model, genotypes are random variables obeying
 \begin{equation}
   \label{eq:kinship_model}
@@ -277,14 +277,14 @@ where \pit is the ancestral allele frequency of locus $i$ \citep{malecot_mathema
 Assuming independent loci, the covariance of the polygenic effect is
 \begin{linenomath*}
 $$
-\Cov( \mathbf{X}^\intercal \boldsymbol{\beta} ) = 2 \sigma^2_s \mathbf{\Phi}^T,
+\Cov( \mathbf{X}' \boldsymbol{\beta} ) = 2 \sigma^2_s \mathbf{\Phi}^T,
 \quad\quad
 \sigma^2_s = \sum_{i=1}^m 2 \pit ( 1 - \pit ) \beta_i^2,
 $$
 \end{linenomath*}
 which is readily modeled by the LMM random effect $\mathbf{s}$.
 (The difference in mean is absorbed by the intercept.)
-Alternatively, consider the eigendecomposition of the kinship matrix $\mathbf{\Phi}^T = \mathbf{U} \mathbf{\Lambda} \mathbf{U}^\intercal$ where $\mathbf{U}$ is the $n \times n$ eigenvector matrix and $\mathbf{\Lambda}$ is the $n \times n$ diagonal matrix of eigenvalues.
+Alternatively, consider the eigendecomposition of the kinship matrix $\mathbf{\Phi}^T = \mathbf{U} \mathbf{\Lambda} \mathbf{U}'$ where $\mathbf{U}$ is the $n \times n$ eigenvector matrix and $\mathbf{\Lambda}$ is the $n \times n$ diagonal matrix of eigenvalues.
 The random effect can be written as
 \begin{linenomath*}
 $$
@@ -317,7 +317,7 @@ In practice, the kinship matrix used for PCA and LMM is estimated with variation
   \mathbf{\hat{\Phi}}^T
   =
   \frac{1}{m}
-  \mathbf{X}_S^\intercal
+  \mathbf{X}_S'
   \mathbf{X}_S
   ,
 \end{equation}
@@ -1153,15 +1153,15 @@ For 1000 Genomes and HGDP the true $\bar{\varphi}^T$ are 0.126 and 0.124, respec
 Lastly, we construct new allele frequencies,
 \begin{linenomath*}
 $$
-p' = w \pith + ( 1 - w ) q,
+p^* = w \pith + ( 1 - w ) q,
 $$
 \end{linenomath*}
 by a weighted average of \pith and $q \in (0, 1)$ drawn independently from a different distribution.
-$\E[q] = \frac{1}{2}$ is required to have $\E \left[ p' \right] = \frac{1}{2}$.
+$\E[q] = \frac{1}{2}$ is required to have $\E \left[ p^* \right] = \frac{1}{2}$.
 The resulting variance is
 \begin{linenomath*}
 $$
-\Var(p')
+\Var(p^*)
 =
 w^2 W^T + (1-w)^2 \Var(q)
 ,
@@ -1175,7 +1175,7 @@ q \sim \text{Beta} \left( \frac{1}{2} \left( \frac{1}{ 4 V^T } - 1 \right), \fra
 .
 $$
 \end{linenomath*}
-Although $w=0$ yields $\Var(p') = V^T$, we use the second root of the quadratic equation to use \pith:
+Although $w=0$ yields $\Var(p^*) = V^T$, we use the second root of the quadratic equation to use \pith:
 \begin{linenomath*}
 $$
 w = \frac{ 2 V^T }{ W^T + V^T }.
