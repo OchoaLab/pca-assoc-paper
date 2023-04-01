@@ -1049,10 +1049,11 @@ LD effects must be adjusted for, if present, so in unfiltered data we advise the
 However, in this work, simulated genotypes do not have LD, and the real datasets were filtered to remove LD, so here there is no proximal contamination and LD confounding is minimized if present at all, so these evaluations may be considered the ideal situation where LD effects have been adjusted successfully, and in this setting LMM outperforms PCA.
 Overall, these alternative PCs or kinship matrices differ from their basic counterparts by either the extent to which LD influences the estimates (which may be a confounder in a small portion of the genome, by definition) or by sampling noise, neither of which are expected to change our key conclusion.
 
-% limitations overview
+% limitations overview: sample size, new LMMs
 One of the limitations of this work include relatively small sample sizes compared to modern association studies.
 However, our conclusions are not expected to change with larger sample sizes, as cryptic relatedness will continue to be abundant in such data, if not increase in abundance, and thus give LMMs an advantage over PCA \citep{henn_cryptic_2012, shchur_number_2018, loh_mixed-model_2018}.
-Recent approaches not tested in this work have made LMMs more scalable and applicable to biobank-scale data \citep{loh_efficient_2015, zhou_efficiently_2018, mbatchou_computationally_2021}, so one clear next step is carefully evaluating these approaches in simulations with larger sample sizes.
+One reason PCA has been favored over classic LMMs is because PCA's runtime scales much better with increasing sample size.
+However, recent approaches not tested in this work have made LMMs more scalable and applicable to biobank-scale data \citep{loh_efficient_2015, zhou_efficiently_2018, mbatchou_computationally_2021}, so one clear next step is carefully evaluating these approaches in simulations with larger sample sizes.
 A different benefit for including PCs were recently reported for BOLT-LMM, which does not result in greater power but rather in reduced runtime, a property that may be specific to its use of scalable algorithms such as conjugate gradient and variational Bayes \citep{loh_mixed-model_2018}.
 Many of these newer LMMs also no longer follow the infinitesimal model of the basic LMM \citep{loh_efficient_2015, mbatchou_computationally_2021}, and employ additional approximations, which are features not evaluated in this work and worthy of future study.
 
@@ -1064,7 +1065,7 @@ Better modeling rare variants and their structure is a key next step in associat
 % Q vs CC traits
 The largest limitation of our work is that we only considered quantitative traits.
 We noted that previous evaluations involving case-control traits tended to report PCA-LMM ties or mixed results, an observation potentially confounded by the use of low-dimensional simulations without family relatedness (\cref{tab:lit}).
-An additional concern is case-control ascertainment bias, which appears to affect LMMs more severely, although recent work appears to solve this problem \citep{yang_advantages_2014, zhou_efficiently_2018}.
+An additional concern is case-control ascertainment bias and imbalance, which appears to affect LMMs more severely, although recent work appears to solve this problem \citep{yang_advantages_2014, zhou_efficiently_2018}.
 Future evaluations should aim to include our simulations and real datasets, to ensure that previous results were not biased in favor of PCA by employing unrealistic low-dimensional genotype simulations, or by not simulating large coefficients for rare variants expected for diseases by various selection models.
 
 % closing
