@@ -116,8 +116,8 @@ Therefore, many specialized approaches have been developed for genetic associati
 
 % PCA
 Genetic association with PCA consists of including the top eigenvectors of the population kinship matrix as covariates in a generalized linear model \citep{zhang_semiparametric_2003, price_principal_2006, bouaziz_accounting_2011}.
-These top eigenvectors are commonly referred to as PCs in genetics \citep{patterson_population_2006}, the convention adopted here, but in other fields PCs denote the projections of loci onto eigenvectors \citep{jolliffe_principal_2002}.
-The direct ancestor of PCA association is structured association, in which inferred ancestry or admixture proportions are used as regression covariates \citep{pritchard_association_2000}.
+These top eigenvectors (effectively a set of new coordinates for every individual) are commonly referred to as PCs in genetics \citep{patterson_population_2006}, the convention adopted here, but in other fields PCs denote the projections of loci onto eigenvectors (new independent coordinates for each locus) \citep{jolliffe_principal_2002}.
+The direct ancestor of PCA association is structured association, in which inferred ancestry (genetic cluster membership, often aligned with labels such as ``European'', ``African'', ``Asian'', etc.) or admixture proportions of these ancestries are used as regression covariates \citep{pritchard_association_2000}.
 These models are deeply connected because PCs map to ancestry empirically \citep{alexander_fast_2009, zhou_strong_2016} and theoretically \citep{mcvean_genealogical_2009,zheng_eigenanalysis_2016,cabreros_likelihood-free_2019,chiu_inferring_2022}, and they work as well as global ancestry in association studies but are estimated more easily \citep{patterson_population_2006, zhao_arabidopsis_2007, alexander_fast_2009, bouaziz_accounting_2011}.
 Another closely related approach to PCA is nonmetric multidimensional scaling \citep{zhu_nonmetric_2009}.
 PCs are also proposed for modeling environment effects that are correlated to ancestry, for example, through geography \citep{novembre_genes_2008, zhang_principal_2015, lin_admixed_2021}.
@@ -130,8 +130,8 @@ PCA remains a popular and powerful approach for association studies.
 % LMM
 The other dominant association model under relatedness is the LMM, which includes a random effect parametrized by the kinship matrix.
 Unlike PCA, LMM does not assume that relatedness is low-dimensional, and explicitly models families via the kinship matrix.
-Early LMMs used kinship matrices estimated from known pedigrees or using methods that captured recent relatedness only, and modeled population structure as fixed effects \citep{yu_unified_2006, zhao_arabidopsis_2007, zhu_nonmetric_2009}.
-Modern LMMs estimate kinship from genotypes using a non-parametric estimator, often referred to as a genetic relationship matrix, that captures the combined covariance due to recent family relatedness and ancestral population structure \citep{kang_efficient_2008, astle_population_2009, ochoa_estimating_2021}.
+Early LMMs used kinship matrices estimated from known pedigrees or using methods that captured recent relatedness only, and modeled population structure (ancestry) as fixed effects \citep{yu_unified_2006, zhao_arabidopsis_2007, zhu_nonmetric_2009}.
+Modern LMMs estimate kinship from genotypes using a non-parametric estimator, often referred to as a genetic relationship matrix, that captures the combined covariance due to recent family relatedness (such as a first cousin relationship) and more ancient population structure (such as sharing numerous distant ancestors from the same continent) \citep{kang_efficient_2008, astle_population_2009, ochoa_estimating_2021}.
 Like PCA, LMM has also been proposed for modeling environment correlated to genetics \citep{vilhjalmsson_nature_2013, wang_trade-offs_2022}.
 The classic LMM assumes a quantitative (continuous) complex trait, the focus of our work.
 Although case-control (binary) traits and their underlying ascertainment are theoretically a challenge \citep{yang_advantages_2014}, LMMs have been applied successfully to balanced case-control studies \citep{astle_population_2009, kang_variance_2010} and simulations \citep{price_new_2010, wu_comparison_2011, sul_mixed_2013}, and have been adapted for unbalanced case-control studies \citep{zhou_efficiently_2018}.
@@ -384,7 +384,7 @@ Fixed loci ($i$ where $\xij = 0$ for all $j$, or $\xij = 2$ for all $j$) are dra
 Each replicate draws a genotypes starting from \pit.
 
 As a brief aside, we prove that global ancestry proportions as covariates is equivalent in expectation to using PCs under the admixture model.
-Note that the latent space of $\mathbf{X}$, given by $(\pi_{ij})$, has $K$ dimensions (number of columns of $\mathbf{Q} = (q_{ju})$), so the top $K$ PCs span this space.
+Note that the latent space of $\mathbf{X}$ (the subspace to which the data is constrained by the admixture model) is given by $(\pi_{ij})$, which has $K$ dimensions (number of columns of $\mathbf{Q} = (q_{ju})$), so the top $K$ PCs span this space.
 Since associations include an intercept term ($\mathbf{1} \alpha$ in \cref{eq:pca_gwas}), estimated PCs are orthogonal to $\mathbf{1}$ (note $\mathbf{\hat{\Phi}}^T \mathbf{1} = \mathbf{0}$ because $\mathbf{X}_S \mathbf{1} = \mathbf{0}$), and the sum of rows of $\mathbf{Q}$ sums to one, then only $K-1$ PCs (plus intercept) are needed to span the latent space of this admixture model.
 
 \subsubsection{Genotype simulation from random admixed families}
@@ -435,11 +435,11 @@ Loci with $\text{MAF} < 0.01$ are drawn again starting from the \pit distributio
 \subsubsection{Fitting tree to real data}
 
 We developed new methods to fit trees to real data based on unbiased kinship estimates from \texttt{popkin}, implemented in \texttt{bnpsd}.
-A tree with given inbreeding edges \f{P_w}{S_w} gives rise to a coancestry matrix $\vartheta_{uv}^T$ for a subpopulation pair ($S_u,S_v$), and the goal is to recover the inbreeding edges from coancestry estimates.
+A tree with given inbreeding coefficients \f{P_w}{S_w} for its edges (between subpopulation $S_w$ and its parent $P_w$) gives rise to a coancestry matrix $\vartheta_{uv}^T$ for a subpopulation pair ($S_u,S_v$), and the goal is to recover these edge inbreeding coefficients from coancestry estimates.
 Coancestry values are total inbreeding coefficients of the MRCA population of each subpopulation pair.
 Therefore, we calculate $\ft[S_w]$ for every $S_w$ recursively from the root as follows.
 Nodes with parent $P_w = T$ are already as desired.
-Given \ft[P_w], the desired \ft[S_w] is calculated via the additive edge $\delta_w$ \citep{ochoa_estimating_2021}:
+Given \ft[P_w], the desired \ft[S_w] is calculated via the ``additive edge'' $\delta_w$ \citep{ochoa_estimating_2021}:
 \begin{equation}
   \label{eq:inbr_total_additive}
   \ft[S_w] = \ft[P_w] + \delta_w,
@@ -447,7 +447,7 @@ Given \ft[P_w], the desired \ft[S_w] is calculated via the additive edge $\delta
   \delta_w = \f{P_w}{S_w} \left( 1 - \ft[P_w] \right).
 \end{equation}
 These $\delta_w \ge 0$ because $0 \le \f{P_w}{S_w}, \ft[P_w] \le 1$ for every $w$.
-Inbreeding edges can be recovered from additive edges:
+Edge inbreeding coefficients can be recovered from additive edges:
 $\f{P_w}{S_w} = \delta_w /( 1 - \ft[P_w] )$.
 Overall, coancestry values are sums of $\delta_w$ over common ancestor nodes,
 \begin{equation}
