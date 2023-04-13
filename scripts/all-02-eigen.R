@@ -1,4 +1,4 @@
-# an attempt to talk about low/high dimensionality using eigenvalues, the old school way
+# an attempt to talk about low/high model dimensions using eigenvalues, the old school way
 
 library(popkin)
 library(genio)
@@ -158,7 +158,7 @@ varexpcum_eigensoft <- lapply( varexp_eigensoft, cumsum )
 plot_ranks <- function( tw_rank, cex_leg = 1 ) {
     barplot(
         unlist( tw_rank ),
-        ylab = 'Dimensionality Estimate',
+        ylab = 'Kinship Matrix Rank Estimate',
         las = 2,
         cex.names = cex_leg, # reduce bar labels too
         col = datasets$col,
