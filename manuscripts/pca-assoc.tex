@@ -193,11 +193,11 @@ LMM and PCA are closely related models \citep{astle_population_2009, janss_infer
 Direct comparisons have yielded mixed results, with several studies finding superior performance for LMM, notably from papers promoting advances in LMMs, while many others report comparable performance (\cref{tab:lit}).
 No papers find that PCA outperforms LMM decisively, although PCA occasionally performs better in isolated and artificial cases or individual measures, often with unknown significance.
 Previous studies generally used either only simulated or only real genotypes, with only two studies using both.
-The simulated genotype studies, which tended to have low model dimensions and differentiation (\Fst), were more likely to report ties or mixed results (6/8), whereas real genotypes tended to clearly favor LMMs (9/11).
+The simulated genotype studies, which tended to have low model dimensions and \Fst, were more likely to report ties or mixed results (6/8), whereas real genotypes tended to clearly favor LMMs (9/11).
 Similarly, 10/12 papers with quantitative traits favor LMMs, whereas 6/9 papers with case-control traits gave ties or mixed results---the only factor we do not explore in this work.
 Additionally, although all previous evaluations measured type I error (or proxies such as genomic inflation factors \citep{devlin_genomic_1999} or QQ plots), a large fraction (6/17) did not measure power (or proxies such as ROC curves), and only four used more than one number of PCs for PCA.
 Lastly, no consensus has emerged as to why LMM might outperform PCA or vice versa \citep{price_new_2010, sul_mixed_2013, price_response_2013, hoffman_correcting_2013}, or which features of the real datasets are critical for the LMM advantage other than family relatedness, resulting in unclear guidance for using PCA.
-Hence, our work includes real and simulated genotypes with higher model dimensions and differentiation matching that of multiethnic human cohorts, we vary the number of PCs, and measure robust proxies for type I error control and calibrated power.
+Hence, our work includes real and simulated genotypes with higher model dimensions and \Fst matching that of multiethnic human cohorts \citep{ochoa_estimating_2021, ochoa_new_2019}, we vary the number of PCs, and measure robust proxies for type I error control and calibrated power.
 
 % this work
 In this work, we evaluate the PCA and LMM association models under various numbers of PCs, which are included in LMMs too.
@@ -836,7 +836,7 @@ Thus, LMM is conclusively superior to PCA, and the only calibrated model, when t
 
 \subsection{Evaluations in real human genotype datasets}
 
-Next we repeat our evaluations with real human genotype data, which differs from our simulations in allele frequency distributions and more complex population structures with greater differentiation, numerous correlated subpopulations, and potential cryptic family relatedness.
+Next we repeat our evaluations with real human genotype data, which differs from our simulations in allele frequency distributions and more complex population structures with greater \Fst, numerous correlated subpopulations, and potential cryptic family relatedness.
 
 \begin{figure}[hp]
   \centering
@@ -1081,8 +1081,8 @@ PCA remains indispensable across population genetics, from visualizing populatio
 \subsection{Appendix A: Fitting ancestral allele frequency distribution to real data}
 
 We calculated \pith distributions of each real dataset.
-However, differentiation increases the variance of these sample \pith relative to the true \pit \citep{ochoa_estimating_2021}.
-We present a new algorithm for constructing an ``undifferentiated'' distribution based on the input data but with the lower variance of the true ancestral distribution.
+However, population structure increases the variance of these sample \pith relative to the true \pit \citep{ochoa_estimating_2021}.
+We present a new algorithm for constructing a new distribution based on the input data but with the lower variance of the true ancestral distribution.
 Suppose the \pit distribution over loci $i$ satisfies $\E \left[ \pit \right] = \frac{1}{2}$ and $\Var \left( \pit \right) = V^T$.
 The sample allele frequency \pith, conditioned on \pit, satisfies
 \begin{linenomath*}
@@ -1252,8 +1252,8 @@ Conversely, $\rmsd = 0.01$, serving as a simpler rule of thumb, corresponds to $
 
 The type I error rate is the proportion of null p-values with $p \le t$.
 Calibrated p-values have type I error rate near $t$, which may be evaluated with a binomial test.
-This measure may give different results for different $t$, for example be significantly miscalibrated only for large $t$ (due to lack of power for smaller $t$).
-In contrast, $\rmsd = 0$ guarantees calibrated type I error rates at all $t$, while large $|\rmsd|$ indicates incorrect type I errors for a range of $t$.
+This measure may give different results for different $t$, for example be significantly miscalibrated only for large $t$ (due to lack of power for smaller $t$), and it requires large simulations to estimate well as it depends on the tail of the distribution.
+In contrast, $\rmsd$ uses the entire distribution so it is easier to estimate, $\rmsd = 0$ guarantees calibrated type I error rates at all $t$, while large $|\rmsd|$ indicates incorrect type I errors for a range of $t$.
 Empirically, we find the expected agreement and monotonic relationship between $\rmsd$ and type I error rate (\cref{fig:rmsd-vs-tie}).
 
 \subsubsection{Statistical power and comparison to $\auc$}
@@ -1266,7 +1266,7 @@ F(t) = \Pr( p < t | H_1 ).
 $$
 \end{linenomath*}
 $F(t)$ is a cumulative function, so it is monotonically increasing and has an inverse.
-Like type I error control, power may rank models differently depending on $t$.
+Like type I error control, power may rank models differently depending on $t$, and it is also harder to estimate than $\auc$ because power depends on the tail of the distribution.
 
 Power is not meaningful when p-values are not calibrated.
 To establish a clear connection to $\auc$, assume calibrated (uniform) null p-values: $\Pr( p < t | H_0 ) = t$.
