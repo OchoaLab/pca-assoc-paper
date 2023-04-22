@@ -636,12 +636,9 @@ $m_1/m$.
 
 \subsection{Overview of evaluations}
 
-% path of images % HACK eventually should copy and/or rename?
-\graphicspath{ {../../data/} }
-
 \begin{figure}
   \begin{fullwidth}
-    \includegraphics[width=\linewidth,height=0.85\textheight,keepaspectratio]{kinship.pdf}
+    \includegraphics[width=\linewidth,height=0.85\textheight,keepaspectratio]{fig1.pdf}
     \caption{
       Population structures of simulated and real human genotype datasets.
       First two columns are population kinship matrices as heatmaps: individuals along x- and y-axis, kinship as color.
@@ -688,7 +685,7 @@ The FES model captures the rough inverse relationship between coefficient and mi
 The RC model draws coefficients independent of allele frequency, corresponding to neutral traits \citep{zeng_signatures_2018, simons_population_2018}, which results in a wider effect size distribution that reduces association power and effective polygenicity compared to FES.
 
 \begin{figure}
-  \includegraphics{sim-n1000-k10-f0.1-s0.5-g1/measures-illustration.pdf}
+  \includegraphics{fig2.pdf}
   \caption{
     Illustration of evaluation measures.
     Three archetypal models illustrate our complementary measures:
@@ -710,7 +707,7 @@ The RC model draws coefficients independent of allele frequency, corresponding t
     Each point is a pair of statistics for one replicate, one association model (PCA or LMM with some number of PCs $r$), one trait model (FES vs RC, all heritability/environments tested), and one dataset (color coded by dataset).
     Note log y-axis.
     The sigmoidal curve in \EQ{rmsd-vs-lambda-sigmoidal} is fit to the data.
-  }{\includegraphics{rmsd-vs-lambda.pdf}}
+  }{\includegraphics{fig2s1.pdf}}
   \label{figsupp:rmsd-vs-lambda}
   % 
   \figsupp[Comparison between $\rmsd$ and type I error rate.]{
@@ -720,7 +717,7 @@ The RC model draws coefficients independent of allele frequency, corresponding t
     As expected, increased type I error rates correspond to $\rmsd > 0$, while reduced type I error rates correspond to $\rmsd < 0$.
     Each point is a pair of statistics for one replicate, one association model (PCA or LMM with some number of PCs $r$), one trait model (FES vs RC, all heritability/environments tested), and one dataset (color coded by dataset).
     Note log y-axis.
-  }{\includegraphics{rmsd-vs-tie.pdf}}
+  }{\includegraphics{fig2s2.pdf}}
   \label{figsupp:rmsd-vs-tie}
   % 
   \figsupp[Comparison between $\auc$ and calibrated power.]{
@@ -728,7 +725,7 @@ The RC model draws coefficients independent of allele frequency, corresponding t
     Calibrated power is power calculated at an empirical type I error threshold of 1e-4.
     Each point is a pair of statistics for one replicate, one association model (PCA or LMM with some number of PCs $r$), one trait model (FES vs RC, all heritability/environments tested), and one dataset (color coded by dataset).
     Gray dashed line is $y = x$ line.
-  }{\includegraphics{auc-vs-power.pdf}}
+  }{\includegraphics{fig2s3.pdf}}
   \label{figsupp:auc-vs-power}
 \end{figure}
 
@@ -815,7 +812,7 @@ Lastly, LMM with $r=0$ always has significantly greater or statistically tied $\
 
 \begin{figure}
   \begin{fullwidth}
-    \includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{fes/rmsd-auc-sim.pdf}
+    \includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{fig3.pdf}
     \caption{
       Evaluations in admixture simulations with FES traits, high heritability.
       PCA and LMM models have varying number of PCs ($r \in \{0, ..., 90\}$ on x-axis), with the distributions (y-axis) of $\rmsd$ (top subpanel) and $\auc$ (bottom subpanel) for 50 replicates.
@@ -834,29 +831,29 @@ Lastly, LMM with $r=0$ always has significantly greater or statistically tied $\
     % SUPP FIGS!
     \figsupp{
       Evaluations in admixture simulations with RC traits, high heritability.
-    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{rmsd-auc-sim.pdf}}
+    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fig3s1.pdf}}
     \label{figsupp:rmsd-auc-sim-rc}
     % 
     \figsupp{
       Evaluations in admixture simulations with FES traits, low heritability.
-    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fes/m_causal_fac-27/h0.3/rmsd-auc-sim.pdf}}
+    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fig3s2.pdf}}
     \label{figsupp:rmsd-auc-sim-fes-h3}
     % 
     \figsupp{
       Evaluations in admixture simulations with RC traits, low heritability.
-    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{m_causal_fac-27/h0.3/rmsd-auc-sim.pdf}}
+    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fig3s3.pdf}}
     \label{figsupp:rmsd-auc-sim-rc-h3}
     % 
     \figsupp[Evaluations in admixture simulations with FES traits, environment.]{
       Evaluations in admixture simulations with FES traits, environment.
       ``LMM lab.'' was only tested with $r=0$.
-    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fes/m_causal_fac-27/h0.3/env0.3-0.2/rmsd-auc-sim.pdf}}
+    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fig3s4.pdf}}
     \label{figsupp:rmsd-auc-sim-fes-env}
     % 
     \figsupp[Evaluations in admixture simulations with RC traits, environment.]{
       Evaluations in admixture simulations with RC traits, environment.
       ``LMM lab.'' was only tested with $r=0$.
-    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{m_causal_fac-27/h0.3/env0.3-0.2/rmsd-auc-sim.pdf}}
+    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fig3s5.pdf}}
     \label{figsupp:rmsd-auc-sim-rc-env}
   \end{fullwidth}
 \end{figure}
@@ -893,7 +890,7 @@ Next we repeat our evaluations with real human genotype data, which differs from
 
 \begin{figure}
   \begin{fullwidth}
-    \includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{fes/rmsd-auc-real.pdf}
+    \includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{fig4.pdf}
     \caption{
       Evaluations in real human genotype datasets with FES traits, high heritability.
       Same setup as \FIG{rmsd-auc-sim}, see that for details.
@@ -909,29 +906,29 @@ Next we repeat our evaluations with real human genotype data, which differs from
     % SUPP FIGS!
     \figsupp{
       Evaluations in real human genotype datasets with RC traits, high heritability.
-    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{rmsd-auc-real.pdf}}
+    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fig4s1.pdf}}
     \label{figsupp:rmsd-auc-real-rc}
     % 
     \figsupp{
       Evaluations in real human genotype datasets with FES traits, low heritability.
-    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fes/m_causal_fac-27/h0.3/rmsd-auc-real.pdf}}
+    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fig4s2.pdf}}
     \label{figsupp:rmsd-auc-real-fes-h3}
     % 
     \figsupp{
       Evaluations in real human genotype datasets with RC traits, low heritability.
-    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{m_causal_fac-27/h0.3/rmsd-auc-real.pdf}}
+    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fig4s3.pdf}}
     \label{figsupp:rmsd-auc-real-rc-h3}
     % 
     \figsupp[Evaluations in real human genotype datasets with FES traits, environment.]{
       Evaluations in real human genotype datasets with FES traits, environment.
       ``LMM lab.'' was only tested with $r=0$.
-    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fes/m_causal_fac-27/h0.3/env0.3-0.2/rmsd-auc-real.pdf}}
+    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fig4s4.pdf}}
     \label{figsupp:rmsd-auc-real-fes-env}
     % 
     \figsupp[Evaluations in real human genotype datasets with RC traits, environment.]{
       Evaluations in real human genotype datasets with RC traits, environment.
       ``LMM lab.'' was only tested with $r=0$.
-    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{m_causal_fac-27/h0.3/env0.3-0.2/rmsd-auc-real.pdf}}
+    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fig4s5.pdf}}
     \label{figsupp:rmsd-auc-real-rc-env}
 \end{fullwidth}
 \end{figure}
@@ -956,7 +953,7 @@ Nevertheless, LMM with $r=0$ was significantly better than PCA for all measures 
 
 \begin{figure}
   \begin{fullwidth}
-    \includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{fes/rmsd-auc-real-sim.pdf}
+    \includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{fig5.pdf}
     \caption{
       Evaluations in subpopulation tree simulations fit to human data with FES traits, high heritability.
       Same setup as \FIG{rmsd-auc-sim}, see that for details.
@@ -972,7 +969,7 @@ Nevertheless, LMM with $r=0$ was significantly better than PCA for all measures 
     % SUPP FIGS!
     \figsupp{
       Evaluations in subpopulation tree simulations fit to human data with RC traits, high heritability.
-    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{rmsd-auc-real-sim.pdf}}
+    }{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{fig5s1.pdf}}
     \label{figsupp:rmsd-auc-real-sim-rc}
   \end{fullwidth}
 \end{figure}
@@ -989,7 +986,7 @@ Overall, these subpopulation tree simulations do not recapitulate the large LMM 
 \subsection{Numerous distant relatives explain poor PCA performance in real data}
 
 \begin{figure}
-  \includegraphics[width=\textwidth]{king_log-x.pdf}
+  \includegraphics[width=\textwidth]{fig6.pdf}
   \caption{
     Local kinship distributions.
     Curves are complementary cumulative distribution of lower triangular kinship matrix (self kinship excluded) from KING-robust estimator.
@@ -1007,7 +1004,7 @@ Overall, these subpopulation tree simulations do not recapitulate the large LMM 
     Cumulative variance explained versus eigenvalue rank fraction.
     \textbf{C.}
     Variance explained by first 10 eigenvalues.
-  }{\includegraphics[width=\textwidth]{eigen.pdf}}
+  }{\includegraphics[width=\textwidth]{fig6s1.pdf}}
   \label{figsupp:eigen}
   % 
   \figsupp[Number of PCs significantly associated with traits.]{
@@ -1016,7 +1013,7 @@ Overall, these subpopulation tree simulations do not recapitulate the large LMM 
     Q-values are estimated from the 90 p-values (one for each PC in a given dataset and replicate) using the R package \texttt{qvalue} assuming $\pi_0 = 1$ (necessary since the default $\pi_0$ estimates were unreliable for such small numbers of p-values and occasionally produced errors), and an FDR threshold of 0.05 is used to determine the number of significant PCs.
     Distribution per dataset is over its 50 replicates.
     Shown are results for FES traits with $h^2=0.8$ (the results for RC were very similar, not shown).
-  }{\includegraphics[width=0.5\textwidth]{fes/pcs-num-sig.pdf}}
+  }{\includegraphics[width=0.5\textwidth]{fig6s2.pdf}}
   \label{figsupp:pcs-num-sig}
 \end{figure}
 
@@ -1039,7 +1036,7 @@ In all real datasets we identified highly related individual pairs with kinship 
 However, these highly related pairs are vastly outnumbered by more distant pairs with evident non-zero local kinship as compared to the extreme tree simulation values.
 
 \begin{figure}
-  \includegraphics[width=\textwidth]{fes/rmsd-auc_king-cutoff-4.pdf}
+  \includegraphics[width=\textwidth]{fig7.pdf}
   \caption{
     Evaluation in real datasets excluding 4th degree relatives, FES traits, high heritability.
     Each dataset is a column, rows are measures.
@@ -1049,7 +1046,7 @@ However, these highly related pairs are vastly outnumbered by more distant pairs
   % SUPP FIGS!
   \figsupp{
     Evaluation in real datasets excluding 4th degree relatives, FES traits, low heritability.
-  }{\includegraphics[width=\textwidth]{fes/m_causal_fac-27/h0.3/rmsd-auc_king-cutoff-4.pdf}}
+  }{\includegraphics[width=\textwidth]{fig7s1.pdf}}
   \label{figsupp:king_cutoff-h3}
 \end{figure}
 
@@ -1115,7 +1112,7 @@ Despite that, these low heritability evaluations measured lower $\auc$ values th
 The gap between LMM and PCA was reduced in these evaluations, but the main conclusion of the high heritability evaluation holds for low heritability as well, namely that LMM with $r=0$ significantly outperforms or ties LMM with $r > 0$ and PCA in all cases (\TABLE{human_sum_pcs_h3}).
 
 \begin{figure}
-  \includegraphics[width=\textwidth]{fes/m_causal_fac-27/h0.3/env0.3-0.2/rmsd-auc_king-cutoff-4.pdf}
+  \includegraphics[width=\textwidth]{fig8.pdf}
   \caption{
     Evaluation in real datasets excluding 4th degree relatives, FES traits, environment.
     Traits simulated with environment effects, otherwise the same as \FIG{king_cutoff}.
@@ -1130,7 +1127,7 @@ The gap between LMM and PCA was reduced in these evaluations, but the main concl
     Columns: \textbf{A.} FES and \textbf{B.} RC traits show similar results.
     First row shows that for PCA curves (dashed), $\rmsd$ is higher (worse) in environment simulations for low $r$, but becomes equal in both simulations once $r$ is sufficiently large; for LMM curves (solid), $\rmsd$ is equal in both simulations for all $r$, all datasets.
     Second row shows that for PCA, $\auc$ is higher (better) in low heritability simulations for low $r$, but becomes higher in environment simulations once $r$ is sufficiently large; for LMM, performance is better in environment simulations for all $r$, all datasets.
-  }{\includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{low-herit-vs-env.pdf}}
+  }{\includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{fig8s1.pdf}}
   \label{figsupp:low-herit-vs-env}
 \end{figure}
 
