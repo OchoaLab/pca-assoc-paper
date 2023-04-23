@@ -1,0 +1,18 @@
+# https://elifesciences.org/inside-elife/85518309/plain-language-summaries-how-to-write-an-elife-digest
+
+# background - 77/150 words
+DNA variants can contribute to causing diseases and other traits in humans, and scientists use special statistical methods to find these DNA variants.
+There are two dominant methods used for this task when the study includes individuals with different ancestries, one is faster, the other is slower but it also works well when there are close relatives (like first cousins) in the study.
+Currently it is not always clear when to use one or the other method.
+
+# question to answer - 49/75 words
+For that reason, we ran new tests to find out in which cases each method does better, and help scientists better choose the best method for their study.
+We used real DNA variants and also DNA variants simulated in complicated ways, and simulated continuous traits, to test these methods.
+
+# findings - 50/100 words
+We found that the method that also works well with close relatives is generally the best method for human studies, because real studies always included close relatives despite scientists' best attempts to exclude them.
+The two methods can be combined, but we did not see an advantage for the combination.
+
+# who benefits, what needs to be done still - 73/75 words
+Always using the best method will improve the chances that the findings are correct for these human DNA studies---for which parts of our DNA are causing disease or other traits---and increase the number of correct findings too.
+However, many other questions remain that we did not consider, particularly whether binary traits (where individuals either have a disease or they do not) have the same conclusion as the continuous traits we studied.
