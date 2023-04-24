@@ -16,3 +16,8 @@ The two methods can be combined, but we did not see an advantage for the combina
 # who benefits, what needs to be done still - 73/75 words
 Always using the best method will improve the chances that the findings are correct for these human DNA studies---for which parts of our DNA are causing disease or other traits---and increase the number of correct findings too.
 However, many other questions remain that we did not consider, particularly whether binary traits (where individuals either have a disease or they do not) have the same conclusion as the continuous traits we studied.
+
+
+
+# Impact statement
+It is always better to use mixed effects models over principal components association regression for genetic association studies of continuous traits, since the former models family structure and close relatives are always found in real human studies.
